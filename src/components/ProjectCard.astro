@@ -1,0 +1,113 @@
+---
+import Icon from './Icon.astro';
+import Media from './Media.astro';
+import { sectorBySlug } from '../data/sectors';
+import type { Project } from '../data/projects';
+
+interface Props {
+  project: Project;
+  index?: number;
+  priority?: boolean;
+}
+const { project, index = 0, priority = false } = Astro.props;
+const sector = sectorBySlug(project.sector);
+---
+
+<article
+  class:list={['card', project.wide && 'card--wide']}
+  data-project
+  data-sector={project.sector}
+  data-index={index}
+>
+  <a class="card__link" href={`/realisations/${project.slug}`}>
+    <div class="card__frame">
+      <Media
+        src={project.cover.src}
+        alt={project.cover.alt}
+        ratio={project.ratio}
+        widths={project.wide ? [640, 1000, 1400, 2000] : [400, 640, 900, 1200]}
+        sizes={project.wide ? '(max-width: 900px) 100vw, 1320px' : '(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw'}
+        priority={priority}
+        class="card__media"
+      />
+      <span class="card__badge">{sector?.label ?? project.sector}</span>
+    </div>
+
+    <div class="card__body">
+      <h3 class="card__title">{project.title}</h3>
+      <p class="card__excerpt muted">{project.excerpt}</p>
+      <span class="card__meta">
+        <span class="card__city muted">{project.city}</span>
+        <span class="card__cta">
+          Voir le projet
+          <Icon name="arrow-up-right" size={14} stroke={2.2} />
+        </span>
+      </span>
+    </div>
+  </a>
+</article>
+
+<style>
+  .card { min-width: 0; }
+  .card[hidden] { display: none; }
+  .card__link { display: block; }
+
+  .card__frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    border: 1px solid var(--ink);
+  }
+  .card__frame :global(.card__media) { width: 100%; }
+  .card__frame :global(.card__media img) {
+    transition: transform 400ms var(--ease-out);
+  }
+  .card__link:hover :global(.card__media img) { transform: scale(1.035) translateY(-5px); }
+
+  .card__badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    padding: 8px 13px 7px;
+    border-radius: 100px;
+    border: 1px solid var(--ivory);
+    background: rgba(15, 14, 13, 0.55);
+    color: var(--ivory);
+    font: 600 var(--fs-eyebrow) / 1 var(--font-body);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition:
+      background-color 400ms var(--ease-out),
+      color 400ms var(--ease-out),
+      border-color 400ms var(--ease-out);
+  }
+  .card__link:hover .card__badge {
+    background: var(--blush);
+    color: var(--ink);
+    border-color: var(--blush);
+  }
+
+  .card__body { margin-top: 18px; }
+  .card__title { font-size: clamp(1.5rem, 2.08vw, 1.875rem); }
+  .card--wide .card__title { font-size: clamp(1.75rem, 2.64vw, 2.375rem); }
+  .card__excerpt { margin-top: 8px; font-size: 0.90625rem; }
+
+  .card__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--ink);
+  }
+  .card__city { font: 500 0.84375rem/1 var(--font-body); }
+  .card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font: 600 0.84375rem/1 var(--font-body);
+  }
+  .card__link:hover .card__cta :global(svg) { transform: translate(2px, -2px); }
+  .card__cta :global(svg) { transition: transform 200ms var(--ease); }
+</style>

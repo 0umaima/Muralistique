@@ -1,0 +1,168 @@
+---
+import Icon from './Icon.astro';
+import ProjectCard from './ProjectCard.astro';
+import { projects } from '../data/projects';
+import { sectors } from '../data/sectors';
+
+/**
+ * Grille des réalisations : filtres par secteur + « voir plus », entièrement
+ * côté client.
+ *
+ * Sans JavaScript : toutes les cartes sont rendues et visibles, les liens vers
+ * les pages projet restent donc tous accessibles ; seuls les filtres et le
+ * bouton « voir plus » disparaissent.
+ */
+const PAGE_SIZE = 6;
+const counts = new Map<string, number>();
+projects.forEach((p) => counts.set(p.sector, (counts.get(p.sector) ?? 0) + 1));
+const usedSectors = sectors.filter((s) => counts.has(s.slug));
+---
+
+<section class="browser theme-ivory" id="projets" data-section-theme="ivory">
+  <div class="browser__bar">
+    <div class="browser__bar-inner shell pad">
+      <div class="browser__filters only-js" role="group" aria-label="Filtrer par secteur">
+        <button class="filter is-active" type="button" data-filter="tous" aria-pressed="true">Tous</button>
+        {
+          usedSectors.map((sector) => (
+            <button class="filter" type="button" data-filter={sector.slug} aria-pressed="false">
+              {sector.label}
+            </button>
+          ))
+        }
+      </div>
+      <p class="browser__count" data-project-count aria-live="polite">
+        {projects.length} projet{projects.length > 1 ? 's' : ''}
+      </p>
+    </div>
+  </div>
+
+  <div class="shell pad">
+    <div class="browser__grid" data-project-grid data-page-size={PAGE_SIZE}>
+      {projects.map((project, i) => <ProjectCard project={project} index={i} priority={i === 0} />)}
+    </div>
+
+    <p class="browser__empty" data-project-empty hidden>
+      <Icon name="search-x" size={22} stroke={1.8} />
+      <span>
+        Aucun projet dans ce secteur pour l’instant.
+        <button class="browser__reset" type="button" data-filter-reset>Voir tous les projets</button>
+      </span>
+    </p>
+
+    <div class="browser__more only-js" data-project-more hidden>
+      <button class="btn btn--outline" type="button" data-project-more-button>
+        Voir plus de projets
+        <Icon name="chevron-down" size={16} stroke={2.2} />
+      </button>
+      <p class="browser__more-count muted" data-project-remaining></p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .browser { padding-bottom: clamp(3rem, 6.9vw, 6.25rem); }
+
+  .browser__bar {
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    background: var(--ivory);
+  }
+  .browser__bar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding-block: 24px;
+  }
+  html:not(.js) .browser__bar-inner { justify-content: flex-end; }
+
+  .browser__filters { display: flex; flex-wrap: wrap; gap: 10px; }
+  .filter {
+    padding: 12px 20px;
+    border-radius: 100px;
+    border: 1px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    font: 500 0.84375rem/1 var(--font-body);
+    transition: background-color 200ms var(--ease), color 200ms var(--ease);
+  }
+  .filter:hover { background: var(--ivory-2); }
+  .filter.is-active {
+    background: var(--ink);
+    color: var(--ivory);
+    font-weight: 600;
+  }
+
+  .browser__count {
+    font: 500 0.84375rem/1 var(--font-body);
+    color: var(--muted-on-light);
+    white-space: nowrap;
+  }
+
+  .browser__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+    align-items: start;
+    padding-top: clamp(3rem, 6.7vw, 6rem);
+  }
+  .browser__grid :global(.card--wide) { grid-column: 1 / -1; }
+
+  /* Décalage vertical repris de la maquette. Sans JavaScript, la règle
+     structurelle suffit ; avec JavaScript, le script repositionne le décalage
+     sur les cartes réellement visibles après filtrage. */
+  .browser__grid :global(.card:nth-child(3n + 2):not(.card--wide)) { margin-top: 72px; }
+  .browser__grid[data-js-flow] :global(.card) { margin-top: 0; }
+  .browser__grid[data-js-flow] :global(.card.is-offset) { margin-top: 72px; }
+
+  .browser__empty {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 64px;
+    padding: 28px;
+    border: 1px dashed var(--ink);
+    border-radius: 18px;
+    background: var(--ivory-2);
+    font-size: var(--fs-body);
+  }
+  .browser__empty[hidden] { display: none; }
+  .browser__reset {
+    display: inline;
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .browser__more {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: clamp(2.5rem, 4.4vw, 4rem);
+  }
+  .browser__more[hidden] { display: none; }
+  .browser__more-count { font-size: var(--fs-xs); }
+
+  @media (max-width: 1100px) {
+    .browser__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .browser__grid :global(.card:nth-child(3n + 2):not(.card--wide)) { margin-top: 0; }
+    .browser__grid[data-js-flow] :global(.card.is-offset) { margin-top: 0; }
+  }
+  @media (max-width: 700px) {
+    .browser__grid { grid-template-columns: 1fr; gap: 40px; }
+    .browser__bar-inner { flex-direction: column; align-items: flex-start; }
+    .browser__filters { width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+    .filter { white-space: nowrap; }
+  }
+</style>
+
+<script>
+  import { initProjectFilters } from '../scripts/projects';
+  initProjectFilters();
+</script>

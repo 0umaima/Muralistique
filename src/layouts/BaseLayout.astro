@@ -1,0 +1,85 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site.mjs';
+import { asset } from '../lib/images';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Thème de la première section, pour que l'en-tête démarre à la bonne couleur. */
+  headerTheme?: 'ink' | 'ivory';
+  /** Lien de navigation à marquer comme page courante. */
+  activeNav?: string;
+  /** Image de partage spécifique à la page (chemin dans src/assets/images/). */
+  ogImage?: string;
+  /** Empêche l'indexation (page 404). */
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  headerTheme = 'ink',
+  activeNav,
+  ogImage = 'brand/og.jpg',
+  noindex = false,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname.replace(/\/+$/, '') || '/', Astro.site ?? site.url).href;
+const ogUrl = new URL(asset(ogImage).src, Astro.site ?? site.url).href;
+const fullTitle = title === site.name ? `${site.name} — Fresques murales sur mesure` : `${title} — ${site.name}`;
+---
+
+<!doctype html>
+<html lang={site.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="theme-color" content="#0F0E0D" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogUrl} />
+
+<!-- Polices auto-hébergées (public/fonts/) : aucun appel externe. -->
+    <link rel="preload" href="/fonts/bricolage-grotesque-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- Marque <html> comme « JavaScript actif ». Placé ici, avant tout rendu :
+         sans JS, aucune animation d'apparition n'est appliquée et tout le
+         contenu reste visible. -->
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+
+    <slot name="head" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+    <Header theme={headerTheme} active={activeNav} />
+    <main id="contenu">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

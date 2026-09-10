@@ -1,0 +1,166 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import BrandIcon from '../components/BrandIcon.astro';
+import QuoteForm from '../components/QuoteForm.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import { site, phoneIsPlaceholder } from '../data/site.mjs';
+---
+
+<BaseLayout
+  title="Demander un devis"
+  description="Décrivez votre mur, votre lieu et vos délais : Muralistique vous répond sous 48 h avec un devis gratuit pour votre fresque murale."
+  headerTheme="ivory"
+  activeNav="/devis"
+>
+  <div class="devis" data-section-theme="ivory">
+    <section class="devis__form theme-ivory">
+      <div class="devis__form-inner">
+        <p class="eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />Devis gratuit</p>
+        <h1 class="devis__title">Parlez-nous de votre mur.</h1>
+        <p class="devis__lead muted">
+          Une idée, même minimale, suffit pour commencer. Décrivez-la, et nous construisons le projet avec vous à
+          partir de là.
+        </p>
+
+        <div class="devis__form-body">
+          <QuoteForm />
+        </div>
+      </div>
+    </section>
+
+    <aside class="devis__aside theme-ink" data-section-theme="ink">
+      <div class="devis__aside-inner">
+        <div class="devis__phone">
+          <p class="devis__aside-kicker">Une question avant de vous lancer ?</p>
+          <h2 class="devis__aside-title">Vous préférez nous appeler ?</h2>
+          <p class="devis__aside-text muted">
+            Certains projets se racontent plus facilement à l’oral. Nous sommes disponibles pour un premier échange.
+          </p>
+
+          {
+            site.contact.phoneDisplay && (
+              <p class="devis__number">
+                <a href={`tel:${site.contact.phoneHref}`}>{site.contact.phoneDisplay}</a>
+              </p>
+            )
+          }
+          {
+            phoneIsPlaceholder() && (
+              <p class="devis__todo">
+                <Icon name="alert-circle" size={15} stroke={1.8} />
+                Numéro de téléphone à renseigner dans <code>src/data/site.mjs</code>.
+              </p>
+            )
+          }
+          {site.contact.hours && <p class="devis__hours muted">{site.contact.hours}</p>}
+        </div>
+
+        <div class="devis__channels">
+          <WhatsAppButton variant="blush" label="WhatsApp" block />
+          {
+            site.social.instagram ? (
+              <a class="btn btn--ghost-light btn--block" href={site.social.instagram} target="_blank" rel="noopener noreferrer">
+                <BrandIcon name="instagram" size={18} />
+                Instagram
+              </a>
+            ) : (
+              <a class="btn btn--ghost-light btn--block" href={`mailto:${site.contact.email}`}>
+                <Icon name="mail" size={18} stroke={1.8} />
+                Écrire un e-mail
+              </a>
+            )
+          }
+        </div>
+      </div>
+    </aside>
+  </div>
+</BaseLayout>
+
+<style>
+  .devis { display: grid; grid-template-columns: 1.2fr 1fr; align-items: stretch; }
+
+  .devis__form { padding: clamp(3rem, 6.9vw, 6.25rem) var(--gutter); border-right: 1px solid var(--ink); }
+  .devis__form-inner { max-width: 760px; margin-left: auto; }
+  .devis__title {
+    margin-top: 24px;
+    font-size: var(--fs-h1);
+    line-height: 0.94;
+    letter-spacing: -0.05em;
+    max-width: 640px;
+  }
+  .devis__lead { margin-top: 24px; max-width: 520px; font-size: var(--fs-body-lg); }
+  .devis__form-body { margin-top: clamp(2.25rem, 3.6vw, 3.25rem); }
+
+  .devis__aside {
+    padding: clamp(3rem, 6.9vw, 6.25rem) var(--gutter);
+    background: var(--ink);
+    display: flex;
+    align-items: center;
+  }
+  .devis__aside-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+    width: 100%;
+    max-width: 480px;
+  }
+  .devis__phone { text-align: center; }
+  .devis__aside-kicker {
+    font: 600 var(--fs-eyebrow) / 1 var(--font-body);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted-on-dark);
+  }
+  .devis__aside-title {
+    margin-top: 24px;
+    font-size: clamp(1.875rem, 3.19vw, 2.875rem);
+    line-height: 1.06;
+    color: var(--ivory);
+  }
+  .devis__aside-text { margin-top: 20px; font-size: var(--fs-body); line-height: 1.6; }
+
+  .devis__number {
+    margin-top: 34px;
+    font: 700 clamp(1.75rem, 3.05vw, 2.75rem) / 1 var(--font-display);
+    letter-spacing: -0.03em;
+    color: var(--ivory);
+  }
+  .devis__number a:hover { color: var(--blush); }
+  .devis__hours { margin-top: 12px; font-size: var(--fs-body-sm); }
+  .devis__todo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    font-size: var(--fs-xs);
+    font-style: italic;
+    color: var(--blush);
+  }
+  .devis__todo code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-style: normal; }
+
+  .devis__channels { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: center; }
+  /* Quand le numéro WhatsApp manque, l'avertissement prend toute la largeur. */
+  .devis__channels :global(.wa-missing) { grid-column: 1 / -1; }
+  .devis__channels :global(.btn) {
+    height: 62px;
+    padding-inline: 18px;
+    white-space: nowrap;
+    font-size: var(--fs-small);
+  }
+
+  @media (max-width: 1000px) {
+    .devis { grid-template-columns: 1fr; }
+    .devis__form { border-right: 0; border-bottom: 1px solid var(--ink); }
+    .devis__form-inner { margin-left: 0; }
+    .devis__aside-inner { margin-inline: auto; }
+  }
+  @media (max-width: 560px) {
+    .devis__channels { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  import { initReveal } from '../scripts/reveal';
+  initReveal();
+</script>

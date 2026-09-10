@@ -1,0 +1,140 @@
+---
+/**
+ * Comparateur avant / après.
+ *
+ * Fonctionne au pointeur (souris, doigt), au clavier (flèches sur le curseur)
+ * et reste utilisable sans JavaScript : le champ `range` natif pilote la
+ * découpe via une variable CSS mise à jour par le script ; sans script, les
+ * deux images restent visibles l'une au-dessus de l'autre à 50 %.
+ */
+import Icon from './Icon.astro';
+import Media from './Media.astro';
+
+interface Props {
+  before: { src: string; alt: string };
+  after: { src: string; alt: string };
+  /** Identifiant unique si plusieurs comparateurs cohabitent sur une page. */
+  id?: string;
+  class?: string;
+  /** Proportion du cadre. */
+  ratio?: string;
+}
+const { before, after, id = 'ba', class: className = '', ratio = '2 / 1' } = Astro.props;
+---
+
+<div class:list={['ba', className]} data-ba style={`--ba-pos:50%; aspect-ratio:${ratio}`}>
+  <div class="ba__layer ba__layer--after">
+    <Media src={after.src} alt={after.alt} widths={[700, 1100, 1600, 2400]} sizes="(max-width: 1500px) 100vw, 1320px" />
+  </div>
+  <div class="ba__layer ba__layer--before">
+    <Media src={before.src} alt={before.alt} widths={[700, 1100, 1600, 2400]} sizes="(max-width: 1500px) 100vw, 1320px" />
+  </div>
+
+  <div class="ba__handle" aria-hidden="true">
+    <span class="ba__knob">
+      <Icon name="chevron-left" size={12} stroke={1.8} />
+      <Icon name="chevron-right" size={12} stroke={1.8} />
+    </span>
+  </div>
+
+  <span class="ba__tag ba__tag--before">Avant</span>
+  <span class="ba__tag ba__tag--after">Après</span>
+</div>
+
+<label class="ba__control" for={`${id}-range`}>
+  <span class="ba__control-label">Curseur avant / après</span>
+  <input
+    id={`${id}-range`}
+    class="ba__range"
+    type="range"
+    min="2"
+    max="98"
+    value="50"
+    step="1"
+    data-ba-range
+    aria-label="Position du curseur entre l’image avant et l’image après"
+  />
+</label>
+
+<style>
+  .ba {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    border: 1px solid var(--ink);
+    cursor: ew-resize;
+    user-select: none;
+    touch-action: pan-y;
+  }
+  .ba__layer { position: absolute; inset: 0; }
+  /* Neutralise le glisser-déposer natif des images pendant la comparaison. */
+  .ba :global(img) { -webkit-user-drag: none; user-select: none; }
+  .ba__layer :global(.media) { width: 100%; height: 100%; }
+  /* La couche « avant » est rognée à droite du curseur. */
+  .ba__layer--before { clip-path: inset(0 calc(100% - var(--ba-pos)) 0 0); }
+
+  .ba__handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--ba-pos);
+    width: 1px;
+    background: var(--ivory);
+    pointer-events: none;
+  }
+  .ba__knob {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: clamp(44px, 4.3vw, 62px);
+    height: clamp(44px, 4.3vw, 62px);
+    border-radius: 50%;
+    background: var(--blush);
+    color: var(--ink);
+  }
+
+  .ba__tag {
+    position: absolute;
+    top: 20px;
+    padding: 9px 14px 8px;
+    font: 600 var(--fs-eyebrow) / 1 var(--font-body);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+  .ba__tag--before { left: 20px; background: var(--ivory); color: var(--ink); }
+  .ba__tag--after { right: 20px; background: var(--ink); color: var(--ivory); }
+
+  .ba__control {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .ba__control-label {
+    font: 600 var(--fs-eyebrow) / 1 var(--font-body);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted-on-light);
+    white-space: nowrap;
+  }
+  .ba__range { flex: 1; min-width: 0; height: 22px; accent-color: var(--blush); }
+
+  @media (max-width: 640px) {
+    .ba { border-radius: 16px; }
+    .ba__tag { top: 12px; padding: 7px 11px 6px; font-size: 0.625rem; }
+    .ba__tag--before { left: 12px; }
+    .ba__tag--after { right: 12px; }
+    .ba__control-label { display: none; }
+  }
+</style>
+
+<script>
+  import { initBeforeAfter } from '../scripts/before-after';
+  initBeforeAfter();
+</script>

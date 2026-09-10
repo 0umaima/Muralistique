@@ -1,0 +1,240 @@
+---
+import Icon from '../Icon.astro';
+import Media from '../Media.astro';
+
+/**
+ * Hero de l'accueil.
+ *
+ * ▶ VIDÉO : la maquette prévoit une courte vidéo (ou GIF) au centre. Elle est
+ *   remplacée ici par une image fixe, volontairement (voir README §
+ *   « Vidéos YouTube »). Le cadre central est déjà au bon format : le jour où
+ *   vous activez la vidéo, seul ce composant est à modifier.
+ */
+---
+
+<section class="hero theme-ink" data-section-theme="ink">
+  <div class="hero__bg" aria-hidden="true">
+    <Media
+      src="home/hero-bg.jpg"
+      alt=""
+      widths={[900, 1400, 1920, 2560]}
+      sizes="100vw"
+      eager
+      class="hero__bg-media"
+    />
+  </div>
+  <div class="hero__scrim" aria-hidden="true"></div>
+
+  <div class="hero__inner shell pad">
+    <p class="hero__badge">
+      <Icon name="sparkle" size={13} stroke={1.6} />
+      Atelier de fresques murales
+    </p>
+
+    <div class="hero__cards">
+      <div class="hero__card hero__card--left">
+        <Media
+          src="home/hero-left.jpg"
+          alt="Chantier de fresque murale en cours — photo à remplacer"
+          widths={[280, 420, 560, 816]}
+          sizes="(max-width: 900px) 28vw, 272px"
+          eager
+        />
+      </div>
+
+      <div class="hero__card hero__card--center">
+        <Media
+          src="home/hero-center.jpg"
+          alt="Geste de peinture sur un mur, en gros plan — photo à remplacer"
+          widths={[320, 480, 720, 1176]}
+          sizes="(max-width: 900px) 42vw, 392px"
+          priority
+        />
+        <!-- Emplacement réservé à la vidéo (voir README § « Vidéos YouTube ») -->
+        <p class="hero__slot">
+          <Icon name="play" size={11} stroke={0} class="hero__slot-icon" />
+          <span class="hero__slot-text">Emplacement vidéo</span>
+        </p>
+      </div>
+
+      <div class="hero__card hero__card--right">
+        <Media
+          src="home/hero-right.jpg"
+          alt="Mur fini, détail de la fresque — photo à remplacer"
+          widths={[280, 420, 560, 816]}
+          sizes="(max-width: 900px) 28vw, 272px"
+          eager
+        />
+      </div>
+    </div>
+
+    <h1 class="hero__title">
+      <span class="hero__line hero__line--1">Nous transformons vos murs</span>
+      <span class="hero__line hero__line--2">en œuvres d’art.</span>
+    </h1>
+
+    <div class="hero__actions">
+      <a class="btn btn--blush" href="/devis">
+        Demander un devis
+        <Icon name="arrow-up-right" size={14} stroke={2.2} />
+      </a>
+      <a class="btn btn--ghost-light" href="/realisations">Voir les réalisations</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(2rem, 4.4vw, 4rem) clamp(2.5rem, 5.3vw, 4.75rem);
+    background: var(--ink);
+  }
+
+  .hero__bg { position: absolute; inset: 0; opacity: 0.32; }
+  .hero__bg :global(.media),
+  .hero__bg :global(.hero__bg-media) { width: 100%; height: 100%; }
+  .hero__scrim { position: absolute; inset: 0; background: rgba(15, 14, 13, 0.55); }
+
+  .hero__inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 14px 7px;
+    border-radius: 100px;
+    background: var(--blush);
+    color: var(--ink);
+    font: 600 clamp(0.594rem, 0.76vw, 0.6875rem) / 1 var(--font-body);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .hero__cards {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: clamp(1.625rem, 3.05vw, 2.75rem);
+  }
+
+  .hero__card {
+    position: relative;
+    flex: none;
+    overflow: hidden;
+    border-radius: clamp(12px, 1.53vw, 22px);
+    border: 1px solid rgba(244, 240, 231, 0.35);
+  }
+  .hero__card :global(.media) { width: 100%; height: 100%; }
+
+  .hero__card--left,
+  .hero__card--right {
+    width: clamp(96px, 18.9vw, 272px);
+    height: clamp(124px, 23.6vw, 340px);
+    z-index: 1;
+  }
+  .hero__card--left { transform: rotate(-5deg); }
+  .hero__card--right { transform: rotate(5deg); }
+
+  .hero__card--center {
+    width: clamp(150px, 27.2vw, 392px);
+    height: clamp(186px, 32.6vw, 470px);
+    margin-inline: clamp(-30px, -2.08vw, -12px);
+    border-radius: clamp(14px, 1.67vw, 24px);
+    border-color: rgba(244, 240, 231, 0.5);
+    z-index: 3;
+  }
+
+  .hero__slot {
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 13px;
+    border-radius: 100px;
+    background: rgba(15, 14, 13, 0.72);
+    color: var(--ivory);
+    font: 600 0.625rem/1 var(--font-body);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  /* L'icône vient du composant Icon : sélecteur global obligatoire. */
+  .hero__slot :global(.hero__slot-icon) { fill: var(--blush); stroke: none; }
+
+  .hero__title {
+    max-width: 1120px;
+    margin-top: clamp(1.625rem, 2.5vw, 2.25rem);
+    font-size: var(--fs-hero);
+    line-height: 0.94;
+    letter-spacing: -0.05em;
+    color: var(--ivory);
+  }
+  .hero__line { display: block; }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin-top: clamp(1.625rem, 2.78vw, 2.5rem);
+  }
+
+  @media (max-width: 700px) {
+    /* Le cadre est trop étroit pour le libellé : on ne garde que le repère. */
+    .hero__slot { left: 8px; bottom: 8px; padding: 7px; }
+    .hero__slot-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  }
+  @media (max-width: 560px) {
+    .hero__actions { flex-direction: column; align-self: stretch; }
+    .hero__actions :global(.btn) { width: 100%; }
+  }
+
+  /* ——— Entrée à l'ouverture de la page ———
+     Uniquement quand JavaScript est actif : sans lui, tout est déjà en place. */
+  .js .hero__badge { animation: h-fade 350ms var(--ease-out) both; }
+  .js .hero__card--center { animation: h-center 850ms var(--ease-out) both; }
+  .js .hero__card--left { animation: h-left 900ms var(--ease-out) 120ms both; }
+  .js .hero__card--right { animation: h-right 900ms var(--ease-out) 120ms both; }
+  .js .hero__line--1 { animation: h-line 700ms var(--ease-out) 300ms both; }
+  .js .hero__line--2 { animation: h-line 700ms var(--ease-out) 380ms both; }
+  .js .hero__actions { animation: h-line 700ms var(--ease-out) 480ms both; }
+
+  @keyframes h-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes h-line {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes h-center {
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to { opacity: 1; transform: none; }
+  }
+  /* Les deux vignettes latérales arrivent par des côtés opposés
+     et se posent sur leur inclinaison de référence. */
+  @keyframes h-left {
+    from { opacity: 0; transform: translateX(70px) rotate(0deg); }
+    to { opacity: 1; transform: rotate(-5deg); }
+  }
+  @keyframes h-right {
+    from { opacity: 0; transform: translateX(-70px) rotate(0deg); }
+    to { opacity: 1; transform: rotate(5deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .js .hero__badge,
+    .js .hero__card--center,
+    .js .hero__line--1,
+    .js .hero__line--2,
+    .js .hero__actions { animation: none; }
+    .js .hero__card--left { animation: none; transform: rotate(-5deg); }
+    .js .hero__card--right { animation: none; transform: rotate(5deg); }
+  }
+</style>

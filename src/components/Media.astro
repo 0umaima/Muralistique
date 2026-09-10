@@ -1,0 +1,81 @@
+---
+/**
+ * Image optimisée par Astro : tailles responsives, formats modernes,
+ * dimensions explicites (pas de saut de mise en page) et chargement différé
+ * par défaut. Passez `priority` pour l'image principale au-dessus de la ligne
+ * de flottaison (une seule par page).
+ */
+import { Image } from 'astro:assets';
+import { asset } from '../lib/images';
+
+interface Props {
+  /** Chemin relatif dans src/assets/images/ */
+  src: string;
+  alt: string;
+  /** Proportion du cadre, ex. '3 / 4'. Omettre pour laisser l'image libre. */
+  ratio?: string;
+  /** Largeurs générées. Par défaut : jeu adapté à une carte de grille. */
+  widths?: number[];
+  /** Attribut `sizes`. Par défaut : pleine largeur mobile, tiers en desktop. */
+  sizes?: string;
+  /** Image prioritaire (hero) : chargement immédiat + fetchpriority haute.
+   *  Une seule par page. */
+  priority?: boolean;
+  /** Chargement immédiat sans priorité réseau haute (visuels au-dessus de la
+   *  ligne de flottaison qui ne sont pas l'image principale). */
+  eager?: boolean;
+  /** Classe du cadre. */
+  class?: string;
+  /** Classe de l'élément <img>. */
+  imgClass?: string;
+  /** Léger zoom au survol. */
+  zoom?: boolean;
+  /** object-position, ex. 'center top'. */
+  position?: string;
+}
+
+const {
+  src,
+  alt,
+  ratio,
+  widths = [400, 640, 900, 1280, 1800],
+  sizes = '(max-width: 900px) 100vw, 33vw',
+  priority = false,
+  eager = false,
+  class: className = '',
+  imgClass = '',
+  zoom = false,
+  position,
+} = Astro.props;
+
+const image = asset(src);
+// Ne jamais demander plus large que le fichier source.
+const safeWidths = [...new Set(widths.filter((w) => w <= image.width).concat(Math.min(image.width, Math.max(...widths))))].sort(
+  (a, b) => a - b
+);
+const style = [ratio ? `aspect-ratio:${ratio}` : null, position ? `--media-pos:${position}` : null]
+  .filter(Boolean)
+  .join(';');
+---
+
+<div class:list={['media', zoom && 'media--zoom', className]} style={style}>
+  <Image
+    src={image}
+    alt={alt}
+    widths={safeWidths}
+    sizes={sizes}
+    loading={priority || eager ? 'eager' : 'lazy'}
+    decoding={priority ? 'sync' : 'async'}
+    priority={priority}
+    class={imgClass}
+  />
+</div>
+
+<style>
+  .media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--media-pos, center);
+  }
+</style>

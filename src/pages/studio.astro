@@ -1,0 +1,380 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import Media from '../components/Media.astro';
+import ContactCta from '../components/ContactCta.astro';
+import { studio } from '../data/content';
+---
+
+<BaseLayout
+  title="Studio"
+  description="Muralistique est l’atelier de fresques murales d’Amine Houmam : concept, croquis et peinture sur site, du premier trait au vernis de protection."
+  headerTheme="ink"
+  activeNav="/studio"
+>
+  <section class="shero theme-ink" data-section-theme="ink">
+    <div class="shero__media">
+      <Media
+        src="studio/hero.jpg"
+        alt="Amine Houmam en train de peindre une fresque murale — photo à remplacer"
+        widths={[700, 1100, 1600, 2132]}
+        sizes="(max-width: 900px) 100vw, 74vw"
+        priority
+        position="center 30%"
+        class="shero__image"
+      />
+    </div>
+
+    <aside class="shero__panel">
+      <div>
+        <Icon name="pen-tool" size={40} stroke={1.6} class="shero__icon" />
+        <p class="shero__role">{studio.founderRole}</p>
+        <p class="shero__lead">{studio.founderLead}</p>
+      </div>
+      <p class="shero__scroll">
+        <Icon name="arrow-down" size={16} stroke={1.8} />
+        Faire défiler
+      </p>
+    </aside>
+
+    <div class="shero__scrim" aria-hidden="true"></div>
+    <h1 class="shero__title">{studio.founderName}</h1>
+    <div class="shero__wipe" aria-hidden="true"></div>
+  </section>
+
+  <section class="sintro theme-ivory" data-section-theme="ivory">
+    <div class="shell pad sintro__grid">
+      <div data-reveal>
+        <span class="sintro__square"></span>
+        <p class="sintro__kicker">Hey, juste une intro</p>
+      </div>
+
+      <div>
+        <p class="sintro__statement" data-reveal>{studio.intro}</p>
+        <a class="btn btn--outline sintro__cta" href="/devis" data-reveal data-reveal-delay="70">
+          Parler de votre projet
+          <Icon name="arrow-up-right" size={14} stroke={2.2} />
+        </a>
+
+        <div class="sintro__columns">
+          {
+            studio.columns.map((column, i) => (
+              <div data-reveal data-reveal-delay={100 + i * 100}>
+                <h2 class="sintro__col-title">{column.title}</h2>
+                <p class="sintro__col-text muted">{column.text}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="satelier theme-ivory-2" id="atelier" data-section-theme="ivory">
+    <div class="satelier__media" data-reveal>
+      <Media
+        src="studio/founder.jpg"
+        alt="Amine Houmam en train de dessiner le tracé d’une fresque — photo à remplacer"
+        widths={[600, 900, 1440]}
+        sizes="(max-width: 900px) 100vw, 50vw"
+        class="satelier__image"
+      />
+    </div>
+
+    <div class="satelier__body" data-reveal data-reveal-delay="100">
+      <p class="eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />L’atelier</p>
+      <h2 class="satelier__title">{studio.atelier.title}</h2>
+      {studio.atelier.paragraphs.map((text) => <p class="satelier__text muted">{text}</p>)}
+
+      <ol class="satelier__steps">
+        {
+          studio.atelier.steps.map((step, i) => (
+            <li>
+              <span class="satelier__step-num">{String(i + 1).padStart(2, '0')}</span>
+              <span>{step}</span>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="satelier__lineart" data-draw aria-hidden="true">
+        <svg viewBox="0 0 420 110" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+          <path d="M4 92C64 92 82 26 140 26c40 0 54 46 94 46 34 0 54-30 74-46 22-18 60-22 104-8"></path>
+          <path d="M140 26c16 12 16 32 0 44"></path>
+          <path d="M330 18c22-6 46 6 52 28"></path>
+        </svg>
+      </div>
+
+      <blockquote class="satelier__quote">
+        <p>{studio.atelier.quote}</p>
+        <footer>{studio.atelier.quoteAuthor}</footer>
+      </blockquote>
+    </div>
+  </section>
+
+  <section class="sgallery theme-ivory" id="presse" data-section-theme="ivory">
+    <div class="shell pad">
+      <div class="section-head" data-reveal>
+        <div>
+          <p class="eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />Dans l’atelier</p>
+          <h2 class="sgallery__title">Du croquis au mur, en images.</h2>
+        </div>
+        <p class="section-head__aside">Chaque fresque commence sur papier avant de vivre sur un mur.</p>
+      </div>
+
+      <ul class="sgallery__grid">
+        {
+          studio.gallery.map((item, i) => (
+            <li style={`--span:${item.span}`} data-reveal data-reveal-delay={i * 80}>
+              <Media
+                src={item.src}
+                alt={item.alt}
+                ratio={item.ratio}
+                widths={[500, 800, 1200, 1800]}
+                sizes={item.span >= 8 ? '(max-width: 900px) 100vw, 66vw' : '(max-width: 900px) 100vw, 33vw'}
+                zoom
+                class="sgallery__media"
+              />
+              <p class="sgallery__caption">
+                <span class="sgallery__dot" />
+                {item.caption}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <ContactCta
+    eyebrow="Travaillons ensemble"
+    title="Votre mur commence par une conversation."
+    secondary="portfolio"
+  />
+</BaseLayout>
+
+<style>
+  /* ——— Hero éditorial ——— */
+  .shero {
+    position: relative;
+    display: grid;
+    grid-template-columns: 74% 26%;
+    min-height: clamp(560px, 61vw, 880px);
+    overflow: hidden;
+    background: var(--ink);
+  }
+  .shero__media { position: relative; overflow: hidden; }
+  .shero__media :global(.shero__image) { width: 100%; height: 100%; }
+  .js .shero__media { animation: img-reveal 900ms var(--ease-out) 420ms both; }
+  @keyframes img-reveal {
+    from { clip-path: inset(0 100% 0 0); transform: scale(1.025); }
+    to { clip-path: inset(0 0 0 0); transform: none; }
+  }
+
+  .shero__panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 32px;
+    padding: clamp(2rem, 3.9vw, 3.5rem) clamp(1.25rem, 2.8vw, 2.5rem);
+    background: var(--ink-2);
+  }
+  .js .shero__panel { animation: s-line 700ms var(--ease-out) 800ms both; }
+  .shero__panel :global(.shero__icon) { color: var(--blush); }
+  .shero__role {
+    margin-top: 34px;
+    font: 600 0.65625rem/1 var(--font-body);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted-on-dark);
+  }
+  .shero__lead { margin-top: 22px; font-size: var(--fs-body); line-height: 1.6; color: var(--ivory); }
+  .shero__scroll {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font: 500 0.78125rem/1 var(--font-body);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-on-dark);
+  }
+  .shero__scroll :global(svg) { color: var(--blush); }
+
+  /* Voile discret : le nom reste lisible quelle que soit la photo posée. */
+  .shero__scrim {
+    position: absolute;
+    left: 0;
+    right: 26%;
+    bottom: 0;
+    height: 46%;
+    background: linear-gradient(to top, rgba(15, 14, 13, 0.72), rgba(15, 14, 13, 0));
+    pointer-events: none;
+  }
+
+  .shero__title {
+    position: absolute;
+    left: var(--gutter);
+    right: 0;
+    bottom: clamp(1.5rem, 3vw, 2.75rem);
+    font-size: var(--fs-h1-studio);
+    line-height: 0.86;
+    letter-spacing: -0.055em;
+    text-transform: uppercase;
+    color: var(--ivory);
+    pointer-events: none;
+  }
+  .js .shero__title { animation: s-line 700ms var(--ease-out) 660ms both; }
+
+  .shero__wipe { position: absolute; inset: 0; background: var(--blush); clip-path: inset(0 0 0 100%); pointer-events: none; }
+  .js .shero__wipe { animation: cover-out 620ms var(--ease-out) 220ms; }
+  @keyframes cover-out {
+    from { clip-path: inset(0 0 0 0); }
+    to { clip-path: inset(0 0 0 100%); }
+  }
+  @keyframes s-line {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* ——— Intro ——— */
+  .sintro { padding-block: var(--section-y-lg); }
+  .sintro__grid {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: clamp(2rem, 5.5vw, 5rem);
+  }
+  .sintro__square { display: block; width: 18px; height: 18px; background: var(--blush); }
+  .sintro__kicker {
+    margin-top: 20px;
+    font: 600 var(--fs-eyebrow) / 1 var(--font-body);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted-on-light);
+  }
+  .sintro__statement {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: var(--fs-statement-lg);
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+  }
+  .sintro__cta { margin-top: 40px; }
+  .sintro__columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.5rem, 3.3vw, 3rem);
+    margin-top: clamp(3rem, 5.5vw, 5rem);
+    padding-top: 40px;
+    border-top: 1px solid var(--ink);
+  }
+  .sintro__col-title { font-size: var(--fs-h3-sm); }
+  .sintro__col-text { margin-top: 14px; font-size: var(--fs-body); line-height: 1.65; }
+
+  /* ——— Atelier ——— */
+  .satelier {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--ink);
+  }
+  .satelier__media {
+    position: relative;
+    min-height: clamp(360px, 57vw, 820px);
+    overflow: hidden;
+    border-right: 1px solid var(--ink);
+  }
+  .satelier__media :global(.satelier__image) { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .satelier__body { padding: clamp(3rem, 7.6vw, 6.875rem) var(--gutter); }
+  .satelier__title { margin-top: 22px; font-size: clamp(2rem, 3.9vw, 3.5rem); max-width: 520px; }
+  .satelier__text { margin-top: 22px; font-size: var(--fs-body); line-height: 1.7; max-width: 520px; }
+
+  .satelier__steps {
+    display: flex;
+    flex-direction: column;
+    margin-top: 44px;
+    border-top: 1px solid var(--ink);
+  }
+  .satelier__steps li {
+    display: flex;
+    gap: 18px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.96875rem;
+  }
+  .satelier__steps li:last-child { border-bottom: 0; }
+  .satelier__step-num {
+    font: 600 0.75rem/1.5 var(--font-body);
+    letter-spacing: 0.12em;
+    color: var(--blush);
+  }
+
+  .satelier__lineart { margin-top: 48px; opacity: 0.6; color: var(--ink); }
+  .satelier__lineart svg { width: min(420px, 100%); height: auto; }
+
+  .satelier__quote {
+    margin: 48px 0 0;
+    padding-left: 24px;
+    border-left: 2px solid var(--ink);
+  }
+  .satelier__quote p {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.375rem, 1.94vw, 1.75rem);
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+  }
+  .satelier__quote footer {
+    margin-top: 16px;
+    font: 600 0.75rem/1 var(--font-body);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted-on-light);
+  }
+
+  /* ——— Galerie ——— */
+  .sgallery { padding-block: var(--section-y) ; }
+  .sgallery__title { margin-top: 22px; font-size: var(--fs-h2-sm); max-width: 620px; }
+  .sgallery__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: clamp(2rem, 3.3vw, 3rem);
+  }
+  .sgallery__grid > li { grid-column: span var(--span); }
+  .sgallery__grid :global(.sgallery__media) {
+    border-radius: 22px;
+    border: 1px solid var(--ink);
+  }
+  .sgallery__caption {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    font: 500 0.84375rem/1 var(--font-body);
+    color: var(--muted-on-light);
+  }
+  .sgallery__dot { width: 7px; height: 7px; background: var(--blush); flex: none; }
+
+  @media (max-width: 900px) {
+    .shero { grid-template-columns: 1fr; min-height: 0; }
+    .shero__media { aspect-ratio: 4 / 5; }
+    .shero__scrim { display: none; }
+    .shero__title {
+      position: static;
+      order: -1;
+      padding: 24px var(--gutter) 0;
+      left: auto;
+      right: auto;
+    }
+    .satelier { grid-template-columns: 1fr; }
+    .satelier__media { min-height: 0; aspect-ratio: 4 / 5; border-right: 0; border-bottom: 1px solid var(--ink); }
+    .sintro__grid { grid-template-columns: 1fr; }
+    .sintro__columns { grid-template-columns: 1fr; }
+    .sgallery__grid > li { grid-column: span 12; }
+  }
+</style>
+
+<script>
+  import { initReveal } from '../scripts/reveal';
+  initReveal();
+</script>

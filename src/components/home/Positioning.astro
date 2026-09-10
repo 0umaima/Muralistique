@@ -1,0 +1,99 @@
+---
+import Icon from '../Icon.astro';
+import Media from '../Media.astro';
+import { positioning, testimonial } from '../../data/content';
+---
+
+<section class="positioning theme-ivory" data-section-theme="ivory">
+  <div class="shell pad">
+    <div class="positioning__statement" data-reveal>
+      <p class="eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />Positionnement</p>
+      <p class="positioning__text">
+        {positioning.before}<mark>{positioning.highlight}</mark>{positioning.after}
+      </p>
+    </div>
+
+    {
+      testimonial.enabled && (
+        <figure class="positioning__quote">
+          <div class="positioning__portrait" data-reveal>
+            <Media
+              src={testimonial.portrait.src}
+              alt={testimonial.portrait.alt}
+              ratio="1 / 1"
+              widths={[260, 400, 520]}
+              sizes="260px"
+              class="positioning__portrait-media"
+            />
+          </div>
+          <div class="positioning__quote-body" data-reveal data-reveal-delay="80">
+            <span class="positioning__mark" aria-hidden="true">“</span>
+            <blockquote class="positioning__blockquote">{testimonial.quote}</blockquote>
+            <figcaption>
+              <span class="positioning__author">{testimonial.author}</span>
+              <span class="positioning__role muted">{testimonial.role}</span>
+            </figcaption>
+          </div>
+        </figure>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .positioning { padding-block: clamp(3.5rem, 9vw, 8.125rem); }
+
+  .positioning__statement { max-width: 1080px; }
+  .positioning__text {
+    margin-top: 30px;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: var(--fs-statement);
+    line-height: 1.14;
+    letter-spacing: -0.035em;
+  }
+  .positioning__text mark {
+    background: var(--blush);
+    color: inherit;
+    padding: 0 6px;
+  }
+
+  .positioning__quote {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: clamp(2rem, 4.4vw, 4rem);
+    align-items: center;
+    margin: clamp(3rem, 6.7vw, 6rem) 0 0;
+  }
+
+  .positioning__portrait { width: clamp(180px, 18vw, 260px); }
+  .positioning__portrait :global(.positioning__portrait-media) {
+    border-radius: 50%;
+    border: 1px solid var(--ink);
+  }
+
+  .positioning__quote-body { position: relative; padding-left: clamp(0px, 5.5vw, 80px); }
+  .positioning__mark {
+    position: absolute;
+    left: 0;
+    top: -34px;
+    font: 700 clamp(5rem, 9.7vw, 8.75rem) / 1 var(--font-display);
+    color: var(--blush);
+  }
+  .positioning__blockquote {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: var(--fs-quote);
+    line-height: 1.22;
+    letter-spacing: -0.025em;
+  }
+  .positioning__author { display: block; margin-top: 24px; font: 600 var(--fs-body-sm) / 1.4 var(--font-body); }
+  .positioning__role { display: block; margin-top: 5px; font-size: var(--fs-small); }
+
+  @media (max-width: 820px) {
+    .positioning__quote { grid-template-columns: 1fr; }
+    .positioning__quote-body { padding-left: 0; padding-top: 40px; }
+    .positioning__mark { top: -20px; }
+  }
+</style>

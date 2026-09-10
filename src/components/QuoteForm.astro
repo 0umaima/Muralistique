@@ -1,0 +1,431 @@
+---
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site.mjs';
+import { quoteOptions } from '../data/content';
+
+const { endpoint, uploads, formEnabled, disabledMessage } = site.form;
+const kb = (bytes: number) => Math.round(bytes / 1024);
+const mb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1).replace('.', ',');
+---
+
+{
+  !formEnabled ? (
+    /* Interrupteur manuel : site.form.formEnabled = false dans src/data/site.mjs */
+    <div class="qf-closed" role="status">
+      <Icon name="alert-circle" size={22} stroke={1.8} />
+      <div>
+        <h2 class="qf-closed__title">Formulaire fermé</h2>
+        <p>{disabledMessage}</p>
+      </div>
+    </div>
+  ) : (
+    <form
+      class="qf"
+      data-quote-form
+      action={endpoint}
+      method="post"
+      enctype="multipart/form-data"
+      accept-charset="UTF-8"
+      novalidate
+      data-max-files={uploads.maxFiles}
+      data-max-file-bytes={uploads.maxFileBytes}
+      data-max-total-bytes={uploads.maxTotalBytes}
+      data-accept={uploads.accept.join(',')}
+      data-accept-label={uploads.acceptLabel}
+    >
+      {/* Piège à robots : invisible pour une personne, rempli par les scripts de spam. */}
+      <p class="qf-honeypot" aria-hidden="true">
+        <label for="qf-gotcha">Ne remplissez pas ce champ</label>
+        <input id="qf-gotcha" type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
+      </p>
+
+      <div class="qf__row">
+        <p class="field">
+          <label class="field__label" for="qf-name">Nom <abbr title="obligatoire">*</abbr></label>
+          <input
+            class="field__input"
+            id="qf-name"
+            name="name"
+            type="text"
+            placeholder="Prénom Nom"
+            autocomplete="name"
+            required
+            aria-describedby="qf-name-error"
+          />
+          <span class="field__error" id="qf-name-error" data-error-for="name"></span>
+        </p>
+
+        <p class="field">
+          <label class="field__label" for="qf-phone">Téléphone</label>
+          <input
+            class="field__input"
+            id="qf-phone"
+            name="phone"
+            type="tel"
+            placeholder="+33 6 00 00 00 00"
+            autocomplete="tel"
+            aria-describedby="qf-phone-error"
+          />
+          <span class="field__error" id="qf-phone-error" data-error-for="phone"></span>
+        </p>
+
+        <p class="field">
+          <label class="field__label" for="qf-email">E-mail <abbr title="obligatoire">*</abbr></label>
+          <input
+            class="field__input"
+            id="qf-email"
+            name="email"
+            type="email"
+            placeholder="vous@exemple.fr"
+            autocomplete="email"
+            required
+            aria-describedby="qf-email-error"
+          />
+          <span class="field__error" id="qf-email-error" data-error-for="email"></span>
+        </p>
+
+        <p class="field">
+          <label class="field__label" for="qf-city">Ville <abbr title="obligatoire">*</abbr></label>
+          <input
+            class="field__input"
+            id="qf-city"
+            name="city"
+            type="text"
+            placeholder="Marseille"
+            autocomplete="address-level2"
+            required
+            aria-describedby="qf-city-error"
+          />
+          <span class="field__error" id="qf-city-error" data-error-for="city"></span>
+        </p>
+      </div>
+
+      <fieldset class="qf__fieldset">
+        <legend class="field__label">Type d’espace</legend>
+        <div class="qf__pills">
+          {quoteOptions.spaceTypes.map((option, i) => (
+            <label class="pill">
+              <input type="radio" name="space_type" value={option} checked={i === 1} />
+              <span>{option}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset class="qf__fieldset">
+        <legend class="field__label">Budget estimé</legend>
+        <div class="qf__budgets">
+          {quoteOptions.budgets.map((option, i) => (
+            <label class:list={['choice', i === quoteOptions.budgets.length - 1 && 'choice--wide']}>
+              <input type="radio" name="budget" value={option} />
+              <span>{option}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <p class="field qf__date">
+        <label class="field__label" for="qf-start">Date de début idéale</label>
+        <input class="field__input" id="qf-start" name="start_date" type="date" />
+      </p>
+
+      <p class="field">
+        <label class="field__label" for="qf-message">Votre projet <abbr title="obligatoire">*</abbr></label>
+        <textarea
+          class="field__input field__input--area"
+          id="qf-message"
+          name="message"
+          rows={5}
+          placeholder="Surface approximative, ambiance souhaitée, contraintes de chantier, échéance…"
+          required
+          aria-describedby="qf-message-error"
+        />
+        <span class="field__error" id="qf-message-error" data-error-for="message"></span>
+      </p>
+
+      {/* ——— Photos ——— */}
+      <div class="qf-files">
+        <div class="qf-files__drop">
+          <span class="qf-files__icon" aria-hidden="true">
+            <Icon name="image-plus" size={18} stroke={1.8} />
+          </span>
+          <div class="qf-files__text">
+            <label class="qf-files__label" for="qf-photos">Ajouter des photos du mur (facultatif)</label>
+            <p class="qf-files__hint" id="qf-photos-hint">
+              {uploads.acceptLabel} · {uploads.maxFiles} fichiers maximum · {kb(uploads.maxFileBytes)} Ko par fichier
+              · {mb(uploads.maxTotalBytes)} Mo au total.
+            </p>
+          </div>
+          <input
+            class="qf-files__input"
+            id="qf-photos"
+            name="photos[]"
+            type="file"
+            multiple
+            accept={uploads.accept.join(',')}
+            aria-describedby="qf-photos-hint qf-photos-error"
+          />
+        </div>
+
+        <ul class="qf-files__list" data-file-list hidden></ul>
+        <p class="field__error" id="qf-photos-error" data-error-for="photos"></p>
+        <p class="qf-files__note muted">
+          Ces limites s’appliquent dans votre navigateur pour éviter les envois trop lourds. Elles ne remplacent pas
+          les limites de stockage du service de réception des formulaires.
+        </p>
+      </div>
+
+      <p class="qf-consent field">
+        <label class="check">
+          <input type="checkbox" name="consent" value="oui" required aria-describedby="qf-consent-error" />
+          <span>
+            J’accepte que mes données soient utilisées uniquement dans le cadre du traitement de ma demande de devis.
+            <abbr title="obligatoire">*</abbr>
+          </span>
+        </label>
+        <span class="field__error" id="qf-consent-error" data-error-for="consent"></span>
+      </p>
+
+      <div class="qf__actions">
+        <button class="btn btn--ink qf__submit" type="submit" data-submit>
+          <span data-submit-label>Envoyer la demande</span>
+          <Icon name="arrow-up-right" size={14} stroke={2.2} class="qf__submit-arrow" />
+          <Icon name="loader-circle" size={16} stroke={2.2} class="qf__spinner" />
+        </button>
+        <p class="qf__required muted"><abbr title="obligatoire">*</abbr> Champs obligatoires</p>
+      </div>
+
+      <!-- Récapitulatif d'erreurs global : annoncé aux lecteurs d'écran. -->
+      <div class="qf-status" data-form-status role="status" aria-live="polite" hidden></div>
+    </form>
+  )
+}
+
+<style>
+  .qf { display: flex; flex-direction: column; gap: 34px; }
+
+  .qf-honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .qf__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 10px; margin: 0; }
+  .field__label {
+    font: 600 var(--fs-eyebrow) / 1 var(--font-body);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted-on-light);
+    padding: 0;
+  }
+  .field__label abbr { color: var(--blush); text-decoration: none; border: 0; }
+
+  .field__input {
+    height: 56px;
+    padding: 0 18px;
+    border: 1px solid var(--ink);
+    border-radius: 12px;
+    background: var(--ivory-2);
+    font: 400 var(--fs-body-sm) var(--font-body);
+    color: var(--ink);
+    outline: none;
+    width: 100%;
+  }
+  .field__input::placeholder { color: color-mix(in srgb, var(--muted-on-light) 75%, transparent); }
+  .field__input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .field__input--area { height: 150px; padding: 16px 18px; line-height: 1.6; resize: vertical; }
+  .field__input[aria-invalid='true'] { border-color: #a8341f; background: #f6e6e0; }
+
+  .field__error {
+    display: none;
+    font: 500 var(--fs-xs) / 1.4 var(--font-body);
+    color: #a8341f;
+  }
+  .field__error:not(:empty) { display: block; }
+
+  .qf__fieldset { border: none; padding: 0; margin: 0; }
+  .qf__fieldset legend { margin-bottom: 16px; }
+
+  .qf__pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 13px 18px;
+    border-radius: 100px;
+    border: 1px solid var(--ink);
+    font: 500 var(--fs-small) / 1 var(--font-body);
+    cursor: pointer;
+    transition: background-color 200ms var(--ease);
+  }
+  .pill:hover { background: var(--ivory-2); }
+  .pill input { width: 15px; height: 15px; accent-color: var(--ink); margin: 0; }
+  .pill:has(input:checked) { background: var(--blush); }
+  .pill:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 3px; }
+
+  .qf__budgets {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .choice {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    border: 1px solid var(--ink);
+    border-radius: 12px;
+    font: 500 0.90625rem/1.2 var(--font-body);
+    cursor: pointer;
+    transition: background-color 200ms var(--ease);
+  }
+  .choice:hover { background: var(--ivory-2); }
+  .choice--wide { grid-column: span 2; }
+  .choice input { width: 17px; height: 17px; accent-color: var(--ink); margin: 0; flex: none; }
+  .choice:has(input:checked) { background: var(--blush); }
+  .choice:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 3px; }
+
+  .qf__date { max-width: 260px; }
+
+  /* ——— Photos ——— */
+  .qf-files { display: flex; flex-direction: column; gap: 12px; }
+  .qf-files__drop {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    border: 1px dashed var(--ink);
+    border-radius: 14px;
+    background: var(--ivory-2);
+    flex-wrap: wrap;
+  }
+  .qf-files__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    border: 1px solid var(--ink);
+    flex: none;
+  }
+  .qf-files__text { flex: 1; min-width: 200px; }
+  .qf-files__label { font-size: var(--fs-body-sm); font-weight: 600; cursor: pointer; }
+  .qf-files__hint { margin-top: 4px; font-size: var(--fs-xs); color: var(--muted-on-light); }
+  .qf-files__input { flex: none; max-width: 100%; font-size: var(--fs-xs); }
+  .qf-files__note { font-size: var(--fs-xs); line-height: 1.5; }
+
+  .qf-files__list { display: flex; flex-direction: column; gap: 8px; }
+  .qf-files__list[hidden] { display: none; }
+  /* Ces éléments sont créés par le script : sélecteurs globaux obligatoires. */
+  .qf-files__list :global(.qf-files__item) {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px 10px 16px;
+    border: 1px solid var(--ink);
+    border-radius: 12px;
+    background: var(--ivory);
+    font-size: var(--fs-xs);
+  }
+  .qf-files__list :global(.qf-files__name) {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .qf-files__list :global(.qf-files__size) { color: var(--muted-on-light); flex: none; }
+  .qf-files__list :global(.qf-files__remove) {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border: 1px solid var(--ink);
+    border-radius: 100px;
+    background: transparent;
+    font: 600 var(--fs-xs) / 1 var(--font-body);
+    flex: none;
+  }
+  .qf-files__list :global(.qf-files__remove:hover) { background: var(--blush); }
+
+  /* ——— Consentement & envoi ——— */
+  .check {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    font-size: var(--fs-small);
+    color: var(--muted-on-light);
+    line-height: 1.5;
+  }
+  .check input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--ink); flex: none; }
+  .check abbr { color: var(--blush); text-decoration: none; border: 0; }
+
+  .qf__actions { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .qf__submit { padding: 19px 34px; font-size: var(--fs-body-sm); }
+  .qf__submit[disabled] { opacity: 0.75; cursor: progress; }
+  .qf__submit :global(.qf__spinner) { display: none; animation: qf-spin 900ms linear infinite; }
+  .qf__submit[data-state='sending'] :global(.qf__submit-arrow) { display: none; }
+  .qf__submit[data-state='sending'] :global(.qf__spinner) { display: block; }
+  /* Une fois la demande partie, le bouton n'est plus « en cours » : il est clos. */
+  .qf__submit[data-state='done'] { opacity: 1; cursor: default; background: var(--ivory-2); color: var(--ink); border-color: var(--ink); }
+  .qf__submit[data-state='done'] :global(.qf__submit-arrow) { display: none; }
+  @keyframes qf-spin { to { transform: rotate(360deg); } }
+  .qf__required { font-size: var(--fs-xs); }
+  .qf__required abbr { color: var(--blush); text-decoration: none; border: 0; }
+
+  .qf-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px 22px;
+    border-radius: 14px;
+    font-size: var(--fs-body-sm);
+    line-height: 1.55;
+  }
+  .qf-status[hidden] { display: none; }
+  .qf-status[data-tone='error'] { border: 1px solid #a8341f; background: #f6e6e0; color: #6d2415; }
+  .qf-status[data-tone='success'] { border: 1px solid var(--ink); background: var(--blush); color: var(--ink); }
+  .qf-status a { text-decoration: underline; text-underline-offset: 3px; }
+  .qf-status :global(svg) { flex: none; margin-top: 2px; }
+  .qf-closed :global(svg) { flex: none; margin-top: 2px; color: var(--blush); }
+
+  .qf-closed {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 28px;
+    border: 1px dashed var(--ink);
+    border-radius: 16px;
+    background: var(--ivory-2);
+  }
+  .qf-closed :global(svg) { flex: none; margin-top: 2px; color: var(--blush); }
+  .qf-closed__title { font-size: var(--fs-h3-sm); margin-bottom: 8px; }
+  .qf-closed p { font-size: var(--fs-body-sm); color: var(--muted-on-light); }
+
+  @media (max-width: 640px) {
+    .qf__row { grid-template-columns: 1fr; }
+    .qf__budgets { grid-template-columns: 1fr; }
+    .choice--wide { grid-column: span 1; }
+    .qf__date { max-width: none; }
+    .qf__submit { width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .qf__spinner { animation-duration: 2s; }
+  }
+</style>
+
+<script>
+  import { initQuoteForm } from '../scripts/quote-form';
+  initQuoteForm();
+</script>

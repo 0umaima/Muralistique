@@ -1,0 +1,257 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { mainNav } from '../data/nav';
+import { site } from '../data/site.mjs';
+
+interface Props {
+  /** Thème de la section située sous l'en-tête au chargement. */
+  theme?: 'ink' | 'ivory';
+  active?: string;
+}
+const { theme = 'ink', active } = Astro.props;
+
+const isActive = (href: string) => active === href || (active && href !== '/' && active.startsWith(href));
+---
+
+<header class="header" data-header data-theme={theme}>
+  <div class="header__inner pad">
+    <a class="header__brand" href="/" aria-label={`${site.name} — accueil`}>
+      <Logo class="header__logo" size={44} />
+      <span class="header__wordmark">{site.name}</span>
+    </a>
+
+    <nav class="header__nav" aria-label="Navigation principale">
+      <ul class="header__links">
+        {
+          mainNav.map((item) => (
+            <li>
+              <a
+                class:list={['header__link', isActive(item.href) && 'is-current']}
+                href={item.href}
+                aria-current={isActive(item.href) ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      {
+        active !== '/devis' && (
+          <a class="btn btn--blush btn--sm header__cta" href="/devis">
+            Demander un devis
+            <Icon name="arrow-up-right" size={13} stroke={2.2} />
+          </a>
+        )
+      }
+    </nav>
+
+    <button
+      class="header__burger"
+      type="button"
+      data-nav-toggle
+      aria-expanded="false"
+      aria-controls="navigation-mobile"
+    >
+      <span class="visually-hidden">Ouvrir le menu</span>
+      <span class="header__burger-bars" aria-hidden="true"><span></span><span></span></span>
+    </button>
+  </div>
+
+  <div class="header__panel" id="navigation-mobile" data-nav-panel hidden>
+    <nav class="header__panel-inner pad" aria-label="Navigation mobile">
+      <ul class="header__panel-links">
+        {
+          mainNav.map((item) => (
+            <li>
+              <a class="header__panel-link" href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+                <span>{item.label}</span>
+                <Icon name="arrow-up-right" size={18} stroke={2} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      {
+        active !== '/devis' && (
+          <a class="btn btn--blush btn--block header__panel-cta" href="/devis">
+            Demander un devis
+            <Icon name="arrow-up-right" size={14} stroke={2.2} />
+          </a>
+        )
+      }
+      <a class="header__panel-mail" href={`mailto:${site.contact.email}`}>
+        <Icon name="mail" size={16} />
+        {site.contact.email}
+      </a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--ink);
+    color: var(--ivory);
+    border-bottom: 1px solid var(--ink-line);
+    transition:
+      background-color 400ms var(--ease),
+      color 400ms var(--ease),
+      border-color 400ms var(--ease);
+  }
+  .header[data-theme='ivory'] {
+    background: var(--ivory);
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+  }
+
+  .header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    /* Hauteur stable : aucun saut lors du changement de thème */
+    height: var(--header-h);
+    max-width: var(--maxw);
+    margin-inline: auto;
+  }
+
+  .header__brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+  }
+  .header__logo { flex: none; }
+  .header__wordmark {
+    font: 700 0.9375rem/1 var(--font-display);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .header__nav {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+  }
+  .header__links {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    font: 500 0.875rem/1 var(--font-body);
+  }
+  .header__link {
+    display: inline-block;
+    padding-bottom: 3px;
+    border-bottom: 1px solid transparent;
+    transition: border-color 200ms var(--ease);
+  }
+  .header__link:hover { border-bottom-color: var(--blush); }
+  .header__link.is-current { border-bottom-color: var(--blush); font-weight: 600; }
+
+  .header__cta { flex: none; }
+
+  .header__burger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-right: -10px;
+    background: none;
+    border: none;
+    color: inherit;
+  }
+  .header__burger-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 22px;
+  }
+  .header__burger-bars span {
+    display: block;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 260ms var(--ease-out), opacity 200ms var(--ease);
+  }
+  .header__burger[aria-expanded='true'] .header__burger-bars span:first-child {
+    transform: translateY(3.25px) rotate(45deg);
+  }
+  .header__burger[aria-expanded='true'] .header__burger-bars span:last-child {
+    transform: translateY(-3.25px) rotate(-45deg);
+  }
+
+  /* — Panneau mobile ————————————————————————————————— */
+  .header__panel {
+    position: fixed;
+    inset: var(--header-h) 0 0;
+    z-index: 99;
+    background: var(--ink);
+    color: var(--ivory);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .header__panel[hidden] { display: none; }
+  .header__panel-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    padding-block: 28px 40px;
+    min-height: 100%;
+  }
+  .header__panel-links {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--ink-line);
+  }
+  .header__panel-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--ink-line);
+    font: 600 1.5rem/1.1 var(--font-display);
+    letter-spacing: -0.03em;
+  }
+  .header__panel-link[aria-current='page'] { color: var(--blush); }
+  .header__panel-link svg { color: var(--blush); }
+  .header__panel-cta { margin-top: auto; }
+  .header__panel-mail {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: var(--fs-small);
+    color: var(--muted-on-dark);
+    word-break: break-all;
+  }
+
+  .js .header__panel { animation: panel-in 260ms var(--ease-out) both; }
+  @keyframes panel-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @media (max-width: 900px) {
+    .header__nav { display: none; }
+    .header__burger { display: inline-flex; }
+    .header__wordmark { font-size: 0.75rem; letter-spacing: 0.22em; }
+  }
+  @media (min-width: 901px) {
+    .header__panel { display: none !important; }
+  }
+  /* Palier intermédiaire : la barre garde les liens mais resserre les écarts */
+  @media (min-width: 901px) and (max-width: 1180px) {
+    .header__nav, .header__links { gap: 22px; }
+    .header__links { font-size: 0.8125rem; }
+  }
+</style>
+
+<script>
+  import { initHeader } from '../scripts/header';
+  initHeader();
+</script>

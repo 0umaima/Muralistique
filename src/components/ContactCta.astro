@@ -1,0 +1,151 @@
+---
+/**
+ * Bloc de contact en deux cartes, repris à l'identique de la maquette.
+ * Utilisé en bas de l'accueil, des Réalisations et du Studio.
+ */
+import Icon from './Icon.astro';
+import BrandIcon from './BrandIcon.astro';
+import WhatsAppButton from './WhatsAppButton.astro';
+import { site } from '../data/site.mjs';
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  /** Deuxième carte : contact WhatsApp, ou renvoi vers le portfolio. */
+  secondary?: 'whatsapp' | 'portfolio';
+  id?: string;
+}
+const { eyebrow = 'Contact', title, secondary = 'whatsapp', id = 'contact' } = Astro.props;
+---
+
+<section class="cta theme-ink section--lg" id={id} data-section-theme="ink">
+  <div class="shell pad">
+    <div data-reveal>
+      <p class="eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />{eyebrow}</p>
+      <h2 class="cta__title">{title}</h2>
+    </div>
+
+    <div class="cta__lineart" data-draw aria-hidden="true">
+      <svg viewBox="0 0 300 200" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+        <path d="M4 190C70 190 96 130 126 84 156 38 208 8 296 12"></path>
+        <path d="M126 84c-18-24-4-52 30-48-2 30-14 44-30 48"></path>
+      </svg>
+    </div>
+
+    <div class="cta__cards">
+      <div class="cta__card cta__card--blush" data-reveal>
+        <Icon name="message-square-text" size={26} stroke={1.7} />
+        <div>
+          <h3>Demander un devis</h3>
+          <p>Décrivez votre mur, votre lieu et vos délais. Réponse sous 48 h, devis gratuit.</p>
+        </div>
+        <a class="btn btn--ink cta__button" href="/devis">
+          Remplir le formulaire
+          <Icon name="arrow-up-right" size={14} stroke={2.2} />
+        </a>
+      </div>
+
+      {
+        secondary === 'whatsapp' ? (
+          <div class="cta__card cta__card--ink" data-reveal data-reveal-delay="80">
+            <BrandIcon name="whatsapp" size={26} />
+            <div>
+              <h3>Écrire sur WhatsApp</h3>
+              <p class="muted">
+                Envoyez directement des photos de votre mur et échangez en temps réel avec l’atelier.
+              </p>
+            </div>
+            <WhatsAppButton class="cta__button" />
+            <a class="cta__mail" href={`mailto:${site.contact.email}`}>
+              <Icon name="mail" size={15} />
+              {site.contact.email}
+            </a>
+          </div>
+        ) : (
+          <div class="cta__card cta__card--ink" data-reveal data-reveal-delay="80">
+            <Icon name="arrow-up-right" size={26} stroke={1.7} />
+            <div>
+              <h3>Voir les réalisations</h3>
+              <p class="muted">Les transformations documentées, secteur par secteur.</p>
+            </div>
+            <a class="btn btn--ghost-light cta__button" href="/realisations">
+              Ouvrir le portfolio
+              <Icon name="arrow-up-right" size={14} stroke={2.2} />
+            </a>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta { position: relative; overflow: hidden; }
+
+  .cta__title {
+    margin-top: 26px;
+    max-width: 1000px;
+    font-size: var(--fs-h2-xl);
+    line-height: 0.94;
+    letter-spacing: -0.05em;
+  }
+
+  .cta__lineart {
+    position: absolute;
+    right: 40px;
+    top: 120px;
+    width: 300px;
+    opacity: 0.4;
+    color: var(--ivory);
+    pointer-events: none;
+  }
+  .cta__lineart svg { width: 100%; height: auto; }
+  @media (max-width: 1000px) { .cta__lineart { display: none; } }
+
+  .cta__cards {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: clamp(2rem, 4.4vw, 4rem);
+  }
+
+  .cta__card {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding: clamp(1.5rem, 2.8vw, 2.5rem);
+    border-radius: 24px;
+    transition: transform 240ms var(--ease);
+  }
+  .cta__card:hover { transform: translateY(-4px); }
+  .cta__card h3 { font-size: var(--fs-h3); }
+  .cta__card p { margin-top: 12px; max-width: 340px; font-size: var(--fs-body-sm); }
+
+  .cta__card--blush { background: var(--blush); color: var(--ink); }
+  .cta__card--blush h3 { color: var(--ink); }
+  .cta__card--ink {
+    background: var(--ink-2);
+    border: 1px solid var(--ink-line-2);
+    color: var(--ivory);
+  }
+
+  .cta__button { width: fit-content; margin-top: auto; }
+  .cta__card :global(.wa-missing) { margin-top: auto; }
+
+  .cta__mail {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: var(--fs-xs);
+    color: var(--muted-on-dark);
+    word-break: break-all;
+  }
+  .cta__mail:hover { color: var(--blush); }
+
+  @media (max-width: 860px) {
+    .cta__cards { grid-template-columns: 1fr; }
+    .cta__button { width: 100%; }
+  }
+</style>

@@ -1,0 +1,202 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import BrandIcon from './BrandIcon.astro';
+import { site, phoneIsPlaceholder } from '../data/site.mjs';
+import { footerNav } from '../data/nav';
+
+const socials = (
+  [
+    ['instagram', 'Instagram', site.social.instagram],
+    ['facebook', 'Facebook', site.social.facebook],
+    ['linkedin', 'LinkedIn', site.social.linkedin],
+    ['youtube', 'YouTube', site.social.youtube],
+  ] as const
+).filter(([, , url]) => Boolean(url));
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer" data-section-theme="ink">
+  <div class="footer__grid shell pad">
+    <div class="footer__brand">
+      <div class="footer__brand-row">
+        <Logo size={38} />
+        <span class="footer__wordmark">{site.name}</span>
+      </div>
+      <p class="footer__tagline">{site.tagline}</p>
+      {
+        socials.length > 0 && (
+          <ul class="footer__socials">
+            {socials.map(([icon, name, url]) => (
+              <li>
+                <a href={url} target="_blank" rel="noopener noreferrer" aria-label={name}>
+                  <BrandIcon name={icon} size={18} />
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+
+    {
+      footerNav.map((column) => (
+        <nav class="footer__col" aria-label={column.title}>
+          <h2 class="footer__col-title">{column.title}</h2>
+          <ul>
+            {column.links.map((link) => (
+              <li>
+                <a href={link.href}>{link.label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ))
+    }
+
+    <div class="footer__col">
+      <h2 class="footer__col-title">Contact</h2>
+      <ul>
+        <li><a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></li>
+        {
+          site.contact.phoneDisplay && (
+            <li>
+              <a href={`tel:${site.contact.phoneHref}`}>
+                {site.contact.phoneDisplay}
+                {phoneIsPlaceholder() && <span class="footer__todo"> — à remplacer</span>}
+              </a>
+            </li>
+          )
+        }
+        {
+          site.social.instagram ? (
+            <li>
+              <a href={site.social.instagram} target="_blank" rel="noopener noreferrer">
+                Instagram <Icon name="external-link" size={13} />
+              </a>
+            </li>
+          ) : (
+            <li>
+              <span class="footer__todo">Instagram — lien à renseigner</span>
+            </li>
+          )
+        }
+        <li><a href="/mentions-legales">Mentions légales</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer__giant shell pad" aria-hidden="true">{site.name}</div>
+
+  <div class="footer__legal shell pad">
+    <span>© {year} {site.name}. Tous droits réservés.</span>
+    <a href="/mentions-legales">Mentions légales</a>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--ink);
+    color: var(--muted-on-dark);
+    border-top: 1px solid var(--ink-line);
+    overflow: hidden;
+  }
+
+  .footer__grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 48px;
+    padding-block: 72px 40px;
+    font-size: var(--fs-small);
+  }
+
+  .footer__brand-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .footer__wordmark {
+    font: 700 0.875rem/1 var(--font-display);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ivory);
+  }
+  .footer__tagline {
+    margin-top: 20px;
+    max-width: 290px;
+  }
+
+  .footer__socials {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .footer__socials a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--ink-line-2);
+    border-radius: 50%;
+    color: var(--ivory);
+    transition: background-color 200ms var(--ease), border-color 200ms var(--ease);
+  }
+  .footer__socials a:hover { background: var(--blush); border-color: var(--blush); color: var(--ink); }
+
+  .footer__col ul {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+  .footer__col-title {
+    margin-bottom: 11px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: var(--fs-eyebrow);
+    letter-spacing: 0.14em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: var(--ivory);
+  }
+  .footer__col a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 180ms var(--ease);
+  }
+  .footer__col a:hover { color: var(--blush); }
+
+  /* Signale les valeurs encore à renseigner (voir src/data/site.mjs) */
+  .footer__todo { color: var(--blush); font-style: italic; }
+
+  .footer__giant {
+    padding-bottom: 40px;
+    font: 700 clamp(2.5rem, 10.7vw, 9.625rem) / 0.9 var(--font-display);
+    letter-spacing: -0.055em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  .footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-block: 22px;
+    border-top: 1px solid var(--ink-line);
+    font-size: var(--fs-xs);
+  }
+  .footer__legal a:hover { color: var(--blush); }
+
+  @media (max-width: 1000px) {
+    .footer__grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+    .footer__brand { grid-column: 1 / -1; }
+  }
+  @media (max-width: 560px) {
+    .footer__grid { grid-template-columns: 1fr; padding-block: 48px 32px; }
+  }
+</style>

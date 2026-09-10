@@ -1,0 +1,213 @@
+---
+import Icon from '../Icon.astro';
+import Media from '../Media.astro';
+import { services } from '../../data/content';
+---
+
+<section class="services theme-ink section" id="services" data-section-theme="ink">
+  <div class="shell pad">
+    <div class="section-head" data-reveal>
+      <div>
+        <p class="eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />Services</p>
+        <h2 class="services__title">Trois manières de<br />faire entrer l’art.</h2>
+      </div>
+      <p class="section-head__aside">Sur le mur, sur toile ou en direct devant votre public.</p>
+    </div>
+
+    <div class="services__list" data-accordion>
+      {
+        services.map((service, i) => (
+          <div class="services__item">
+            <h3 class="services__heading">
+              <button
+                class="services__trigger"
+                type="button"
+                id={`svc-trigger-${i}`}
+                aria-expanded={i === 0 ? 'true' : 'false'}
+                aria-controls={`svc-panel-${i}`}
+                data-accordion-trigger
+              >
+                <span class="services__num">{service.number}.</span>
+                <span class="services__name">{service.title}</span>
+                <span class="services__tags">
+                  {service.tags.map((tag) => (
+                    <span class="services__tag">{tag}</span>
+                  ))}
+                </span>
+                <span class="services__toggle" aria-hidden="true">
+                  <span class="services__bar services__bar--h" />
+                  <span class="services__bar services__bar--v" />
+                </span>
+              </button>
+            </h3>
+
+            <div
+              class="services__panel"
+              id={`svc-panel-${i}`}
+              role="region"
+              aria-labelledby={`svc-trigger-${i}`}
+              data-accordion-panel
+              data-open={i === 0 ? 'true' : 'false'}
+            >
+              <div class="services__panel-clip">
+                <div class="services__panel-grid">
+                  <Media
+                    src={service.image.src}
+                    alt={service.image.alt}
+                    ratio="309 / 170"
+                    widths={[480, 720, 1236]}
+                    sizes="(max-width: 860px) 100vw, 45vw"
+                    class="services__image"
+                  />
+                  <div>
+                    <h4 class="services__panel-title">{service.heading}</h4>
+                    <p class="services__panel-text muted">{service.text}</p>
+                    <a class="btn btn--blush btn--md services__panel-cta" href="/devis">
+                      Demander un devis
+                      <Icon name="arrow-up-right" size={13} stroke={2.2} />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .services__title { margin-top: 22px; font-size: var(--fs-h2-lg); max-width: 900px; }
+
+  .services__list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: clamp(2rem, 3.9vw, 3.5rem);
+  }
+
+  .services__item {
+    border: 1px solid var(--ink-line-2);
+    border-radius: 22px;
+    background: var(--ink-2);
+    overflow: hidden;
+    transition: border-color 240ms var(--ease);
+  }
+  .services__item:hover { border-color: var(--blush); }
+  .services__item:focus-within { border-color: var(--blush); }
+
+  .services__heading { font: inherit; margin: 0; }
+
+  .services__trigger {
+    display: flex;
+    align-items: center;
+    gap: clamp(14px, 2.2vw, 32px);
+    width: 100%;
+    padding: clamp(20px, 2.2vw, 32px) clamp(20px, 2.4vw, 34px);
+    background: transparent;
+    border: none;
+    text-align: left;
+    color: var(--ivory);
+  }
+
+  .services__num {
+    flex: none;
+    min-width: 76px;
+    font: 700 var(--fs-h3-xl) / 1 var(--font-display);
+    letter-spacing: -0.04em;
+    color: var(--ink-2);
+    -webkit-text-stroke: 1px var(--ink-stroke);
+  }
+  .services__name {
+    flex: 1;
+    font: 700 var(--fs-h3-xl) / 1 var(--font-display);
+    letter-spacing: -0.045em;
+  }
+
+  .services__tags { display: flex; gap: 9px; flex: none; }
+  .services__tag {
+    padding: 8px 14px 7px;
+    border-radius: 100px;
+    border: 1px solid var(--ink-line-3);
+    color: var(--muted-on-dark);
+    font: 500 0.75rem/1 var(--font-body);
+    white-space: nowrap;
+  }
+
+  .services__toggle {
+    position: relative;
+    flex: none;
+    display: block;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 1px solid var(--ink-line-3);
+  }
+  .services__bar {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background: var(--ivory);
+  }
+  .services__bar--h { width: 16px; height: 1.6px; transform: translate(-50%, -50%); }
+  .services__bar--v {
+    width: 1.6px;
+    height: 16px;
+    transform: translate(-50%, -50%) scaleY(1);
+    transition: transform 200ms var(--ease);
+  }
+  .services__trigger[aria-expanded='true'] .services__bar--v { transform: translate(-50%, -50%) scaleY(0); }
+
+  /* Ouverture : 0fr -> 1fr, animable et sans hauteur codée en dur. */
+  .services__panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 450ms var(--ease-out);
+  }
+  .services__panel[data-open='true'] { grid-template-rows: 1fr; }
+  .services__panel-clip { overflow: hidden; }
+
+  .services__panel-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    padding: 8px clamp(20px, 2.4vw, 34px) clamp(20px, 2.4vw, 34px);
+  }
+  .services__panel-grid :global(.services__image) {
+    border-radius: 18px;
+    border: 1px solid var(--ink-line-2);
+  }
+  .services__panel-title {
+    font-size: clamp(1.375rem, 2.08vw, 1.875rem);
+    line-height: 1.15;
+    color: var(--ivory);
+  }
+  .services__panel-text { margin-top: 16px; font-size: var(--fs-body); max-width: 440px; }
+  .services__panel-cta { margin-top: 28px; }
+
+  /* Sans JavaScript, tous les panneaux sont ouverts : aucun contenu caché. */
+  html:not(.js) .services__panel { grid-template-rows: 1fr; }
+  html:not(.js) .services__toggle { display: none; }
+
+  @media (max-width: 1100px) {
+    .services__tags { display: none; }
+  }
+  @media (max-width: 860px) {
+    .services__panel-grid { grid-template-columns: 1fr; gap: 24px; }
+    .services__num { min-width: 48px; }
+  }
+  @media (max-width: 520px) {
+    .services__toggle { width: 36px; height: 36px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .services__panel { transition: none; }
+  }
+</style>
+
+<script>
+  import { initAccordion } from '../../scripts/accordion';
+  initAccordion();
+</script>

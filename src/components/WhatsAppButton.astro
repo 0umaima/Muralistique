@@ -1,0 +1,67 @@
+---
+/**
+ * Bouton WhatsApp.
+ *
+ * Le numéro se configure dans src/data/site.mjs → contact.whatsappNumber.
+ * Tant qu'il n'est pas renseigné, ce composant affiche un avertissement
+ * visible au lieu d'un lien mort : impossible de mettre le site en ligne
+ * sans s'en apercevoir.
+ */
+import BrandIcon from './BrandIcon.astro';
+import Icon from './Icon.astro';
+import { whatsappUrl } from '../data/site.mjs';
+
+interface Props {
+  label?: string;
+  class?: string;
+  /** Style du bouton : 'blush' | 'outline-light' */
+  variant?: 'blush' | 'outline-light';
+  block?: boolean;
+}
+const { label = 'Ouvrir WhatsApp', class: className = '', variant = 'outline-light', block = false } = Astro.props;
+const url = whatsappUrl();
+const variantClass = variant === 'blush' ? 'btn--blush' : 'btn--ghost-light';
+---
+
+{
+  url ? (
+    <a
+      class:list={['btn', variantClass, block && 'btn--block', className]}
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <BrandIcon name="whatsapp" size={18} />
+      {label}
+    </a>
+  ) : (
+    <p class:list={['wa-missing', className]} role="note">
+      <Icon name="alert-circle" size={18} />
+      <span>
+        <strong>Numéro WhatsApp non configuré.</strong> Renseignez
+        <code>contact.whatsappNumber</code> dans <code>src/data/site.mjs</code> pour activer ce bouton.
+      </span>
+    </p>
+  )
+}
+
+<style>
+  .wa-missing {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 18px;
+    border: 1px dashed var(--blush);
+    border-radius: 14px;
+    background: rgba(242, 179, 166, 0.1);
+    color: inherit;
+    font-size: var(--fs-xs);
+    line-height: 1.5;
+    text-align: left;
+  }
+  .wa-missing :global(svg) { flex: none; color: var(--blush); margin-top: 1px; }
+  .wa-missing code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.95em;
+  }
+</style>

@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { projects } from '../data/projects';
+
+const suggestions = projects.slice(0, 3);
+---
+
+<BaseLayout
+  title="Page introuvable"
+  description="Cette page n’existe pas ou a été déplacée."
+  headerTheme="ink"
+  noindex
+>
+  <section class="nf theme-ink" data-section-theme="ink">
+    <div class="shell pad nf__inner">
+      <p class="eyebrow nf__eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />Erreur 404</p>
+      <h1 class="nf__title">Ce mur-là n’existe pas.</h1>
+      <p class="nf__lead muted">
+        La page que vous cherchez a été déplacée ou n’a jamais existé. Voici par où reprendre.
+      </p>
+
+      <div class="nf__actions">
+        <a class="btn btn--blush" href="/">
+          Retour à l’accueil
+          <Icon name="arrow-up-right" size={14} stroke={2.2} />
+        </a>
+        <a class="btn btn--ghost-light" href="/realisations">Voir les réalisations</a>
+      </div>
+
+      <ul class="nf__links">
+        {
+          suggestions.map((project) => (
+            <li>
+              <a href={`/realisations/${project.slug}`}>
+                <span>{project.title}</span>
+                <Icon name="arrow-up-right" size={14} stroke={2.2} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf { display: flex; align-items: center; min-height: calc(100svh - var(--header-h)); }
+  .nf__inner { padding-block: clamp(3rem, 8vw, 7rem); width: 100%; }
+  .nf__eyebrow { color: var(--muted-on-dark); }
+  .nf__title {
+    margin-top: 24px;
+    font-size: var(--fs-h1);
+    line-height: 0.94;
+    letter-spacing: -0.05em;
+    color: var(--ivory);
+  }
+  .nf__lead { margin-top: 22px; max-width: 520px; font-size: var(--fs-body-lg); }
+  .nf__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
+
+  .nf__links {
+    display: flex;
+    flex-direction: column;
+    margin-top: clamp(2.5rem, 4.4vw, 4rem);
+    border-top: 1px solid var(--ink-line);
+    max-width: 620px;
+  }
+  .nf__links a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--ink-line);
+    font: 600 1.25rem/1.2 var(--font-display);
+    letter-spacing: -0.03em;
+    color: var(--ivory);
+  }
+  .nf__links a:hover { color: var(--blush); }
+  .nf__links :global(svg) { color: var(--blush); }
+</style>

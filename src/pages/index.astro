@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/home/Hero.astro';
+import Stats from '../components/home/Stats.astro';
+import Sectors from '../components/home/Sectors.astro';
+import Transformations from '../components/home/Transformations.astro';
+import Process from '../components/home/Process.astro';
+import Services from '../components/home/Services.astro';
+import Positioning from '../components/home/Positioning.astro';
+import ContactCta from '../components/ContactCta.astro';
+import { site } from '../data/site.mjs';
+---
+
+<BaseLayout
+  title={site.name}
+  description="Muralistique, atelier de fresques murales sur mesure : hôtels, cabinets, écoles, restaurants, bureaux et espaces privés. Devis gratuit sous 48 h."
+  headerTheme="ink"
+  activeNav="/"
+>
+  <Hero />
+  <Stats />
+  <Sectors />
+  <Transformations />
+  <Process />
+  <Services />
+  <Positioning />
+  <ContactCta title="Transformons votre espace." />
+</BaseLayout>
+
+<script>
+  import { initReveal } from '../scripts/reveal';
+  initReveal();
+</script>

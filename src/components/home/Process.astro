@@ -1,0 +1,180 @@
+---
+import Icon from '../Icon.astro';
+import Media from '../Media.astro';
+import { processSteps, processImages } from '../../data/content';
+---
+
+<section class="process theme-ivory section" id="processus" data-section-theme="ivory">
+  <div class="process__lineart" data-draw aria-hidden="true">
+    <svg viewBox="0 0 1520 420" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M10 380C170 380 220 120 400 120s250 260 420 260 250-300 430-300c110 0 190 90 250 170"></path>
+      <path d="M400 120c46 30 46 90 0 120"></path>
+      <path d="M1250 80c60-26 130 4 150 70"></path>
+    </svg>
+  </div>
+
+  <div class="shell pad process__inner">
+    <div class="section-head" data-reveal>
+      <div class="process__intro">
+        <p class="eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />Processus</p>
+        <h2 class="process__title">Cinq étapes. Du premier trait au mur livré.</h2>
+      </div>
+      <div class="process__aside">
+        <p class="muted">
+          Chaque projet suit un processus clair, construit autour du lieu, de son public et de l’identité du client.
+        </p>
+        <a class="btn btn--outline btn--md" href="/devis">
+          Demander un devis
+          <Icon name="arrow-up-right" size={13} stroke={2.2} />
+        </a>
+      </div>
+    </div>
+
+    <ol class="process__steps">
+      {
+        processSteps.map((step, i) => (
+          <li
+            class="process__step"
+            data-reveal-rotate
+            data-reveal-delay={i * 80}
+            style={`--reveal-rot:${step.rotate}deg; --reveal-ty:${step.translate}px`}
+          >
+            {/* Deux calques au même tracé : le calque du dessous fait office
+                de bordure de 1 px, y compris le long du coin biseauté. */}
+            <div class="process__frame">
+              <div class:list={['process__card', `process__card--${step.tone}`]}>
+              <span class="process__icon">
+                <Icon name={step.icon} size={34} stroke={1.6} />
+              </span>
+              <span class="process__spacer" />
+              <span class="process__number">{step.number}</span>
+              <h3 class="process__step-title">{step.title}</h3>
+              <p class="process__text">{step.text}</p>
+              </div>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <ul class="process__gallery">
+      {
+        processImages.map((image, i) => (
+          <li data-reveal data-reveal-delay={i * 80}>
+            <Media
+              src={image.src}
+              alt={image.alt}
+              ratio="53 / 40"
+              widths={[400, 640, 848]}
+              sizes="(max-width: 800px) 100vw, 33vw"
+              zoom
+              class="process__image"
+            />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .process { position: relative; overflow: hidden; border-top: 1px solid var(--ink); }
+  .process__inner { position: relative; }
+
+  .process__lineart {
+    position: absolute;
+    left: -40px;
+    right: -40px;
+    top: 300px;
+    opacity: 0.09;
+    color: var(--ink);
+    pointer-events: none;
+  }
+  .process__lineart svg { width: 1520px; max-width: none; height: auto; }
+
+  .process__title { margin-top: 22px; font-size: var(--fs-h2-lg); }
+  .process__intro { max-width: 860px; }
+  .process__aside {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    max-width: 340px;
+  }
+  .process__aside p { font-size: var(--fs-body); }
+
+  .process__steps {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: clamp(3rem, 7.2vw, 6.5rem);
+  }
+
+  /* Coin biseauté repris de la maquette : le cadre sombre déborde d'1 px
+     sous la carte et dessine la bordure, diagonale comprise. */
+  .process__frame {
+    height: clamp(340px, 29.9vw, 430px);
+    padding: 1px;
+    background: var(--ink);
+    clip-path: polygon(0 0, calc(100% - 30px) 0, 100% 30px, 100% 100%, 0 100%);
+    transition: transform 220ms var(--ease), background-color 220ms var(--ease);
+  }
+  .process__step:hover .process__frame { transform: translateY(-5px); background: var(--blush); }
+
+  .process__card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 28px 24px;
+    clip-path: polygon(0 0, calc(100% - 30px) 0, 100% 30px, 100% 100%, 0 100%);
+  }
+
+  .process__card--ivory { background: var(--ivory); color: var(--ink); }
+  .process__card--ink { background: var(--ink); color: var(--muted-on-dark); }
+  .process__card--blush { background: var(--blush); color: var(--blush-ink); }
+
+  .process__icon { display: block; transition: transform 220ms var(--ease); }
+  .process__step:hover .process__icon { transform: rotate(4deg); }
+  .process__card--ivory .process__icon,
+  .process__card--blush .process__icon { color: var(--ink); }
+  .process__card--ink .process__icon { color: var(--blush); }
+
+  .process__spacer { flex: 1; }
+
+  .process__number {
+    font: 700 clamp(1.75rem, 2.36vw, 2.125rem) / 1 var(--font-display);
+    letter-spacing: -0.045em;
+    opacity: 0.55;
+  }
+  .process__card--ivory .process__number, .process__card--blush .process__number { color: var(--ink); }
+  .process__card--ink .process__number { color: var(--ivory); }
+
+  .process__step-title { margin-top: 10px; font-size: var(--fs-h3-sm); }
+  .process__card--ink .process__step-title { color: var(--ivory); }
+
+  .process__text { margin-top: 14px; font-size: 0.84375rem; line-height: 1.55; }
+  .process__card--ivory .process__text { color: var(--muted-on-light); }
+
+  .process__gallery {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: clamp(2.5rem, 5.5vw, 5rem);
+  }
+  .process__gallery :global(.process__image) {
+    border-radius: 24px;
+    border: 1px solid var(--ink);
+  }
+
+  @media (max-width: 1100px) {
+    .process__steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .process__frame { height: auto; min-height: 300px; }
+  }
+  @media (max-width: 760px) {
+    .process__steps { grid-template-columns: 1fr; }
+    .process__gallery { grid-template-columns: 1fr; }
+    .process__lineart { top: 220px; }
+  }
+</style>

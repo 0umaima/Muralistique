@@ -1,0 +1,27 @@
+{
+  "name": "muralistique",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "placeholders": "node scripts/generate-placeholders.mjs",
+    "fonts": "node scripts/fetch-fonts.mjs",
+    "test:interactions": "node scripts/test-interactions.mjs",
+    "test:form": "node scripts/test-form.mjs",
+    "test:a11y": "node scripts/test-a11y.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.3.2",
+    "sharp": "^0.35.4"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  },
+  "description": "Site vitrine de l'atelier de fresques murales Muralistique — Astro, CSS maison, JavaScript minimal."
+}
