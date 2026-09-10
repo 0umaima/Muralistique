@@ -7,13 +7,12 @@
  *
  * Aucun envoi réel n'est effectué vers Basin : la requête est interceptée.
  */
-import { chromium } from 'playwright';
+import { launchBrowser } from './browser.mjs';
 
-const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const BASE = process.env.BASE || 'http://localhost:4321';
 const OUT = process.env.SHOT_DIR || '/tmp';
 
-const browser = await chromium.launch({ executablePath: EXE });
+const browser = await launchBrowser();
 const fails = [];
 const ok = (label, cond, extra = '') => {
   console.log(`${cond ? '  ok  ' : ' FAIL '} ${label}${extra ? ' — ' + extra : ''}`);

@@ -3,14 +3,13 @@
  *
  *   node scripts/test-a11y.mjs
  */
-import { chromium } from 'playwright';
+import { launchBrowser } from './browser.mjs';
 
-const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const BASE = process.env.BASE || 'http://localhost:4321';
 const PAGES = ['/', '/realisations', '/realisations/hotel-rivage', '/studio', '/devis', '/mentions-legales', '/404'];
 const WIDTHS = [360, 768, 1024, 1440];
 
-const browser = await chromium.launch({ executablePath: EXE });
+const browser = await launchBrowser();
 const fails = [];
 const ok = (label, cond, extra = '') => {
   console.log(`${cond ? '  ok  ' : ' FAIL '} ${label}${extra ? ' — ' + extra : ''}`);

@@ -1,14 +1,13 @@
-import { chromium } from 'playwright';
+import { launchBrowser } from './browser.mjs';
 import { mkdir } from 'node:fs/promises';
 
-const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const OUT = process.env.SHOT_DIR || '/tmp/claude-0/-home-user-Muralistique/8a758518-533c-5049-a66a-79be8d5c24c0/scratchpad/shots';
 const BASE = process.env.BASE || 'http://localhost:4321';
 const targets = (process.env.PAGES || '/').split(',');
 const widths = (process.env.WIDTHS || '1440').split(',').map(Number);
 
 await mkdir(OUT, { recursive: true });
-const browser = await chromium.launch({ executablePath: EXE });
+const browser = await launchBrowser();
 
 for (const width of widths) {
   const ctx = await browser.newContext({ viewport: { width, height: 900 }, deviceScaleFactor: 1 });

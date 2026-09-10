@@ -5,12 +5,18 @@ Portfolio de l'atelier de fresques murales **Muralistique**, construit en
 JavaScript natif. Sortie **100 % statique** : aucun CMS, aucune base de
 données, ni React ni Tailwind ni bibliothèque d'animation.
 
+## Démarrage rapide
+
+**Prérequis :** [Node.js](https://nodejs.org) **20.3 ou plus récent** (22 LTS
+recommandé, voir `.nvmrc`). Vérifiez avec `node --version`.
+
+```bash
+npm install      # une seule fois, installe les dépendances
+npm run dev      # développement : http://localhost:4321, rechargement à chaud
 ```
-npm install      # une seule fois
-npm run dev      # http://localhost:4321
-npm run build    # génère dist/
-npm run preview  # sert dist/ pour vérification
-```
+
+Les trois étapes complètes (développement → construction → vérification →
+mise en ligne) sont détaillées au §7.
 
 ---
 
@@ -297,38 +303,191 @@ masqués.
 
 ---
 
-## 7. Tests
+## 7. Commandes, pas à pas
 
-Le site doit être construit et servi, puis :
+### a. Développement
 
-```
-npm run build
-npm run preview                       # dans un terminal
-
-node scripts/test-interactions.mjs    # filtres, accordéon, comparateur, nav mobile,
-                                      # mouvement réduit, fonctionnement sans JS
-node scripts/test-form.mjs            # formulaire : validation, états, limites de
-                                      # fichiers, erreurs serveur (réponses SIMULÉES)
-node scripts/test-a11y.mjs            # 360/768/1024/1440, clavier, sémantique, métadonnées
+```bash
+npm install        # une seule fois
+npm run dev        # http://localhost:4321
 ```
 
-Les trois suites passent. `scripts/shoot.mjs` produit des captures pleine page
-(`PAGES=/,/studio WIDTHS=360,1440 node scripts/shoot.mjs`).
+Le serveur recharge la page à chaque enregistrement. C'est le mode à utiliser
+pour changer des textes, remplacer des images ou ajuster le style.
 
-Ces scripts sont des outils de développement : ils utilisent Playwright, qui
-n'est pas nécessaire au site lui-même.
+> Les images sont optimisées à la volée en développement : le premier
+> chargement d'une page peut prendre une seconde de plus. C'est normal.
+
+### b. Construction (build)
+
+```bash
+npm run build      # écrit le site dans dist/
+```
+
+Astro génère 13 pages HTML statiques, convertit toutes les images en AVIF/WebP
+aux différentes tailles, et produit `sitemap-index.xml`, `robots.txt` et la
+page `404`. Le dossier `dist/` fait environ 4 Mo avec les images d'exemple.
+
+Avant de construire pour de bon, renseignez `site.url` dans
+`src/data/site.mjs` : le sitemap et les URL canoniques en dépendent.
+
+### c. Vérification locale du site construit (« prod »)
+
+```bash
+npm run preview    # sert dist/ sur http://localhost:4321
+```
+
+C'est **exactement** ce qui sera mis en ligne : mêmes fichiers, mêmes images,
+même JavaScript minifié. Utilisez ce mode pour la vérification finale.
+
+Pour tester depuis un téléphone sur le même réseau :
+
+```bash
+npm run preview -- --host
+```
+
+### d. Tests automatisés (facultatif)
+
+Une seule fois, installez le navigateur utilisé par les tests :
+
+```bash
+npx playwright install chromium
+```
+
+Puis, **avec `npm run preview` lancé dans un autre terminal** :
+
+```bash
+npm run test:interactions   # filtres, « voir plus », accordéon, comparateur,
+                            # navigation mobile, mouvement réduit, sans JavaScript
+npm run test:form           # formulaire : validation, états d'envoi, limites de
+                            # fichiers, erreurs serveur — réponses SIMULÉES
+npm run test:a11y           # 360/768/1024/1440 px, clavier, sémantique, métadonnées
+```
+
+Les trois suites passent. **Aucun envoi réel n'est effectué vers Basin.**
+
+Autres outils :
+
+```bash
+npm run placeholders        # régénère les images d'espace réservé
+npm run fonts               # retélécharge les polices dans public/fonts/
+PAGES=/,/studio WIDTHS=360,1440 node scripts/shoot.mjs   # captures pleine page
+```
+
+Ces scripts servent au développement ; ils ne font pas partie du site livré.
 
 ---
 
-## 8. Mise en ligne
+## 8. Mise en ligne sur Cloudflare Pages (offre gratuite)
 
-`npm run build` produit un dossier `dist/` entièrement statique, déployable
-tel quel sur n'importe quel hébergeur (Netlify, Vercel, Cloudflare Pages,
-GitHub Pages, ou un simple serveur de fichiers).
+`npm run build` produit un dossier `dist/` entièrement statique : il n'y a ni
+serveur ni base de données à héberger. L'offre **gratuite** de Cloudflare Pages
+suffit largement (builds illimités en nombre de sites, 500 builds par mois,
+bande passante illimitée, HTTPS et CDN mondial inclus).
 
-Avant de publier : renseignez `site.url` dans `src/data/site.mjs` — le sitemap
-(`/sitemap-index.xml`), le `robots.txt` et les URL canoniques en dépendent.
+### Méthode recommandée — build automatique depuis GitHub
 
-Sont générés automatiquement : `sitemap-index.xml`, `sitemap-0.xml`,
-`robots.txt`, page `404`, métadonnées Open Graph et Twitter Card sur chaque
-page.
+Chaque `git push` reconstruit et publie le site.
+
+1. **Poussez le projet sur GitHub** (dépôt public ou privé, les deux
+   fonctionnent avec l'offre gratuite).
+
+2. Sur [dash.cloudflare.com](https://dash.cloudflare.com) →
+   **Workers & Pages** → **Create** → onglet **Pages** →
+   **Connect to Git** → autorisez GitHub → choisissez le dépôt.
+
+3. Renseignez les réglages de build :
+
+   | Champ | Valeur |
+   | --- | --- |
+   | Framework preset | **Astro** (ou *None*, les valeurs ci-dessous suffisent) |
+   | Build command | `npm run build` |
+   | Build output directory | `dist` |
+   | Root directory | *(laisser vide)* |
+
+4. **Variables d'environnement** → ajoutez, pour la production **et** la
+   prévisualisation :
+
+   ```
+   NODE_VERSION = 22
+   ```
+
+   Le fichier `.nvmrc` du dépôt indique déjà `22`, mais poser la variable évite
+   toute ambiguïté. Astro 7 exige Node 20.3 ou plus.
+
+5. **Save and Deploy.** Le premier build prend 1 à 3 minutes. Le site est
+   ensuite servi sur `https://<nom-du-projet>.pages.dev`.
+
+À partir de là, chaque push sur la branche principale déclenche une mise en
+ligne, et chaque pull request obtient sa propre URL de prévisualisation.
+
+### Méthode alternative — envoi direct du dossier
+
+Sans dépôt Git, ou pour un essai rapide :
+
+- **Par glisser-déposer :** Workers & Pages → Create → Pages →
+  **Upload assets**, puis déposez le dossier `dist/` (construit au préalable
+  avec `npm run build`).
+- **En ligne de commande :**
+
+  ```bash
+  npm run build
+  npx wrangler pages deploy dist --project-name=muralistique
+  ```
+
+  La première exécution ouvre une page d'authentification Cloudflare.
+
+Cette méthode n'a pas de build automatique : il faut reconstruire et renvoyer
+le dossier à chaque modification.
+
+### Brancher votre nom de domaine
+
+1. Projet Pages → onglet **Custom domains** → **Set up a custom domain**.
+2. Saisissez `muralistique.fr` puis recommencez pour `www.muralistique.fr`.
+3. Si le domaine est déjà géré par Cloudflare, les enregistrements DNS sont
+   créés automatiquement. Sinon, Cloudflare affiche l'enregistrement `CNAME` à
+   ajouter chez votre registraire.
+4. Le certificat HTTPS est émis automatiquement (quelques minutes).
+5. **Important :** mettez `site.url` (dans `src/data/site.mjs`) à l'adresse
+   définitive, puis reconstruisez — sinon le sitemap et les URL canoniques
+   pointeront vers le mauvais domaine.
+
+Pour rediriger `muralistique.fr` vers `www.muralistique.fr` (ou l'inverse),
+utilisez **Rules → Redirect Rules** dans le tableau de bord du domaine ; c'est
+inclus dans l'offre gratuite.
+
+### En-têtes HTTP
+
+Le fichier **`public/_headers`** est copié dans `dist/` au build et lu
+automatiquement par Cloudflare Pages. Il définit :
+
+- un cache d'un an pour `/_astro/*` et `/fonts/*` (noms de fichiers versionnés,
+  donc sans risque) ;
+- une revalidation systématique des pages HTML ;
+- `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`,
+  `Permissions-Policy` et `Cross-Origin-Opener-Policy`.
+
+**Content-Security-Policy n'y figure pas volontairement.** Astro intègre
+plusieurs petits scripts directement dans le HTML : une politique
+`script-src 'self'` casserait le site, et une politique par empreintes
+(`'sha256-…'`) changerait à chaque build — donc se briserait en silence sans
+que personne ne s'en aperçoive. Si vous souhaitez tout de même une CSP, la
+directive utile et sans risque à ajouter est celle qui borne la destination du
+formulaire :
+
+```
+Content-Security-Policy: form-action 'self' https://usebasin.com; frame-ancestors 'none'; base-uri 'self'
+```
+
+### Autres hébergeurs
+
+Le dossier `dist/` fonctionne tel quel sur Netlify (qui lit le même format
+`_headers`), Vercel, GitHub Pages ou n'importe quel serveur de fichiers.
+
+---
+
+## 9. Ce qui est généré automatiquement
+
+`sitemap-index.xml`, `sitemap-0.xml`, `robots.txt`, la page `404`, les
+métadonnées Open Graph et Twitter Card de chaque page, et les variantes
+d'images (AVIF/WebP, plusieurs largeurs).
