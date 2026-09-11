@@ -23,5 +23,8 @@
   "devDependencies": {
     "playwright": "^1.63.0"
   },
-  "description": "Site vitrine de l'atelier de fresques murales Muralistique — Astro, CSS maison, JavaScript minimal."
+  "description": "Site vitrine de l'atelier de fresques murales Muralistique — Astro, CSS maison, JavaScript minimal.",
+  "allowScripts": {
+    "sharp@0.35.4": true
+  }
 }
