@@ -64,29 +64,35 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    slug: 'hotel-rivage',
-    title: 'Hôtel Rivage',
-    sector: 'hotellerie',
-    city: 'Marseille',
-    excerpt: 'Hôtel 4 étoiles — hall d’accueil, fresque au trait de 14 m.',
-    body: [
-      'TEXTE À REMPLACER — décrivez ici le point de départ du projet : le lieu, son public, la demande du client et la contrainte principale du mur.',
-      'TEXTE À REMPLACER — racontez la réponse graphique : le motif retenu, la palette, la manière dont le dessin s’adapte à l’architecture.',
-    ],
-    cover: {
-      src: 'projects/hotel-rivage/cover.jpg',
-      alt: 'Fresque au trait dans le hall d’accueil d’un hôtel — photo à remplacer',
-    },
-    ratio: '3 / 4',
+    slug: 'mecanique-en-mouvement',
+
+title: 'Mécanique en mouvement',
+      sector: 'bureaux',
+
+  city: 'Casablanca',
+
+  excerpt: 'Siège social — création d’une fresque panoramique inspirée d’un univers futuriste et technologique.',
+
+  body: [
+    'Pour personnaliser ses espaces de travail, Aurea souhaitait une œuvre forte, contemporaine et immédiatement identifiable, capable de refléter son univers innovant.',
+    'La fresque déploie une créature mécanique monumentale sur plusieurs murs. Les nuances de gris, les contours noirs et les touches de bleu composent une scène immersive tout en s’intégrant à l’architecture épurée des bureaux.',
+  ],
+
+  cover: {
+    src: 'projects/siege-aurea/cover.jpg',
+    alt: 'Fresque panoramique futuriste dans les bureaux du siège Aurea à Casablanca',
+  },
+
+  ratio: '33 / 16',
     beforeAfter: {
-      before: { src: 'projects/hotel-rivage/avant.jpg', alt: 'Le hall d’accueil avant la fresque — photo à remplacer' },
-      after: { src: 'projects/hotel-rivage/apres.jpg', alt: 'Le hall d’accueil après la fresque — photo à remplacer' },
-      label: 'Hôtel Rivage — Hall d’accueil',
-      meta: 'Marseille · Hôtel 4 étoiles',
+      before: { src: 'projects/hotel-rivage/avant.jpeg', alt: 'Le hall d’accueil avant la fresque — photo à remplacer' },
+      after: { src: 'projects/hotel-rivage/apres.jpeg', alt: 'Le hall d’accueil après la fresque — photo à remplacer' },
+      label: 'Mécanique en mouvement',
+      meta: 'Bureaux à Casablanca',
     },
     gallery: [
-      { src: 'projects/hotel-rivage/1.jpg', alt: 'Détail de la fresque — photo à remplacer', caption: 'Détail du tracé' },
-      { src: 'projects/hotel-rivage/2.jpg', alt: 'Vue d’ensemble du hall — photo à remplacer', caption: 'Vue d’ensemble' },
+      { src: 'projects/hotel-rivage/1.jpeg', alt: 'Détail de la fresque — photo à remplacer', caption: 'Détail du tracé' },
+      { src: 'projects/hotel-rivage/2.jpeg', alt: 'Vue d’ensemble du hall — photo à remplacer', caption: 'Vue d’ensemble' },
     ],
     facts: { surface: '', duration: '', year: '', client: '' },
     featuredOnHome: true,

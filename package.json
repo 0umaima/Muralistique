@@ -25,6 +25,7 @@
   },
   "description": "Site vitrine de l'atelier de fresques murales Muralistique — Astro, CSS maison, JavaScript minimal.",
   "allowScripts": {
-    "sharp@0.35.4": true
+    "sharp@0.35.4": true,
+    "esbuild@0.28.2": true
   }
 }
