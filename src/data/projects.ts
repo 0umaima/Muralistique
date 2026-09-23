@@ -312,71 +312,88 @@ title: 'Robotique en mouvement',
     client: '',
   },
 },
-  {
-    slug: 'studio-habitat',
-    title: 'Studio Habitat',
-    sector: 'espaces-prives',
-    city: 'Nantes',
-    excerpt: 'Appartement privé — séjour et cage d’escalier.',
-    body: [
-      'TEXTE À REMPLACER — contexte du projet et attentes des propriétaires.',
-      'TEXTE À REMPLACER — parti pris graphique retenu pour le séjour et la cage d’escalier.',
-    ],
-    cover: {
-      src: 'projects/studio-habitat/cover.jpg',
-      alt: 'Fresque murale dans le séjour d’un appartement — photo à remplacer',
-    },
-    ratio: '21 / 20',
-    gallery: [
-      { src: 'projects/studio-habitat/1.jpg', alt: 'Détail de la fresque — photo à remplacer', caption: 'Détail' },
-      { src: 'projects/studio-habitat/2.jpg', alt: 'Vue de la cage d’escalier — photo à remplacer', caption: 'Cage d’escalier' },
-    ],
-    facts: { surface: '', duration: '', year: '', client: '' },
+
+ 
+{
+  slug: 'hotel-kaan-misti',
+
+  title: 'Hôtel Kaan — Misti Rooftop',
+
+  sector: 'hotels',
+
+  city: 'Casablanca',
+
+  excerpt:
+    'Rooftop Misti — une fresque abstraite en bleu mêlant formes, lignes dynamiques et lettrage inspiré du street art.',
+
+  body: [
+    'Pour le rooftop Misti de l’Hôtel Kaan, l’objectif était de créer une identité visuelle forte, contemporaine et immédiatement reconnaissable, à la hauteur de l’atmosphère urbaine du lieu.',
+    'Cette explosion de formes et de lettres capte l’essence du street art à travers des lignes dynamiques, des compositions abstraites et un lettrage énergique. Les nuances de bleu contrastent avec l’architecture claire du bâtiment et transforment le rooftop en un espace artistique, vivant et immersif.',
+  ],
+
+  cover: {
+    src: 'projects/hotel-kaan-misti/cover.png',
+    alt: 'Fresque street art abstraite sur le rooftop Misti de l’Hôtel Kaan à Casablanca',
   },
-  {
-    slug: 'cabinet-dentaire-opale',
-    title: 'Cabinet Dentaire Opale',
-    sector: 'sante',
-    city: 'Toulouse',
-    excerpt: 'Cabinet dentaire — accueil et salle de soins.',
-    body: [
-      'TEXTE À REMPLACER — contexte du projet et attentes de l’équipe du cabinet.',
-      'TEXTE À REMPLACER — parti pris graphique retenu pour l’accueil et la salle de soins.',
-    ],
-    cover: {
-      src: 'projects/cabinet-dentaire-opale/cover.jpg',
-      alt: 'Fresque murale à l’accueil d’un cabinet dentaire — photo à remplacer',
+
+  ratio: '4 / 5',
+
+  gallery: [
+  
+    {
+      src: 'projects/hotel-kaan-misti/1.png',
+      alt: 'Fresque murale contemporaine dans l’espace intérieur de l’Hôtel Kaan',
+      caption: 'Le street art s’invite chez Kaan',
     },
-    ratio: '4 / 5',
-    gallery: [
-      { src: 'projects/cabinet-dentaire-opale/1.jpg', alt: 'Détail de la fresque — photo à remplacer', caption: 'Détail' },
-      { src: 'projects/cabinet-dentaire-opale/2.jpg', alt: 'Vue de la salle de soins — photo à remplacer', caption: 'Salle de soins' },
-    ],
-    facts: { surface: '', duration: '', year: '', client: '' },
+  ],
+
+  facts: {
+    surface: '',
+    duration: '',
+    year: '',
+    client: 'Hôtel Kaan — Misti Rooftop',
   },
-  {
-    slug: 'siege-aurea',
-    title: 'Siège Aurea',
-    sector: 'bureaux',
-    city: 'Paris',
-    excerpt: 'Siège social — hall d’entrée et salles de réunion, fresque panoramique.',
-    body: [
-      'TEXTE À REMPLACER — contexte du projet et attentes de l’entreprise.',
-      'TEXTE À REMPLACER — parti pris graphique retenu pour le hall et les salles de réunion.',
-    ],
-    cover: {
-      src: 'projects/siege-aurea/cover.jpg',
-      alt: 'Fresque panoramique dans le hall d’un siège social — photo à remplacer',
-    },
-    ratio: '33 / 16',
-    wide: true,
-    gallery: [
-      { src: 'projects/siege-aurea/1.jpg', alt: 'Détail de la fresque — photo à remplacer', caption: 'Détail' },
-      { src: 'projects/siege-aurea/2.jpg', alt: 'Vue des salles de réunion — photo à remplacer', caption: 'Salles de réunion' },
-    ],
-    facts: { surface: '', duration: '', year: '', client: '' },
-    featuredInHero: true,
+},
+{
+  slug: 'tsarine-beauty-house',
+
+  title: 'Tsarine Beauty House',
+
+  sector: 'beaute-bien-etre',
+
+  city: '',
+
+  excerpt:
+    'Spa et espace beauté — une fresque élégante inspirée de la Renaissance, entre figures féminines, raffinement et bien-être.',
+
+  body: [
+    'Pour Tsarine Beauty House, l’objectif était de créer un univers visuel élégant, apaisant et raffiné, à l’image d’un lieu dédié à la beauté et au bien-être.',
+    'Inspiré de l’œuvre emblématique de Michel-Ange, ce dessin mural évoque la force et la beauté du corps humain. Les figures délicates, les lignes majestueuses et les détails inspirés de la Renaissance s’intègrent harmonieusement à l’ambiance du spa.',
+    'D’autres espaces adoptent une approche plus contemporaine et graphique, avec des compositions colorées, des formes géométriques et des motifs dynamiques qui donnent à Tsarine Beauty House une identité artistique unique.',
+  ],
+
+  cover: {
+    src: 'projects/tsarine-beauty-house/cover.png',
+    alt: 'Fresque murale inspirée de la Renaissance dans le Tsarine Beauty House',
   },
+
+  ratio: '4 / 5',
+
+  gallery: [
+    {
+      src: 'projects/tsarine-beauty-house/1.png',
+      alt: 'Fresque murale inspirée de Michel-Ange dans un espace beauté',
+      caption: 'Détail de la fresque',
+    }
+  ],
+
+  facts: {
+    surface: '',
+    duration: '',
+    year: '',
+    client: 'Tsarine Beauty House',
+  },
+},
 ];
 
 export const projectBySlug = (slug: string) => projects.find((p) => p.slug === slug);
