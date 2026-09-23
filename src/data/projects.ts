@@ -64,110 +64,254 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    slug: 'mecanique-en-mouvement',
+    slug: 'robotique-en-mouvement',
 
-title: 'Mécanique en mouvement',
-      sector: 'bureaux',
-
+title: 'Robotique en mouvement',
+ sector: 'bureaux',
   city: 'Casablanca',
 
-  excerpt: 'Siège social — création d’une fresque panoramique inspirée d’un univers futuriste et technologique.',
+  excerpt:
+    'Bureaux CB Robotics — création d’une fresque murale futuriste inspirée de la robotique, de l’automatisation et des technologies RPA.',
 
   body: [
-    'Pour personnaliser ses espaces de travail, Aurea souhaitait une œuvre forte, contemporaine et immédiatement identifiable, capable de refléter son univers innovant.',
-    'La fresque déploie une créature mécanique monumentale sur plusieurs murs. Les nuances de gris, les contours noirs et les touches de bleu composent une scène immersive tout en s’intégrant à l’architecture épurée des bureaux.',
+    'Pour habiller ses bureaux, CB Robotics souhaitait une fresque forte et cohérente avec son univers : la robotique, l’automatisation et les technologies tournées vers le futur.',
+    'La composition met en scène une créature mécanique panoramique, déployée sur plusieurs murs comme une machine en mouvement. Les lignes noires, les volumes gris et les touches de bleu technologique créent une fresque immersive, dynamique et parfaitement liée à l’identité de CB Robotics.',
   ],
 
   cover: {
-    src: 'projects/siege-aurea/cover.jpg',
-    alt: 'Fresque panoramique futuriste dans les bureaux du siège Aurea à Casablanca',
+    src: 'projects/robotique-en-mouvement/apres.jpeg',
+    alt: 'Fresque murale robotique futuriste dans les bureaux de CB Robotics',
   },
 
   ratio: '33 / 16',
-    beforeAfter: {
-      before: { src: 'projects/hotel-rivage/avant.jpeg', alt: 'Le hall d’accueil avant la fresque — photo à remplacer' },
-      after: { src: 'projects/hotel-rivage/apres.jpeg', alt: 'Le hall d’accueil après la fresque — photo à remplacer' },
-      label: 'Mécanique en mouvement',
-      meta: 'Bureaux à Casablanca',
+
+  beforeAfter: {
+    before: {
+      src: 'projects/robotique-en-mouvement/avant.jpeg',
+      alt: 'Mur des bureaux CB Robotics avant la réalisation de la fresque',
     },
-    gallery: [
-      { src: 'projects/hotel-rivage/1.jpeg', alt: 'Détail de la fresque — photo à remplacer', caption: 'Détail du tracé' },
-      { src: 'projects/hotel-rivage/2.jpeg', alt: 'Vue d’ensemble du hall — photo à remplacer', caption: 'Vue d’ensemble' },
-    ],
-    facts: { surface: '', duration: '', year: '', client: '' },
-    featuredOnHome: true,
-    featuredInHero: true,
+    after: {
+      src: 'projects/robotique-en-mouvement/apres.jpeg',
+      alt: 'Fresque robotique futuriste réalisée dans les bureaux de CB Robotics',
+    },
+    label: 'Robotique en mouvement',
+    meta: 'Bureaux CB Robotics',
   },
-  {
-    slug: 'clinique-vision-sud',
-    title: 'Clinique Vision Sud',
-    sector: 'sante',
-    city: 'Aix-en-Provence',
-    excerpt: 'Clinique ophtalmologique — salle d’attente.',
-    body: [
-      'TEXTE À REMPLACER — contexte du projet et attentes de l’équipe soignante.',
-      'TEXTE À REMPLACER — parti pris graphique retenu pour la salle d’attente.',
-    ],
-    cover: {
-      src: 'projects/clinique-vision-sud/cover.jpg',
-      alt: 'Fresque murale dans la salle d’attente d’une clinique — photo à remplacer',
+
+  gallery: [
+    {
+      src: 'projects/robotique-en-mouvement/avant.jpeg',
+      alt: 'Mur avant la fresque dans les bureaux CB Robotics',
+      caption: 'Avant intervention',
     },
-    ratio: '7 / 8',
-    beforeAfter: {
-      before: { src: 'projects/clinique-vision-sud/avant.jpg', alt: 'La salle d’attente avant la fresque — photo à remplacer' },
-      after: { src: 'projects/clinique-vision-sud/apres.jpg', alt: 'La salle d’attente après la fresque — photo à remplacer' },
-      label: 'Clinique Vision Sud — Salle d’attente',
-      meta: 'Aix-en-Provence · Clinique ophtalmologique',
+    {
+      src: 'projects/robotique-en-mouvement/apres.jpeg',
+      alt: 'Vue panoramique de la fresque robotique CB Robotics',
+      caption: 'Fresque panoramique',
     },
-    gallery: [
-      { src: 'projects/clinique-vision-sud/1.jpg', alt: 'Détail de la fresque — photo à remplacer', caption: 'Détail' },
-      { src: 'projects/clinique-vision-sud/2.jpg', alt: 'Vue de la salle d’attente — photo à remplacer', caption: 'Vue d’ensemble' },
-    ],
-    facts: { surface: '', duration: '', year: '', client: '' },
-    featuredInHero: true,
+  ],
+
+  facts: {
+    surface: '',
+    duration: '',
+    year: '',
+    client: 'CB Robotics',
   },
-  {
-    slug: 'ecole-les-tilleuls',
-    title: 'École Les Tilleuls',
-    sector: 'ecoles-enfants',
-    city: 'Lyon',
-    excerpt: 'École primaire — préau et couloir principal.',
-    body: [
-      'TEXTE À REMPLACER — contexte du projet et attentes de l’équipe pédagogique.',
-      'TEXTE À REMPLACER — parti pris graphique retenu pour le préau et le couloir.',
-    ],
-    cover: {
-      src: 'projects/ecole-les-tilleuls/cover.jpg',
-      alt: 'Fresque murale dans le préau d’une école — photo à remplacer',
-    },
-    ratio: '3 / 4',
-    gallery: [
-      { src: 'projects/ecole-les-tilleuls/1.jpg', alt: 'Détail de la fresque — photo à remplacer', caption: 'Détail' },
-      { src: 'projects/ecole-les-tilleuls/2.jpg', alt: 'Vue du couloir principal — photo à remplacer', caption: 'Couloir principal' },
-    ],
-    facts: { surface: '', duration: '', year: '', client: '' },
+
+  featuredOnHome: true,
+  featuredInHero: true,
+},
+{
+  slug: 'harmonie-verte',
+
+  title: 'Harmonie Verte',
+
+  sector: 'bureaux',
+
+  city: '',
+
+  excerpt:
+    'Fresque murale aux tons de verts doux, imaginée pour créer une atmosphère calme, naturelle et inspirante.',
+
+  body: [
+    'Pour habiller son espace intérieur, KOON souhaitait une fresque végétale capable d’apporter douceur, équilibre et sérénité à l’environnement.',
+    'La composition associe différentes nuances de vert, des formes organiques et des silhouettes méditatives. Les feuillages enveloppants créent une atmosphère apaisante tout en renforçant l’identité visuelle du lieu.',
+  ],
+
+  cover: {
+    src: 'projects/harmonie-verte/cover.jpeg',
+    alt: 'Fresque murale végétale aux tons de verts doux dans un espace intérieur KOON',
   },
-  {
-    slug: 'cafe-nord',
-    title: 'Café Nord',
-    sector: 'restaurants-commerces',
-    city: 'Bordeaux',
-    excerpt: 'Café de quartier — salle et devanture intérieure.',
-    body: [
-      'TEXTE À REMPLACER — contexte du projet et attentes du gérant.',
-      'TEXTE À REMPLACER — parti pris graphique retenu pour la salle et la devanture.',
-    ],
-    cover: {
-      src: 'projects/cafe-nord/cover.jpg',
-      alt: 'Fresque murale dans la salle d’un café — photo à remplacer',
+
+  ratio: '33 / 16',
+
+  beforeAfter: {
+    before: {
+      src: 'projects/harmonie-verte/avant.jpeg',
+      alt: 'Espace intérieur avant la réalisation de la fresque murale',
     },
-    ratio: '4 / 5',
-    gallery: [
-      { src: 'projects/cafe-nord/1.jpg', alt: 'Détail de la fresque — photo à remplacer', caption: 'Détail' },
-      { src: 'projects/cafe-nord/2.jpg', alt: 'Vue de la devanture intérieure — photo à remplacer', caption: 'Devanture intérieure' },
-    ],
-    facts: { surface: '', duration: '', year: '', client: '' },
+    after: {
+      src: 'projects/harmonie-verte/apres.jpeg',
+      alt: 'Fresque végétale Harmonie Verte réalisée dans l’espace KOON',
+    },
+    label: 'Harmonie Verte',
+    meta: 'Fresque murale végétale · KOON',
   },
+
+  gallery: [
+    {
+      src: 'projects/harmonie-verte/apres.jpeg',
+      alt: 'Détail des feuillages et des tons verts de la fresque',
+      caption: 'Détail végétal',
+    },
+    {
+      src: 'projects/harmonie-verte/cover.jpeg',
+      alt: 'Vue d’ensemble de la fresque murale Harmonie Verte',
+      caption: 'Vue d’ensemble',
+    },
+  ],
+
+  facts: {
+    surface: '',
+    duration: '',
+    year: '',
+    client: 'KOON',
+  },
+
+  featuredInHero: true,
+},
+ {
+  slug: 'ecole-les-tilleuls',
+
+  title: 'École Les Tilleuls',
+
+  sector: 'ecoles-enfants',
+
+  city: 'Casablanca',
+
+  excerpt:
+    'École pour enfants — création d’une fresque murale colorée inspirée de la nature et du monde animal.',
+
+  body: [
+    'Pour transformer les espaces de jeux en un environnement vivant et stimulant, l’équipe pédagogique souhaitait une fresque joyeuse, accessible aux enfants et propice à l’imaginaire.',
+    'La composition met en scène des animaux comme l’éléphant, la girafe et le paresseux au cœur d’une végétation luxuriante. Les teintes de vert, les couleurs vives et les formes arrondies créent un univers ludique, chaleureux et rassurant dans la cour et les espaces de l’école.',
+  ],
+
+  cover: {
+    src: 'projects/ecole-les-tilleuls/cover.jpeg',
+    alt: 'Fresque murale colorée représentant des animaux et une végétation luxuriante dans une école',
+  },
+
+  ratio: '3 / 4',
+
+  gallery: [
+    {
+      src: 'projects/ecole-les-tilleuls/1.jpeg',
+      alt: 'Détail de la fresque avec un paresseux entouré de feuillages',
+      caption: 'Le paresseux dans la jungle',
+    },
+    {
+      src: 'projects/ecole-les-tilleuls/2.jpeg',
+      alt: 'Fresque murale représentant un éléphant dans un espace de jeux pour enfants',
+      caption: 'Les animaux de la jungle',
+    },
+  ],
+
+  facts: {
+    surface: '',
+    duration: '',
+    year: '',
+    client: 'École Les Tilleuls',
+  },
+},
+{
+  slug: 'cafe-nord',
+
+  title: 'Café Nord',
+
+  sector: 'restaurants-commerces',
+
+  city: 'Bordeaux',
+
+  excerpt:
+    'Café de quartier — création d’une fresque murale chaleureuse et inspirante autour de l’univers du café.',
+
+  body: [
+    'Pour créer une atmosphère accueillante et mémorable, le Café Nord souhaitait habiller ses murs avec une fresque originale, pensée pour accompagner les moments de pause autour d’un bon café.',
+    'Le dessin mural mêle fleurs, feuillages, tasses et formes organiques dans une palette de noir, de blanc et de tons dorés. Une composition expressive qui apporte caractère, chaleur et identité à l’espace.',
+  ],
+
+  cover: {
+    src: 'projects/cafe-nord/cover.jpeg',
+    alt: 'Fresque murale inspirée de l’univers du café dans le Café Nord à Bordeaux',
+  },
+
+  ratio: '4 / 5',
+
+  gallery: [
+    {
+      src: 'projects/cafe-nord/1.jpeg',
+      alt: 'Détail de la fresque murale avec motifs floraux et tasse de café',
+      caption: 'Détail de la fresque',
+    },
+    {
+      src: 'projects/cafe-nord/cover.jpeg',
+      alt: 'Vue d’ensemble de la fresque murale dans le Café Nord',
+      caption: 'Vue d’ensemble',
+    },
+  ],
+
+  facts: {
+    surface: '',
+    duration: '',
+    year: '',
+    client: 'Café Nord',
+  },
+},
+{
+  slug: 'cabine-gynecologique',
+
+  title: 'Cabine de gynécologie',
+
+  sector: 'sante',
+
+  city: '',
+
+  excerpt:
+    'Cabine gynécologique — une fresque en ligne art pensée comme un espace de sérénité, de confiance et de bien-être.',
+
+  body: [
+    'Pour cette cabine gynécologique, l’objectif était de créer un environnement doux, rassurant et élégant, afin d’accompagner les patientes dans un moment intime avec davantage de sérénité.',
+    'La fresque associe des silhouettes féminines, des fleurs et des lignes continues dans un style épuré et délicat. Une composition artistique qui évoque la féminité, la bienveillance et le bien-être tout en s’intégrant harmonieusement à l’architecture du cabinet.',
+  ],
+
+  cover: {
+    src: 'projects/cabine-gynecologique/cover.jpeg',
+    alt: 'Fresque murale en ligne art dans une cabine gynécologique',
+  },
+
+  ratio: '3 / 4',
+
+  gallery: [
+    {
+      src: 'projects/cabine-gynecologique/1.jpeg',
+      alt: 'Fresque murale représentant une silhouette féminine et des fleurs',
+      caption: 'Ligne art et féminité',
+    },
+    {
+      src: 'projects/cabine-gynecologique/2.jpeg',
+      alt: 'Détail d’une fresque florale dans le cabinet gynécologique',
+      caption: 'Détail floral',
+    }
+  ],
+
+  facts: {
+    surface: '',
+    duration: '',
+    year: '',
+    client: '',
+  },
+},
   {
     slug: 'studio-habitat',
     title: 'Studio Habitat',

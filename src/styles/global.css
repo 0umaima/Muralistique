@@ -16,12 +16,12 @@
   --ink-line-3: #4a443d;
   --ink-stroke: #6e665c;   /* contour des grands chiffres évidés */
 
-  --ivory: #f4f0e7;        /* ivoire : fond principal */
-  --ivory-2: #e8e1d6;      /* ivoire soutenu : champs, sections alternées */
+  --ivory: #fff;        /* ivoire : fond principal */
+  --ivory-2: #ffe8e8;      /* ivoire soutenu : champs, sections alternées */
   --ivory-3: #ddd8ce;      /* ivoire profond : fond de planche */
-  --rule: #cfc7ba;         /* filet clair */
+  --rule: #fff4e2;         /* filet clair */
 
-  --blush: #f2b3a6;        /* accent blush */
+  --blush: #ae1717;        /* accent blush */
   --blush-ink: #4a3d39;    /* texte secondaire sur blush */
 
   --muted-on-light: #625b53;

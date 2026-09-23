@@ -174,7 +174,7 @@ export const studio = {
 /** Champs du formulaire de devis (page Devis). */
 export const quoteOptions = {
   spaceTypes: ['Hôtel', 'Cabinet / clinique', 'École', 'Restaurant', 'Commerce', 'Bureau', 'Logement', 'Autre'],
-  /** ⚠ Fourchettes reprises de la maquette (en dirhams) — À ADAPTER à votre marché. */
+  /** ⚠ Fourchettes reprises de la maquette (en dirhams) . */
   budgets: [
     'Moins de 2 000 Dh',
     '2 000 Dh – 5 000 Dh',

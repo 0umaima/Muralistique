@@ -18,7 +18,7 @@ export const site = {
    * À REMPLACER — domaine définitif du site (sans slash final).
    * Utilisé pour le sitemap, robots.txt et les URL canoniques.
    */
-  url: 'https://www.muralistique.fr',
+  url: 'https://www.muralistique.com',
 
   /** Langue du document. */
   locale: 'fr-FR',
@@ -26,15 +26,15 @@ export const site = {
 
   contact: {
     /** À REMPLACER — adresse e-mail réelle de l'atelier. */
-    email: 'bonjour@muralistique.fr',
+    email: 'aminehoumam0@gmail.com',
 
     /**
      * À REMPLACER — numéro de téléphone affiché (format lisible).
      * Laissez la chaîne vide pour masquer complètement le bloc téléphone.
      */
-    phoneDisplay: '+33 0 00 00 00 00',
+    phoneDisplay: '+212 6 81 93 2646 ',
     /** À REMPLACER — même numéro au format composable (tel:). */
-    phoneHref: '+33000000000',
+    phoneHref: '+212681932646',
 
     /** Horaires affichés à côté du numéro. À REMPLACER si besoin. */
     hours: '7j/7 · 9 h – 19 h',
@@ -47,9 +47,9 @@ export const site = {
      * exemples ci-dessous, le site affiche un avertissement visible à la
      * place du bouton WhatsApp (voir src/components/WhatsAppLink.astro).
      */
-    whatsappNumber: '',
+    whatsappNumber: '+212681932646',
     /** Message pré-rempli à l'ouverture de WhatsApp. */
-    whatsappMessage: 'Bonjour Muralistique, je souhaite un devis pour une fresque murale.',
+    whatsappMessage: 'Bonjour Amine, je souhaite un devis pour une fresque murale.',
 
     /** Ville / zone d'intervention affichée. À REMPLACER. */
     city: '',
@@ -57,7 +57,7 @@ export const site = {
 
   social: {
     /** À REMPLACER — URL complète du profil, ou chaîne vide pour masquer le lien. */
-    instagram: '',
+    instagram: 'https://www.instagram.com/muralistique/',
     facebook: '',
     linkedin: '',
     youtube: '',
