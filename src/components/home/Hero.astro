@@ -1,80 +1,77 @@
 ---
 import Icon from '../Icon.astro';
 import Media from '../Media.astro';
+import FixedBg from '../FixedBg.astro';
 import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
 
-
 /**
- * Hero de l'accueil.
+ * Hero de l'accueil : un collage de trois grands visuels à angles francs,
+ * le titre posé par-dessus leur bas, sur un fond photo fixe.
  *
- * ▶ VIDÉO : la maquette prévoit une courte vidéo (ou GIF) au centre. Elle est
- *   remplacée ici par une image fixe, volontairement (voir README §
- *   « Vidéos YouTube »). Le cadre central est déjà au bon format : le jour où
- *   vous activez la vidéo, seul ce composant est à modifier.
+ * À l'ouverture, les visuels apparaissent l'un après l'autre (gauche,
+ * centre, droite) derrière un volet jaune, puis le titre monte.
+ * Pour changer une image : remplacez le fichier dans src/assets/images/home/
+ * en gardant son nom.
  */
 ---
 
 <section class="hero theme-ink" data-section-theme="ink">
-  <div class="hero__bg" aria-hidden="true">
-    <Media
-      src="home/hero-bg.jpg"
-      alt=""
-      widths={[900, 1400, 1920, 2560]}
-      sizes="100vw"
-      eager
-      class="hero__bg-media"
-    />
-  </div>
-  <div class="hero__scrim" aria-hidden="true"></div>
+  <FixedBg src="home/hero-bg.jpg" scrim={0.62} eager />
 
   <div class="hero__inner shell pad">
-    <p class="hero__badge">
-      <Icon name="sparkle" size={13} stroke={1.6} />
-      Atelier de fresques murales
-    </p>
-
-    <div class="hero__cards">
-      <div class="hero__card hero__card--left">
+    <div class="hero__stage">
+      <div class="hero__shot hero__shot--left">
         <Media
           src="home/hero-left.jpeg"
-          alt="Chantier de fresque murale en cours — photo à remplacer"
-          widths={[280, 420, 560, 816]}
-          sizes="(max-width: 900px) 28vw, 272px"
+          alt="Fresque « Build Something » peinte dans un espace de travail"
+          widths={[320, 480, 640, 900]}
+          sizes="(max-width: 700px) 42vw, 26vw"
           eager
+          position="center 40%"
+          class="hero__media"
         />
       </div>
 
-      <div class="hero__card hero__card--center">
-  <img
-    class="hero__gif"
-    src={heroCenterGif}
-    alt="Geste de peinture sur une fresque murale"
-    width="392"
-    height="470"
-    loading="eager"
-    fetchpriority="high"
-    decoding="async"
-  />
-</div>
+      <div class="hero__shot hero__shot--center">
+        <img
+          class="hero__gif"
+          src={heroCenterGif}
+          alt="Geste de peinture sur une fresque murale"
+          width="720"
+          height="1280"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </div>
 
-      <div class="hero__card hero__card--right">
+      <div class="hero__shot hero__shot--right">
         <Media
           src="home/hero-right.jpeg"
-          alt="Mur fini, détail de la fresque — photo à remplacer"
-          widths={[280, 420, 560, 816]}
-          sizes="(max-width: 900px) 28vw, 272px"
+          alt="Visage peint au trait noir sur des aplats jaune, rouge et bleu"
+          widths={[320, 480, 640, 900]}
+          sizes="(max-width: 700px) 42vw, 36vw"
           eager
+          position="center 35%"
+          class="hero__media"
         />
       </div>
+
+      <svg class="hero__stroke hero__stroke--a" viewBox="0 0 220 420" fill="none" aria-hidden="true">
+        <path pathLength="1" d="M14 404C120 330 206 250 196 150 186 52 104 8 40 30"></path>
+      </svg>
+      <svg class="hero__stroke hero__stroke--b" viewBox="0 0 320 220" fill="none" aria-hidden="true">
+        <path pathLength="1" d="M8 212C52 120 120 40 212 22c48-9 84 6 100 30"></path>
+      </svg>
+
+      <h1 class="hero__title">
+        <span class="hero__line hero__line--1">Fresques peintes</span>
+        <span class="hero__line hero__line--2">à la main</span>
+      </h1>
     </div>
 
-    <h1 class="hero__title">
-      <span class="hero__line hero__line--1">Nous transformons vos murs</span>
-      <span class="hero__line hero__line--2">en œuvres d’art.</span>
-    </h1>
-
     <div class="hero__actions">
-      <a class="btn btn--blush" href="/devis">
+      <a class="btn btn--accent" href="/devis">
         Demander un devis
         <Icon name="arrow-up-right" size={14} stroke={2.2} />
       </a>
@@ -86,143 +83,177 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
 <style>
   .hero {
     position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    min-height: calc(100svh - var(--header-h));
+    padding-block: clamp(1.5rem, 3vw, 2.5rem) clamp(2rem, 4vw, 3.5rem);
     overflow: hidden;
-    padding-block: clamp(2rem, 4.4vw, 4rem) clamp(2.5rem, 5.3vw, 4.75rem);
     background: var(--ink);
   }
 
-  .hero__bg { position: absolute; inset: 0; opacity: 0.32; }
-  .hero__bg :global(.media),
-  .hero__bg :global(.hero__bg-media) { width: 100%; height: 100%; }
-  .hero__scrim { position: absolute; inset: 0; background: rgba(15, 14, 13, 0.55); }
-
   .hero__inner {
-    position: relative;
-    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
   }
 
-  .hero__badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    padding: 8px 14px 7px;
-    border-radius: 100px;
-    background: var(--blush);
-    color: var(--ink);
-    font: 600 clamp(0.594rem, 0.76vw, 0.6875rem) / 1 var(--font-body);
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-  }
-
-  .hero__cards {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: clamp(1.625rem, 3.05vw, 2.75rem);
-  }
-
-  .hero__card {
+  /* ——— Scène du collage ———
+     Toutes les positions sont en % de la scène, dont le format est fixe :
+     le collage garde ses proportions à toutes les largeurs. */
+  .hero__stage {
     position: relative;
-    flex: none;
+    /* Largeur plafonnée par la hauteur d'écran : le collage et son titre
+       tiennent dans la première vue, même sur un portable peu haut. */
+    width: min(100%, 1320px, (100svh - var(--header-h) - 4.5rem) * 1320 / 740);
+    aspect-ratio: 1320 / 740;
+  }
+
+  .hero__shot {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--w);
+    aspect-ratio: var(--ar);
     overflow: hidden;
-    border-radius: clamp(12px, 1.53vw, 22px);
-    border: 1px solid rgba(244, 240, 231, 0.35);
+    background: var(--ink-2);
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.65);
   }
-  .hero__card :global(.media) { width: 100%; height: 100%; }
+  .hero__shot--left { --x: 2%; --y: 7%; --w: 25%; --ar: 3 / 4; z-index: 1; }
+  .hero__shot--center { --x: 28.5%; --y: 0%; --w: 35%; --ar: 4 / 5; z-index: 2; }
+  .hero__shot--right { --x: 60.5%; --y: 15%; --w: 36%; --ar: 1 / 1; z-index: 3; }
 
-  .hero__card--left,
-  .hero__card--right {
-    width: clamp(96px, 18.9vw, 272px);
-    height: clamp(124px, 23.6vw, 340px);
-    z-index: 1;
+  .hero__shot :global(.hero__media),
+  .hero__gif {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
-  .hero__card--left { transform: rotate(-5deg); }
-  .hero__card--right { transform: rotate(5deg); }
+  .hero__gif { object-position: center 45%; }
 
-  .hero__card--center {
-    width: clamp(150px, 27.2vw, 392px);
-    height: clamp(186px, 32.6vw, 470px);
-    margin-inline: clamp(-30px, -2.08vw, -12px);
-    border-radius: clamp(14px, 1.67vw, 24px);
-    border-color: rgba(244, 240, 231, 0.5);
-    z-index: 3;
+  /* Traits jaunes, à la manière d'un coup de pinceau autour du collage */
+  .hero__stroke {
+    position: absolute;
+    z-index: 4;
+    overflow: visible;
+    pointer-events: none;
   }
-.hero__gif {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+  .hero__stroke path {
+    stroke: var(--accent);
+    stroke-width: 7;
+    stroke-linecap: round;
+  }
+  .hero__stroke--a { left: -3%; top: 34%; width: 13%; }
+  .hero__stroke--b { right: -2%; bottom: 4%; width: 20%; }
 
   .hero__title {
-    max-width: 1120px;
-    margin-top: clamp(1.625rem, 2.5vw, 2.25rem);
-    font-size: var(--fs-hero);
-    line-height: 0.94;
-    letter-spacing: -0.05em;
+    position: absolute;
+    z-index: 5;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-size: clamp(3rem, 8.6vw, 8rem);
+    font-weight: 900;
+    line-height: 0.86;
+    text-align: center;
     color: var(--ivory);
+    text-shadow: 0 4px 40px rgba(0, 0, 0, 0.45);
+    pointer-events: none;
   }
   .hero__line { display: block; }
+  .hero__line--2 { color: var(--accent); }
 
   .hero__actions {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 14px;
-    margin-top: clamp(1.625rem, 2.78vw, 2.5rem);
+    margin-top: clamp(1.5rem, 2.8vw, 2.5rem);
   }
 
-  @media (max-width: 700px) {
-    /* Le cadre est trop étroit pour le libellé : on ne garde que le repère. */
-    .hero__slot { left: 8px; bottom: 8px; padding: 7px; }
-    .hero__slot-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  /* Tablette : la scène se resserre un peu en hauteur */
+  @media (max-width: 900px) {
+    .hero { min-height: 0; }
+    .hero__stage { width: 100%; aspect-ratio: 4 / 3; }
+    .hero__shot--left { --x: 0%; --y: 10%; --w: 30%; }
+    .hero__shot--center { --x: 27%; --y: 0%; --w: 42%; }
+    .hero__shot--right { --x: 63%; --y: 16%; --w: 37%; }
+    .hero__stroke--a { left: -4%; top: 44%; width: 16%; }
+    .hero__stroke--b { width: 26%; }
   }
-  @media (max-width: 560px) {
+
+  /* Mobile : collage plus vertical, titre sur toute la largeur */
+  @media (max-width: 600px) {
+    .hero__stage { aspect-ratio: 4 / 5; }
+    .hero__shot--left { --x: 0%; --y: 8%; --w: 40%; --ar: 3 / 4; }
+    .hero__shot--center { --x: 26%; --y: 0%; --w: 50%; --ar: 3 / 4; }
+    .hero__shot--right { --x: 58%; --y: 20%; --w: 42%; --ar: 3 / 4; }
+    .hero__title { font-size: clamp(2.5rem, 12.4vw, 4.25rem); }
+    .hero__stroke--a { display: none; }
+    .hero__stroke--b { width: 34%; right: -4%; bottom: 30%; }
     .hero__actions { flex-direction: column; align-self: stretch; }
     .hero__actions :global(.btn) { width: 100%; }
   }
 
-  /* ——— Entrée à l'ouverture de la page ———
-     Uniquement quand JavaScript est actif : sans lui, tout est déjà en place. */
-  .js .hero__badge { animation: h-fade 350ms var(--ease-out) both; }
-  .js .hero__card--center { animation: h-center 850ms var(--ease-out) both; }
-  .js .hero__card--left { animation: h-left 900ms var(--ease-out) 120ms both; }
-  .js .hero__card--right { animation: h-right 900ms var(--ease-out) 120ms both; }
-  .js .hero__line--1 { animation: h-line 700ms var(--ease-out) 300ms both; }
-  .js .hero__line--2 { animation: h-line 700ms var(--ease-out) 380ms both; }
-  .js .hero__actions { animation: h-line 700ms var(--ease-out) 480ms both; }
+  /* ——— Entrée : un visuel à la fois ———
+     Chaque cadre s'ouvre de gauche à droite sur un aplat jaune, qui se
+     retire à son tour pour découvrir l'image. Les trois cadres passent
+     l'un après l'autre, puis le titre monte. Uniquement quand JavaScript
+     est actif : sans lui, tout est déjà en place. */
+  .hero__shot--left { --d: 150ms; }
+  .hero__shot--center { --d: 900ms; }
+  .hero__shot--right { --d: 1650ms; }
 
-  @keyframes h-fade { from { opacity: 0; } to { opacity: 1; } }
+  .hero__shot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: right;
+    pointer-events: none;
+  }
+
+  :global(.js) .hero__shot { animation: shot-open 650ms var(--ease-out) var(--d) both; }
+  :global(.js) .hero__shot::after { animation: shot-cover 700ms cubic-bezier(0.7, 0, 0.3, 1) calc(var(--d) + 380ms) both; }
+  :global(.js) .hero__shot :global(.hero__media),
+  :global(.js) .hero__gif { animation: shot-zoom 1500ms var(--ease-out) calc(var(--d) + 380ms) both; }
+
+  :global(.js) .hero__stroke path { animation: stroke-draw 1100ms var(--ease-out) 2500ms both; }
+  :global(.js) .hero__line--1 { animation: h-line 800ms var(--ease-out) 2350ms both; }
+  :global(.js) .hero__line--2 { animation: h-line 800ms var(--ease-out) 2480ms both; }
+  :global(.js) .hero__actions { animation: h-line 700ms var(--ease-out) 2700ms both; }
+
+  @keyframes shot-open {
+    from { clip-path: inset(0 100% 0 0); }
+    to { clip-path: inset(0 0 0 0); }
+  }
+  @keyframes shot-cover {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+  }
+  @keyframes shot-zoom {
+    from { transform: scale(1.22); }
+    to { transform: none; }
+  }
+  @keyframes stroke-draw {
+    from { stroke-dasharray: 1; stroke-dashoffset: 1; }
+    to { stroke-dasharray: 1; stroke-dashoffset: 0; }
+  }
   @keyframes h-line {
-    from { opacity: 0; transform: translateY(30px); }
+    from { opacity: 0; transform: translateY(40px); }
     to { opacity: 1; transform: none; }
-  }
-  @keyframes h-center {
-    from { opacity: 0; transform: translateY(24px) scale(0.98); }
-    to { opacity: 1; transform: none; }
-  }
-  /* Les deux vignettes latérales arrivent par des côtés opposés
-     et se posent sur leur inclinaison de référence. */
-  @keyframes h-left {
-    from { opacity: 0; transform: translateX(70px) rotate(0deg); }
-    to { opacity: 1; transform: rotate(-5deg); }
-  }
-  @keyframes h-right {
-    from { opacity: 0; transform: translateX(-70px) rotate(0deg); }
-    to { opacity: 1; transform: rotate(5deg); }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .js .hero__badge,
-    .js .hero__card--center,
-    .js .hero__line--1,
-    .js .hero__line--2,
-    .js .hero__actions { animation: none; }
-    .js .hero__card--left { animation: none; transform: rotate(-5deg); }
-    .js .hero__card--right { animation: none; transform: rotate(5deg); }
+    :global(.js) .hero__shot,
+    :global(.js) .hero__shot::after,
+    :global(.js) .hero__shot :global(.hero__media),
+    :global(.js) .hero__gif,
+    :global(.js) .hero__stroke path,
+    :global(.js) .hero__line--1,
+    :global(.js) .hero__line--2,
+    :global(.js) .hero__actions { animation: none; }
   }
 </style>

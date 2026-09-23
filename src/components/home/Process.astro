@@ -120,7 +120,7 @@ import { processSteps, processImages } from '../../data/content';
     clip-path: polygon(0 0, calc(100% - 30px) 0, 100% 30px, 100% 100%, 0 100%);
     transition: transform 220ms var(--ease), background-color 220ms var(--ease);
   }
-  .process__step:hover .process__frame { transform: translateY(-5px); background: var(--blush); }
+  .process__step:hover .process__frame { transform: translateY(-5px); background: var(--accent); }
 
   .process__card {
     display: flex;
@@ -133,22 +133,22 @@ import { processSteps, processImages } from '../../data/content';
 
   .process__card--ivory { background: var(--ivory); color: var(--ink); }
   .process__card--ink { background: var(--ink); color: var(--muted-on-dark); }
-  .process__card--blush { background: var(--blush); color: var(--blush-ink); }
+  .process__card--accent { background: var(--accent); color: var(--accent-ink); }
 
   .process__icon { display: block; transition: transform 220ms var(--ease); }
   .process__step:hover .process__icon { transform: rotate(4deg); }
   .process__card--ivory .process__icon,
-  .process__card--blush .process__icon { color: var(--ink); }
-  .process__card--ink .process__icon { color: var(--blush); }
+  .process__card--accent .process__icon { color: var(--ink); }
+  .process__card--ink .process__icon { color: var(--accent); }
 
   .process__spacer { flex: 1; }
 
   .process__number {
     font: 700 clamp(1.75rem, 2.36vw, 2.125rem) / 1 var(--font-display);
-    letter-spacing: -0.045em;
+    letter-spacing: var(--ls-display);
     opacity: 0.55;
   }
-  .process__card--ivory .process__number, .process__card--blush .process__number { color: var(--ink); }
+  .process__card--ivory .process__number, .process__card--accent .process__number { color: var(--ink); }
   .process__card--ink .process__number { color: var(--ivory); }
 
   .process__step-title { margin-top: 10px; font-size: var(--fs-h3-sm); }

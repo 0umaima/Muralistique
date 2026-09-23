@@ -1,5 +1,5 @@
 /**
- * Télécharge les polices (Bricolage Grotesque + Manrope) depuis Google Fonts
+ * Télécharge les polices (Big Shoulders Display + Manrope) depuis Google Fonts
  * vers public/fonts/, pour les héberger avec le site.
  *
  * ▶ À relancer uniquement si vous voulez mettre à jour les fichiers :
@@ -13,7 +13,7 @@ const OUT = new URL('../public/fonts/', import.meta.url);
 const KEEP = new Set(['latin', 'latin-ext']);
 
 const FAMILIES = [
-  { css: 'Bricolage+Grotesque:opsz,wght@12..96,400..700', family: 'Bricolage Grotesque', slug: 'bricolage-grotesque' },
+  { css: 'Big+Shoulders+Display:wght@500..900', family: 'Big Shoulders Display', slug: 'big-shoulders-display' },
   { css: 'Manrope:wght@400..700', family: 'Manrope', slug: 'manrope' },
 ];
 

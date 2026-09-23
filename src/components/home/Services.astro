@@ -62,7 +62,7 @@ import { services } from '../../data/content';
                   <div>
                     <h4 class="services__panel-title">{service.heading}</h4>
                     <p class="services__panel-text muted">{service.text}</p>
-                    <a class="btn btn--blush btn--md services__panel-cta" href="/devis">
+                    <a class="btn btn--accent btn--md services__panel-cta" href="/devis">
                       Demander un devis
                       <Icon name="arrow-up-right" size={13} stroke={2.2} />
                     </a>
@@ -94,8 +94,8 @@ import { services } from '../../data/content';
     overflow: hidden;
     transition: border-color 240ms var(--ease);
   }
-  .services__item:hover { border-color: var(--blush); }
-  .services__item:focus-within { border-color: var(--blush); }
+  .services__item:hover { border-color: var(--accent); }
+  .services__item:focus-within { border-color: var(--accent); }
 
   .services__heading { font: inherit; margin: 0; }
 
@@ -115,14 +115,14 @@ import { services } from '../../data/content';
     flex: none;
     min-width: 76px;
     font: 700 var(--fs-h3-xl) / 1 var(--font-display);
-    letter-spacing: -0.04em;
+    letter-spacing: var(--ls-display);
     color: var(--ink-2);
     -webkit-text-stroke: 1px var(--ink-stroke);
   }
   .services__name {
     flex: 1;
     font: 700 var(--fs-h3-xl) / 1 var(--font-display);
-    letter-spacing: -0.045em;
+    letter-spacing: var(--ls-display);
   }
 
   .services__tags { display: flex; gap: 9px; flex: none; }

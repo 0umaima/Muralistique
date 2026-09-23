@@ -89,17 +89,21 @@ Résumé :
 
 | Dossier | Contenu |
 | --- | --- |
-| `brand/` | `logo.png` (256 × 256, fond transparent) et `og.jpg` (1200 × 630, partage réseaux sociaux) |
-| `home/` | Fond du hero + les trois vignettes (gauche, centre, droite) |
+| `brand/` | `og.jpg` (1200 × 630, partage réseaux sociaux). Le logo, lui, est du texte (`src/components/Logo.astro`) |
+| `home/` | Fond fixe du hero + les trois visuels du collage (gauche, GIF central, droite) |
 | `sectors/` | Une image par secteur (6) |
 | `process/` | Croquis, tracé, mise en couleur |
 | `services/` | Fresque, toile, performance |
 | `people/` | Portrait du témoignage |
 | `portfolio/` | Fond du hero de la page Réalisations |
-| `studio/` | Hero, portrait secondaire, 4 images de galerie |
+| `studio/` | Photo du hero (les images d'atelier restent disponibles pour la mosaïque, voir `studio.gallery` dans `src/data/content.ts`) |
 | `projects/<slug>/` | `cover.jpg`, `avant.jpg`, `apres.jpg`, `1.jpg`, `2.jpg` |
 
-Le favicon est `public/favicon.png` (copie du logo — pensez à le remplacer aussi).
+Le favicon est `public/favicon.png` : le « M » jaune du logo sur fond noir.
+
+Les **fonds fixes** (photo immobile pendant que la section défile, effet
+« ascenseur ») se choisissent dans les composants : `home/Hero.astro`,
+`home/Stats.astro`, la prop `bg` de `ContactCta` et `pages/studio.astro`.
 
 **Textes alternatifs :** ils se modifient dans `src/data/`, à côté du chemin de
 chaque image. Ils sont obligatoires pour l'accessibilité et le référencement.
@@ -242,14 +246,24 @@ src/
   styles/global.css  Jetons de design : palette, échelle typographique, rythme
   data/              Contenu (voir §2)
   assets/images/     Images optimisées par Astro
-public/fonts/        Bricolage Grotesque + Manrope auto-hébergées
+public/fonts/        Big Shoulders Display + Manrope auto-hébergées
 scripts/             Outils de développement (placeholders, captures, tests)
 ```
 
 ### Design
 
-- Palette **ivoire / encre / blush** et typographies **Bricolage Grotesque**
-  (titres) + **Manrope** (textes), conformes à la maquette.
+- Identité reprise du logo : **noir / blanc** et le **jaune exact du « M »**
+  (`--accent: #FBBE67`) comme accent, plus une crème très claire pour les
+  sections alternées et un ambre (`--accent-strong`) pour les petits éléments
+  d'accent sur fond blanc.
+- Typographies : **Big Shoulders Display** (titres, navigation, boutons — en
+  capitales étroites, comme le logo) + **Manrope** (textes courants). La police
+  du logo, *Editorial Comment JNL*, est commerciale : Big Shoulders Display est
+  l'alternative libre la plus proche. Si vous achetez la licence web, déposez
+  le `.woff2` dans `public/fonts/`, déclarez-le dans `src/styles/fonts.css` et
+  placez-le en tête de `--font-display`.
+- Logo purement typographique (`src/components/Logo.astro`) : « MURALISTIQUE »
+  très espacé, « M » plus haut et jaune.
 - Toutes les valeurs sont des variables CSS en haut de `src/styles/global.css` :
   changez-les là et tout le site suit.
 - Échelle typographique fluide en `clamp()` : la borne haute correspond
@@ -276,13 +290,20 @@ fermeture par Échap, focus rendu au bouton, défilement de page bloqué.
 
 - Apparitions au défilement : fondu + 24 px vers le haut, 700 ms, léger
   décalage en cascade, **une seule fois par chargement**.
-- Vignettes du hero : entrée par les côtés opposés, 900 ms, jusqu'à leur
-  inclinaison de référence (−5° / +5°).
+- Hero de l'accueil : les trois visuels (angles francs) apparaissent **l'un
+  après l'autre** derrière un volet jaune, puis le titre monte par-dessus.
+- Fonds fixes (`FixedBg.astro`) : la photo reste immobile et la section glisse
+  dessus, dans les deux sens de défilement (hero, chiffres clés, contact,
+  hero et citation du Studio). Technique `clip` + `position: fixed`, qui
+  fonctionne aussi sur iOS, contrairement à `background-attachment: fixed`.
 - Chiffres clés : comptage jusqu'à la valeur exacte à la première apparition,
   suffixes conservés (`+`, `%`, ` j`).
 - Cartes du processus : légère rotation au départ, alignement à l'arrivée.
-- Studio : volet blush qui s'efface, révélation de la photo au clip, entrée du
-  titre. Accordéon en `grid-template-rows`. Survol des cartes projet.
+- Studio (`src/scripts/scroll-fx.ts`) : volet jaune et nom lettre par lettre
+  à l'ouverture, phrase d'intro révélée mot à mot au défilement, défilé
+  horizontal épinglé des murs (grands écrans ; rail au doigt sur mobile),
+  étapes en bandeau défilant, mosaïque découverte au clip avec léger parallaxe.
+- Accordéon en `grid-template-rows`. Survol des cartes projet.
 
 Tout est en CSS + `IntersectionObserver`. `prefers-reduced-motion: reduce`
 désactive l'ensemble, et **si le JavaScript échoue ou est désactivé, aucun

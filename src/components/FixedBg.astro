@@ -1,0 +1,83 @@
+---
+/**
+ * Image de fond « fixe » : la photo reste immobile pendant que la section
+ * défile par-dessus, comme une fenêtre qui glisse sur le mur — la section
+ * suivante recouvre l'image en descendant et la découvre en remontant.
+ *
+ * Pourquoi pas `background-attachment: fixed` ? Il est ignoré sur iOS et
+ * interdit l'optimisation d'image d'Astro. Ici, un calque `position: fixed`
+ * est découpé par son conteneur (`clip`), ce qui fonctionne partout.
+ *
+ * ⚠ À placer dans une section `position: relative; isolation: isolate;`
+ *   (le calque passe alors sous le contenu, au-dessus du fond de section),
+ *   et jamais sous un élément transformé (`transform`, `filter`,
+ *   `[data-reveal]`…) : un ancêtre transformé fige le calque.
+ */
+import Media from './Media.astro';
+
+interface Props {
+  /** Chemin relatif dans src/assets/images/ */
+  src: string;
+  /** object-position, ex. 'center 30%'. */
+  position?: string;
+  /** Opacité de la photo (le fond de la section passe à travers). */
+  opacity?: number;
+  /** Voile sombre au-dessus de la photo, de 0 à 1. */
+  scrim?: number;
+  /** Image au-dessus de la ligne de flottaison. */
+  priority?: boolean;
+  eager?: boolean;
+  class?: string;
+}
+
+const { src, position, opacity = 1, scrim = 0, priority = false, eager = false, class: className = '' } = Astro.props;
+---
+
+<div class:list={['fixed-bg', className]} aria-hidden="true" style={`--fixed-bg-opacity:${opacity};--fixed-bg-scrim:${scrim}`}>
+  <div class="fixed-bg__layer">
+    <Media
+      src={src}
+      alt=""
+      widths={[900, 1400, 1920, 2560]}
+      sizes="100vw"
+      priority={priority}
+      eager={eager}
+      position={position}
+      class="fixed-bg__media"
+    />
+    <div class="fixed-bg__scrim"></div>
+  </div>
+</div>
+
+<style>
+  .fixed-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    /* Découpe le calque fixe aux dimensions de la section : en dehors, il
+       n'existe pas. `clip` est la seule découpe qui s'applique aussi aux
+       descendants `position: fixed` dans tous les navigateurs. */
+    clip: rect(0, auto, auto, 0);
+    clip-path: inset(0);
+    pointer-events: none;
+  }
+  .fixed-bg__layer {
+    position: fixed;
+    inset: 0;
+    /* Hauteur « grande » du viewport : pas de saut quand la barre
+       d'adresse mobile se replie. */
+    height: 100lvh;
+  }
+  .fixed-bg__layer :global(.fixed-bg__media) {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    opacity: var(--fixed-bg-opacity);
+  }
+  .fixed-bg__scrim {
+    position: absolute;
+    inset: 0;
+    background: var(--ink);
+    opacity: var(--fixed-bg-scrim);
+  }
+</style>

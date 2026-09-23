@@ -178,13 +178,13 @@ const facts = [
     font: 500 var(--fs-xs) / 1 var(--font-body);
     color: var(--muted-on-dark);
   }
-  .detail-hero__crumbs a:hover { color: var(--blush); }
+  .detail-hero__crumbs a:hover { color: var(--accent); }
   .detail-hero__eyebrow { margin-top: 28px; color: var(--muted-on-dark); }
   .detail-hero__title {
     margin-top: 22px;
     font-size: var(--fs-h1);
     line-height: 0.94;
-    letter-spacing: -0.05em;
+    letter-spacing: var(--ls-display);
     color: var(--ivory);
     max-width: 16ch;
   }
@@ -257,7 +257,7 @@ const facts = [
     font: 500 0.84375rem/1 var(--font-body);
     color: var(--muted-on-light);
   }
-  .detail-gallery__dot { width: 7px; height: 7px; background: var(--blush); flex: none; }
+  .detail-gallery__dot { width: 7px; height: 7px; background: var(--accent); flex: none; }
 
   .detail-next { border-top: 1px solid var(--ink); }
   .detail-next__link {
@@ -268,7 +268,7 @@ const facts = [
     padding-block: clamp(2rem, 3.9vw, 3.5rem);
     transition: background-color 240ms var(--ease);
   }
-  .detail-next__link:hover { background: var(--blush); }
+  .detail-next__link:hover { background: var(--accent); }
   .detail-next__label {
     display: block;
     font: 600 var(--fs-eyebrow) / 1 var(--font-body);
@@ -280,7 +280,7 @@ const facts = [
     display: block;
     margin-top: 14px;
     font: 700 var(--fs-h2-sm) / 1 var(--font-display);
-    letter-spacing: -0.045em;
+    letter-spacing: var(--ls-display);
   }
   .detail-next__link :global(svg) { flex: none; transition: transform 240ms var(--ease); }
   .detail-next__link:hover :global(svg) { transform: translateX(6px); }

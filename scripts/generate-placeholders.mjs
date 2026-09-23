@@ -17,10 +17,11 @@ import { dirname, join } from 'node:path';
 
 const ROOT = new URL('../src/assets/images/', import.meta.url).pathname;
 
-const INK = '#0F0E0D';
-const IVORY = '#F4F0E7';
-const IVORY_2 = '#E8E1D6';
-const BLUSH = '#F2B3A6';
+// Palette du site (voir src/styles/global.css) : noir, blanc, jaune du logo.
+const INK = '#0B0B0B';
+const IVORY = '#FFFFFF';
+const IVORY_2 = '#F3ECDF';
+const ACCENT = '#FBBE67';
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -60,7 +61,7 @@ function svg(w, h, label, { tone = 'light' } = {}) {
   <rect width="${w}" height="${h}" fill="url(#hatch)"/>
   <rect x="${stroke * 3}" y="${stroke * 3}" width="${w - stroke * 6}" height="${h - stroke * 6}"
         fill="none" stroke="${fg}" stroke-width="${stroke}" opacity="0.35"/>
-  <circle cx="${w / 2}" cy="${cy}" r="${markR}" fill="${BLUSH}"/>
+  <circle cx="${w / 2}" cy="${cy}" r="${markR}" fill="${ACCENT}"/>
   <path d="M ${w / 2 - markR * 0.42} ${cy + markR * 0.3}
            L ${w / 2 - markR * 0.1} ${cy - markR * 0.18}
            L ${w / 2 + markR * 0.12} ${cy + markR * 0.12}
@@ -97,32 +98,16 @@ async function emit(rel, w, h, label, opts = {}) {
   return rel;
 }
 
-/** Logo : marque circulaire, fond transparent. */
-async function emitLogo() {
-  const size = 256;
-  const body = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-    <circle cx="128" cy="128" r="126" fill="${INK}"/>
-    <circle cx="128" cy="128" r="126" fill="none" stroke="${BLUSH}" stroke-width="4"/>
-    <path d="M52 168c26-10 34-38 58-62s54-38 94-30" fill="none" stroke="${BLUSH}" stroke-width="9" stroke-linecap="round"/>
-    <path d="M150 84c16 6 22 20 20 36" fill="none" stroke="${IVORY}" stroke-width="9" stroke-linecap="round"/>
-    <text x="128" y="212" text-anchor="middle" fill="${IVORY}" font-family="Manrope, Helvetica, Arial, sans-serif"
-          font-size="30" font-weight="700" letter-spacing="4">M</text>
-  </svg>`;
-  const out = join(ROOT, 'brand/logo.png');
-  await mkdir(dirname(out), { recursive: true });
-  await sharp(Buffer.from(body)).png({ compressionLevel: 9 }).toFile(out);
-}
-
 /** Image de partage social (Open Graph). */
 async function emitOg() {
   const w = 1200, h = 630;
   const body = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
     <rect width="${w}" height="${h}" fill="${INK}"/>
-    <path d="M60 520c120-40 170-180 280-290S560 60 760 92" fill="none" stroke="${BLUSH}" stroke-width="6" stroke-linecap="round" opacity="0.75"/>
+    <path d="M60 520c120-40 170-180 280-290S560 60 760 92" fill="none" stroke="${ACCENT}" stroke-width="6" stroke-linecap="round" opacity="0.75"/>
     <path d="M620 150c60 20 86 74 74 132" fill="none" stroke="${IVORY}" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
     <text x="72" y="330" fill="${IVORY}" font-family="Helvetica, Arial, sans-serif" font-size="86" font-weight="700" letter-spacing="-3">Muralistique</text>
-    <text x="72" y="392" fill="${BLUSH}" font-family="Helvetica, Arial, sans-serif" font-size="30" font-weight="600" letter-spacing="6">FRESQUES MURALES SUR MESURE</text>
-    <text x="72" y="560" fill="#B8B0A6" font-family="Helvetica, Arial, sans-serif" font-size="22" font-weight="500">Image de partage à remplacer — src/assets/images/brand/og.jpg</text>
+    <text x="72" y="392" fill="${ACCENT}" font-family="Helvetica, Arial, sans-serif" font-size="30" font-weight="600" letter-spacing="6">FRESQUES MURALES SUR MESURE</text>
+    <text x="72" y="560" fill="#A9A9A9" font-family="Helvetica, Arial, sans-serif" font-size="22" font-weight="500">Image de partage à remplacer — src/assets/images/brand/og.jpg</text>
   </svg>`;
   const out = join(ROOT, 'brand/og.jpg');
   await mkdir(dirname(out), { recursive: true });
@@ -185,7 +170,6 @@ for (const [slug, w, h, label] of PROJECT_SLUGS) {
   }
 }
 
-await emitLogo();
 await emitOg();
 for (const [rel, w, h, label, opts] of JOBS) await emit(rel, w, h, label, opts);
 
@@ -193,7 +177,7 @@ await writeFile(
   join(ROOT, 'README.md'),
   `# Images du site\n\nChaque fichier ici est un **espace réservé** généré par \`scripts/generate-placeholders.mjs\`.\n\n**Pour mettre vos photos :** remplacez le fichier par le vôtre **en gardant exactement le même nom**.\nAstro se charge du redimensionnement, des formats modernes (AVIF/WebP) et du chargement différé.\n\nFormats d'origine conseillés (le double des dimensions d'affichage, JPEG ou PNG de bonne qualité) :\n\n${[...JOBS]
     .map(([rel, w, h, label]) => `- \`${rel}\` — ${w} × ${h} px — ${label}`)
-    .join('\n')}\n- \`brand/logo.png\` — 256 × 256 px — logo (fond transparent conseillé)\n- \`brand/og.jpg\` — 1200 × 630 px — image de partage sur les réseaux sociaux\n\nLes textes alternatifs (\`alt\`) se modifient dans \`src/data/\`.\n`
+    .join('\n')}\n- \`brand/og.jpg\` — 1200 × 630 px — image de partage sur les réseaux sociaux\n\nLes textes alternatifs (\`alt\`) se modifient dans \`src/data/\`.\n`
 );
 
-console.log(`✓ ${JOBS.length + 2} placeholders générés dans src/assets/images/`);
+console.log(`✓ ${JOBS.length + 1} placeholders générés dans src/assets/images/`);
