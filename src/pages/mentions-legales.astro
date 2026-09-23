@@ -93,7 +93,7 @@ const missing = rows.filter((row) => !row.value).length;
 <style>
   .legal { padding-block: clamp(2.5rem, 5.5vw, 5rem); }
   .legal__eyebrow { color: var(--muted-on-dark); }
-  .legal__title { margin-top: 22px; font-size: var(--fs-h1); letter-spacing: -0.05em; color: var(--ivory); }
+  .legal__title { margin-top: 22px; font-size: var(--fs-h1); letter-spacing: var(--ls-display); color: var(--ivory); }
 
   .legal-body__inner { max-width: 780px; }
 
@@ -109,7 +109,7 @@ const missing = rows.filter((row) => !row.value).length;
     font-size: var(--fs-body-sm);
     line-height: 1.55;
   }
-  .legal__todo :global(svg) { flex: none; margin-top: 2px; color: var(--blush); }
+  .legal__todo :global(svg) { flex: none; margin-top: 2px; color: var(--accent-strong); }
   .legal__todo code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 
   .legal__list { margin: 0; border-top: 1px solid var(--ink); }

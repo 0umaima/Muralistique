@@ -57,7 +57,7 @@ import { site, phoneIsPlaceholder } from '../data/site.mjs';
         </div>
 
         <div class="devis__channels">
-          <WhatsAppButton variant="blush" label="WhatsApp" block />
+          <WhatsAppButton variant="accent" label="WhatsApp" block />
           {
             site.social.instagram ? (
               <a class="btn btn--ghost-light btn--block" href={site.social.instagram} target="_blank" rel="noopener noreferrer">
@@ -86,7 +86,7 @@ import { site, phoneIsPlaceholder } from '../data/site.mjs';
     margin-top: 24px;
     font-size: var(--fs-h1);
     line-height: 0.94;
-    letter-spacing: -0.05em;
+    letter-spacing: var(--ls-display);
     max-width: 640px;
   }
   .devis__lead { margin-top: 24px; max-width: 520px; font-size: var(--fs-body-lg); }
@@ -123,10 +123,10 @@ import { site, phoneIsPlaceholder } from '../data/site.mjs';
   .devis__number {
     margin-top: 34px;
     font: 700 clamp(1.75rem, 3.05vw, 2.75rem) / 1 var(--font-display);
-    letter-spacing: -0.03em;
+    letter-spacing: var(--ls-display);
     color: var(--ivory);
   }
-  .devis__number a:hover { color: var(--blush); }
+  .devis__number a:hover { color: var(--accent); }
   .devis__hours { margin-top: 12px; font-size: var(--fs-body-sm); }
   .devis__todo {
     display: inline-flex;
@@ -135,7 +135,7 @@ import { site, phoneIsPlaceholder } from '../data/site.mjs';
     margin-top: 14px;
     font-size: var(--fs-xs);
     font-style: italic;
-    color: var(--blush);
+    color: var(--accent);
   }
   .devis__todo code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-style: normal; }
 

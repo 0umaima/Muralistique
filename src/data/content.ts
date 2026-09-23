@@ -24,7 +24,7 @@ export const processSteps = [
     number: '01',
     title: 'Visite & brief',
     text: 'Relevé du mur, contraintes du lieu, attentes du public.',
-    /** Ambiance de la carte : 'ivory' | 'ink' | 'blush' (repris de la maquette). */
+    /** Ambiance de la carte : 'ivory' | 'ink' | 'accent' (jaune du logo). */
     tone: 'ivory' as const,
     icon: 'map' as const,
     /** Rotation de départ de l'animation d'entrée. */
@@ -62,7 +62,7 @@ export const processSteps = [
     number: '05',
     title: 'Livraison',
     text: 'Vernis de protection, reportage photo et vidéo du résultat.',
-    tone: 'blush' as const,
+    tone: 'accent' as const,
     icon: 'house' as const,
     rotate: 4,
     translate: 38,
@@ -128,46 +128,41 @@ export const positioning = {
   after: ', imaginées pour chaque lieu.',
 };
 
-/** Page Studio. */
+/**
+ * Page Studio — volontairement peu de texte : des images et des titres.
+ * Les photos se remplacent dans src/assets/images/ (même nom de fichier).
+ */
 export const studio = {
   founderName: 'Amine Houmam',
   founderRole: 'Fondateur & artiste muraliste',
-  founderLead:
-    'Amine Houmam imagine et réalise chaque fresque, du premier croquis jusqu’au dernier détail peint sur le mur.',
-  intro:
-    'Muralistique est un atelier de fresques murales qui transforme les murs en éléments vivants, pensés pour l’identité, le public et l’histoire de chaque lieu.',
-  columns: [
-    {
-      title: 'Une idée pensée pour le lieu',
-      text: 'Chaque fresque commence par l’écoute du client, l’observation de l’espace et la compréhension de celles et ceux qui vont y vivre, travailler ou passer.',
-    },
-    {
-      title: 'Du dessin à la réalisation',
-      text: 'Amine imagine le concept, prépare le croquis et peint chaque projet directement sur place, avec une attention particulière portée aux lignes, aux proportions et aux couleurs.',
-    },
+  /** Phrase d'introduction, révélée mot à mot au défilement. */
+  intro: 'Un atelier, une ligne continue, quelques couleurs — et des murs pensés pour l’identité de chaque lieu.',
+
+  /** Défilé horizontal « Quelques murs signés ». `slug` renvoie à src/data/projects.ts ;
+   *  `image` permet de choisir une autre photo que la couverture du projet. */
+  works: [
+    { slug: 'cafe-nord' },
+    { slug: 'harmonie-verte' },
+    { slug: 'robotique-en-mouvement', image: 'projects/robotique-en-mouvement/apres.jpeg' },
+    { slug: 'ecole-les-tilleuls' },
+    { slug: 'cabine-gynecologique' },
   ],
-  atelier: {
-    title: 'De l’idée au mur, chaque trait a une raison.',
-    paragraphs: [
-      'Peintre de formation, Amine dessine et exécute chaque fresque de bout en bout — du premier trait de crayon jusqu’au dernier passage de vernis. Il a fondé Muralistique pour mettre ce métier au service des lieux professionnels : hôtels, cabinets, écoles, commerces, bureaux.',
-      'Sa signature : une ligne continue, précise, qui raconte l’identité du lieu en quelques couleurs seulement.',
-    ],
-    steps: [
-      'Comprendre le lieu et son public',
-      'Définir la direction visuelle',
-      'Dessiner la composition au trait',
-      'Tester les proportions et les couleurs',
-      'Peindre sur place',
-      'Finir, protéger et documenter le résultat',
-    ],
-    quote: '« Un mur ne devrait jamais être neutre. Il porte l’identité du lieu, ou il ne porte rien. »',
-    quoteAuthor: 'Amine Houmam, Fondateur',
-  },
+
+  /** Les étapes, réduites à des titres qui défilent. */
+  steps: ['Écouter le lieu', 'Dessiner', 'Tester les couleurs', 'Peindre sur place', 'Protéger'],
+
+  quote: 'Un mur ne devrait jamais être neutre. Il porte l’identité du lieu, ou il ne porte rien.',
+  quoteAuthor: 'Amine Houmam',
+
+  /** Mosaïque « Le geste, en détail » : une image, un titre. Les photos
+   *  d'atelier (studio/croquis.jpg, studio/couleurs.jpg…) peuvent remplacer
+   *  ces détails de murs dès qu'elles sont prêtes. */
   gallery: [
-    { src: 'studio/croquis.jpg', alt: 'Croquis préparatoire — photo à remplacer', caption: 'Croquis', span: 8, ratio: '37 / 20' },
-    { src: 'studio/couleurs.jpg', alt: 'Mélange des couleurs en atelier — photo à remplacer', caption: 'Mélange des couleurs', span: 4, ratio: '17 / 20' },
-    { src: 'studio/trace.jpg', alt: 'Tracé de la composition au mur — photo à remplacer', caption: 'Tracé au mur', span: 4, ratio: '51 / 55' },
-    { src: 'studio/travail.jpg', alt: 'Amine en plein travail sur une fresque — photo à remplacer', caption: 'Amine en plein travail', span: 8, ratio: '111 / 55' },
+    { src: 'projects/cabine-gynecologique/2.jpeg', alt: 'Détail d’une fresque florale au trait dans un cabinet gynécologique', title: 'Le trait' },
+    { src: 'projects/ecole-les-tilleuls/1.jpeg', alt: 'Détail de la fresque avec un paresseux entouré de feuillages', title: 'La couleur' },
+    { src: 'projects/cafe-nord/1.jpeg', alt: 'Détail de la fresque murale avec motifs floraux et tasse de café', title: 'La lettre' },
+    { src: 'projects/ecole-les-tilleuls/2.jpeg', alt: 'Fresque murale représentant un éléphant dans un espace de jeux pour enfants', title: 'L’échelle' },
+    { src: 'projects/harmonie-verte/apres.jpeg', alt: 'Fresque végétale Harmonie Verte réalisée dans l’espace KOON', title: 'L’identité' },
   ],
 };
 

@@ -2,8 +2,29 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
 import Media from '../components/Media.astro';
+import FixedBg from '../components/FixedBg.astro';
+import MarqueeBand from '../components/MarqueeBand.astro';
 import ContactCta from '../components/ContactCta.astro';
 import { studio } from '../data/content';
+import { projectBySlug } from '../data/projects';
+import { sectorBySlug } from '../data/sectors';
+
+const nameWords = studio.founderName.split(' ');
+const introWords = studio.intro.split(' ');
+
+const works = studio.works.flatMap(({ slug, image }) => {
+  const project = projectBySlug(slug);
+  if (!project) return [];
+  return [
+    {
+      slug,
+      title: project.title,
+      meta: [sectorBySlug(project.sector)?.label, project.city].filter(Boolean).join(' · '),
+      src: image ?? project.cover.src,
+      alt: project.cover.alt,
+    },
+  ];
+});
 ---
 
 <BaseLayout
@@ -12,133 +33,148 @@ import { studio } from '../data/content';
   headerTheme="ink"
   activeNav="/studio"
 >
+  <!-- ——— Hero : la photo reste fixe, la page glisse dessus ——— -->
   <section class="shero theme-ink" data-section-theme="ink">
-    <div class="shero__media">
-      <Media
-        src="studio/hero.jpg"
-        alt="Amine Houmam en train de peindre une fresque murale — photo à remplacer"
-        widths={[700, 1100, 1600, 2132]}
-        sizes="(max-width: 900px) 100vw, 74vw"
-        priority
-        position="center 30%"
-        class="shero__image"
-      />
-    </div>
+    <FixedBg src="studio/hero.jpg" position="62% 30%" priority class="shero__bg" />
+    <div class="shero__shade" aria-hidden="true"></div>
 
-    <aside class="shero__panel">
-      <div>
-        <Icon name="pen-tool" size={40} stroke={1.6} class="shero__icon" />
-        <p class="shero__role">{studio.founderRole}</p>
-        <p class="shero__lead">{studio.founderLead}</p>
-      </div>
+    <div class="shero__inner shell pad">
+      <p class="eyebrow shero__role"><Icon name="sparkle" size={13} stroke={1.6} />{studio.founderRole}</p>
+
+      <h1 class="shero__title">
+        <span class="visually-hidden">{studio.founderName}</span>
+        <span aria-hidden="true">
+          {
+            nameWords.map((word, w) => (
+              <span class="shero__word">
+                {[...word].map((letter, i) => (
+                  <span class="shero__letter" style={`--i:${w * 6 + i}`}>
+                    {letter}
+                  </span>
+                ))}
+              </span>
+            ))
+          }
+        </span>
+      </h1>
+
       <p class="shero__scroll">
         <Icon name="arrow-down" size={16} stroke={1.8} />
         Faire défiler
       </p>
-    </aside>
+    </div>
 
-    <div class="shero__scrim" aria-hidden="true"></div>
-    <h1 class="shero__title">{studio.founderName}</h1>
     <div class="shero__wipe" aria-hidden="true"></div>
   </section>
 
+  <!-- ——— Intro : une seule phrase, révélée mot à mot ——— -->
   <section class="sintro theme-ivory" data-section-theme="ivory">
-    <div class="shell pad sintro__grid">
-      <div data-reveal>
-        <span class="sintro__square"></span>
-        <p class="sintro__kicker">Hey, juste une intro</p>
-      </div>
-
-      <div>
-        <p class="sintro__statement" data-reveal>{studio.intro}</p>
-        <a class="btn btn--outline sintro__cta" href="/devis" data-reveal data-reveal-delay="70">
-          Parler de votre projet
-          <Icon name="arrow-up-right" size={14} stroke={2.2} />
-        </a>
-
-        <div class="sintro__columns">
-          {
-            studio.columns.map((column, i) => (
-              <div data-reveal data-reveal-delay={100 + i * 100}>
-                <h2 class="sintro__col-title">{column.title}</h2>
-                <p class="sintro__col-text muted">{column.text}</p>
-              </div>
-            ))
-          }
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="satelier theme-ivory-2" id="atelier" data-section-theme="ivory">
-    <div class="satelier__media" data-reveal>
-      <Media
-        src="studio/founder.jpg"
-        alt="Amine Houmam en train de dessiner le tracé d’une fresque — photo à remplacer"
-        widths={[600, 900, 1440]}
-        sizes="(max-width: 900px) 100vw, 50vw"
-        class="satelier__image"
-      />
-    </div>
-
-    <div class="satelier__body" data-reveal data-reveal-delay="100">
-      <p class="eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />L’atelier</p>
-      <h2 class="satelier__title">{studio.atelier.title}</h2>
-      {studio.atelier.paragraphs.map((text) => <p class="satelier__text muted">{text}</p>)}
-
-      <ol class="satelier__steps">
+    <div class="shell pad sintro__inner">
+      <p class="sintro__kicker" data-reveal><span class="sintro__square"></span>Hey, juste une intro</p>
+      <p class="sintro__statement" data-scrub>
         {
-          studio.atelier.steps.map((step, i) => (
-            <li>
-              <span class="satelier__step-num">{String(i + 1).padStart(2, '0')}</span>
-              <span>{step}</span>
-            </li>
+          introWords.map((word) => (
+            <>
+              <span class="sintro__word" data-word>
+                {word}
+              </span>{' '}
+            </>
           ))
         }
-      </ol>
-
-      <div class="satelier__lineart" data-draw aria-hidden="true">
-        <svg viewBox="0 0 420 110" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
-          <path d="M4 92C64 92 82 26 140 26c40 0 54 46 94 46 34 0 54-30 74-46 22-18 60-22 104-8"></path>
-          <path d="M140 26c16 12 16 32 0 44"></path>
-          <path d="M330 18c22-6 46 6 52 28"></path>
-        </svg>
-      </div>
-
-      <blockquote class="satelier__quote">
-        <p>{studio.atelier.quote}</p>
-        <footer>{studio.atelier.quoteAuthor}</footer>
-      </blockquote>
+      </p>
+      <a class="btn btn--outline sintro__cta" href="/devis" data-reveal>
+        Parler de votre projet
+        <Icon name="arrow-up-right" size={14} stroke={2.2} />
+      </a>
     </div>
   </section>
 
+  <!-- ——— Quelques murs : défilé horizontal épinglé ——— -->
+  <section class="sworks theme-ink" id="murs" data-section-theme="ink" data-hscroll>
+    <div class="sworks__sticky" data-hscroll-sticky>
+      <div class="sworks__head shell pad">
+        <h2 class="sworks__title" data-reveal>Quelques murs<br /><span>signés.</span></h2>
+        <a class="link-underline sworks__all" href="/realisations" data-reveal data-reveal-delay="80">
+          Toutes les réalisations
+          <Icon name="arrow-up-right" size={13} stroke={2.2} />
+        </a>
+      </div>
+
+      <div class="sworks__viewport">
+        <ul class="sworks__track" data-hscroll-track>
+          {
+            works.map((work, i) => (
+              <li class="sworks__item" data-hscroll-item>
+                <a class="sworks__card" href={`/realisations/${work.slug}`}>
+                  <Media
+                    src={work.src}
+                    alt={work.alt}
+                    widths={[400, 640, 900, 1200]}
+                    sizes="(max-width: 900px) 78vw, 34vw"
+                    zoom
+                    class="sworks__media"
+                  />
+                  <span class="sworks__num">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="sworks__caption">
+                    <span class="sworks__name">{work.title}</span>
+                    {work.meta && <span class="sworks__meta">{work.meta}</span>}
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+          <li class="sworks__item sworks__item--end" data-hscroll-item>
+            <a class="sworks__more" href="/realisations">
+              <span>Voir tous les murs</span>
+              <Icon name="arrow-up-right" size={40} stroke={1.6} />
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ——— Les étapes, en titres seulement ——— -->
+  <div class="visually-hidden">
+    <h2>Les étapes</h2>
+    <ol>{studio.steps.map((step) => <li>{step}</li>)}</ol>
+  </div>
+  <MarqueeBand words={studio.steps} />
+
+  <!-- ——— Citation sur photo fixe ——— -->
+  <section class="squote theme-ink" data-section-theme="ink">
+    <FixedBg src="projects/cabine-gynecologique/1.jpeg" scrim={0.72} />
+    <figure class="squote__inner shell pad">
+      <span class="squote__mark" aria-hidden="true" data-reveal>“</span>
+      <blockquote class="squote__text" data-reveal data-reveal-delay="80">{studio.quote}</blockquote>
+      <figcaption class="squote__author" data-reveal data-reveal-delay="160">{studio.quoteAuthor}</figcaption>
+    </figure>
+  </section>
+
+  <!-- ——— Le geste, en détail : mosaïque d'images et de titres ——— -->
   <section class="sgallery theme-ivory" id="presse" data-section-theme="ivory">
     <div class="shell pad">
-      <div class="section-head" data-reveal>
-        <div>
-          <p class="eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />Dans l’atelier</p>
-          <h2 class="sgallery__title">Du croquis au mur, en images.</h2>
-        </div>
-        <p class="section-head__aside">Chaque fresque commence sur papier avant de vivre sur un mur.</p>
-      </div>
+      <h2 class="sgallery__title" data-reveal>Le geste,<br /><span>en détail</span></h2>
 
       <ul class="sgallery__grid">
         {
           studio.gallery.map((item, i) => (
-            <li style={`--span:${item.span}`} data-reveal data-reveal-delay={i * 80}>
-              <Media
-                src={item.src}
-                alt={item.alt}
-                ratio={item.ratio}
-                widths={[500, 800, 1200, 1800]}
-                sizes={item.span >= 8 ? '(max-width: 900px) 100vw, 66vw' : '(max-width: 900px) 100vw, 33vw'}
-                zoom
-                class="sgallery__media"
-              />
-              <p class="sgallery__caption">
-                <span class="sgallery__dot" />
-                {item.caption}
-              </p>
+            <li class={`sgallery__item sgallery__item--${i + 1}`} data-reveal data-reveal-delay={(i % 2) * 90}>
+              <div class="sgallery__frame">
+                <div class="sgallery__parallax" data-parallax={i % 2 ? '0.08' : '0.12'}>
+                  <Media
+                    src={item.src}
+                    alt={item.alt}
+                    widths={[400, 700, 1000, 1400]}
+                    sizes={i === 0 ? '(max-width: 900px) 100vw, 58vw' : '(max-width: 900px) 100vw, 40vw'}
+                    class="sgallery__media"
+                  />
+                </div>
+              </div>
+              <h3 class="sgallery__caption">
+                <span class="sgallery__index">{String(i + 1).padStart(2, '0')}</span>
+                {item.title}
+              </h3>
             </li>
           ))
         }
@@ -150,84 +186,92 @@ import { studio } from '../data/content';
     eyebrow="Travaillons ensemble"
     title="Votre mur commence par une conversation."
     secondary="portfolio"
+    bg="projects/ecole-les-tilleuls/cover.jpeg"
   />
 </BaseLayout>
 
 <style>
-  /* ——— Hero éditorial ——— */
+  /* ——— Hero ——— */
   .shero {
     position: relative;
-    display: grid;
-    grid-template-columns: 74% 26%;
-    min-height: clamp(560px, 61vw, 880px);
+    isolation: isolate;
+    display: flex;
+    min-height: calc(100svh - var(--header-h));
     overflow: hidden;
     background: var(--ink);
   }
-  .shero__media { position: relative; overflow: hidden; }
-  .shero__media :global(.shero__image) { width: 100%; height: 100%; }
-  .js .shero__media { animation: img-reveal 900ms var(--ease-out) 420ms both; }
-  @keyframes img-reveal {
-    from { clip-path: inset(0 100% 0 0); transform: scale(1.025); }
-    to { clip-path: inset(0 0 0 0); transform: none; }
+  /* L'image s'installe en douceur (le calque fixe lui-même n'est pas
+     transformé : seule l'image à l'intérieur l'est). */
+  :global(.js) .shero :global(.shero__bg .fixed-bg__media) { animation: s-settle 1600ms var(--ease-out) 300ms both; }
+  @keyframes s-settle {
+    from { transform: scale(1.12); }
+    to { transform: none; }
   }
 
-  .shero__panel {
+  /* Voile en dégradé : le nom reste lisible quelle que soit la photo posée. */
+  .shero__shade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to top, rgba(11, 11, 11, 0.85) 0%, rgba(11, 11, 11, 0.2) 55%, rgba(11, 11, 11, 0.35) 100%);
+    pointer-events: none;
+  }
+
+  .shero__inner {
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 32px;
-    padding: clamp(2rem, 3.9vw, 3.5rem) clamp(1.25rem, 2.8vw, 2.5rem);
-    background: var(--ink-2);
+    gap: 2rem;
+    padding-block: clamp(1.75rem, 3.5vw, 3rem) clamp(1.5rem, 3vw, 2.75rem);
   }
-  .js .shero__panel { animation: s-line 700ms var(--ease-out) 800ms both; }
-  .shero__panel :global(.shero__icon) { color: var(--blush); }
-  .shero__role {
-    margin-top: 34px;
-    font: 600 0.65625rem/1 var(--font-body);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--muted-on-dark);
+  .shero__role { color: var(--ivory); }
+  :global(.js) .shero__role { animation: s-line 700ms var(--ease-out) 700ms both; }
+
+  .shero__title {
+    font-size: var(--fs-h1-studio);
+    font-weight: 900;
+    line-height: 0.82;
+    color: var(--ivory);
   }
-  .shero__lead { margin-top: 22px; font-size: var(--fs-body); line-height: 1.6; color: var(--ivory); }
+  .shero__word { display: block; overflow: hidden; padding-bottom: 0.04em; }
+  .shero__word:last-child { color: var(--accent); }
+  .shero__letter { display: inline-block; }
+  :global(.js) .shero__letter {
+    animation: s-letter 900ms var(--ease-out) both;
+    animation-delay: calc(800ms + var(--i) * 45ms);
+  }
+  @keyframes s-letter {
+    from { transform: translateY(105%) rotate(6deg); }
+    to { transform: none; }
+  }
+
   .shero__scroll {
     display: flex;
     align-items: center;
     gap: 12px;
-    font: 500 0.78125rem/1 var(--font-body);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted-on-dark);
-  }
-  .shero__scroll :global(svg) { color: var(--blush); }
-
-  /* Voile discret : le nom reste lisible quelle que soit la photo posée. */
-  .shero__scrim {
-    position: absolute;
-    left: 0;
-    right: 26%;
-    bottom: 0;
-    height: 46%;
-    background: linear-gradient(to top, rgba(15, 14, 13, 0.72), rgba(15, 14, 13, 0));
-    pointer-events: none;
-  }
-
-  .shero__title {
-    position: absolute;
-    left: var(--gutter);
-    right: 0;
-    bottom: clamp(1.5rem, 3vw, 2.75rem);
-    font-size: var(--fs-h1-studio);
-    line-height: 0.86;
-    letter-spacing: -0.055em;
+    align-self: flex-end;
+    font: 700 0.875rem/1 var(--font-display);
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--ivory);
+  }
+  .shero__scroll :global(svg) { color: var(--accent); }
+  :global(.js) .shero__scroll :global(svg) { animation: s-bob 1800ms var(--ease) 2000ms infinite; }
+  @keyframes s-bob {
+    0%, 100% { transform: none; }
+    50% { transform: translateY(5px); }
+  }
+
+  .shero__wipe {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: var(--accent);
+    clip-path: inset(0 0 0 100%);
     pointer-events: none;
   }
-  .js .shero__title { animation: s-line 700ms var(--ease-out) 660ms both; }
-
-  .shero__wipe { position: absolute; inset: 0; background: var(--blush); clip-path: inset(0 0 0 100%); pointer-events: none; }
-  .js .shero__wipe { animation: cover-out 620ms var(--ease-out) 220ms; }
+  :global(.js) .shero__wipe { animation: cover-out 800ms cubic-bezier(0.7, 0, 0.3, 1) 150ms; }
   @keyframes cover-out {
     from { clip-path: inset(0 0 0 0); }
     to { clip-path: inset(0 0 0 100%); }
@@ -238,143 +282,278 @@ import { studio } from '../data/content';
   }
 
   /* ——— Intro ——— */
-  .sintro { padding-block: var(--section-y-lg); }
-  .sintro__grid {
-    display: grid;
-    grid-template-columns: 400px 1fr;
-    gap: clamp(2rem, 5.5vw, 5rem);
-  }
-  .sintro__square { display: block; width: 18px; height: 18px; background: var(--blush); }
+  .sintro { padding-block: clamp(4.5rem, 12vw, 11rem); }
+  .sintro__inner { max-width: 1260px; }
   .sintro__kicker {
-    margin-top: 20px;
-    font: 600 var(--fs-eyebrow) / 1 var(--font-body);
-    letter-spacing: 0.2em;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font: 700 0.875rem/1 var(--font-display);
+    letter-spacing: 0.24em;
     text-transform: uppercase;
     color: var(--muted-on-light);
   }
+  .sintro__square { display: block; width: 16px; height: 16px; background: var(--accent); }
   .sintro__statement {
+    margin-top: 32px;
     font-family: var(--font-display);
-    font-weight: 500;
-    font-size: var(--fs-statement-lg);
-    line-height: 1.1;
-    letter-spacing: -0.04em;
+    font-weight: 800;
+    font-size: clamp(2.5rem, 6.4vw, 5.875rem);
+    line-height: 0.98;
+    text-transform: uppercase;
+    letter-spacing: var(--ls-display);
   }
-  .sintro__cta { margin-top: 40px; }
-  .sintro__columns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(1.5rem, 3.3vw, 3rem);
-    margin-top: clamp(3rem, 5.5vw, 5rem);
-    padding-top: 40px;
-    border-top: 1px solid var(--ink);
-  }
-  .sintro__col-title { font-size: var(--fs-h3-sm); }
-  .sintro__col-text { margin-top: 14px; font-size: var(--fs-body); line-height: 1.65; }
+  /* Sans JS (ou mouvement réduit) : la phrase est entière. Avec JS, chaque
+     mot s'allume au passage. */
+  .sintro__statement.is-scrubbing .sintro__word { opacity: 0.14; transition: opacity 260ms var(--ease); }
+  .sintro__statement.is-scrubbing .sintro__word.is-lit { opacity: 1; }
+  .sintro__cta { margin-top: clamp(2rem, 4vw, 3.5rem); }
 
-  /* ——— Atelier ——— */
-  .satelier {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    border-top: 1px solid var(--ink);
-  }
-  .satelier__media {
-    position: relative;
-    min-height: clamp(360px, 57vw, 820px);
-    overflow: hidden;
-    border-right: 1px solid var(--ink);
-  }
-  .satelier__media :global(.satelier__image) { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .satelier__body { padding: clamp(3rem, 7.6vw, 6.875rem) var(--gutter); }
-  .satelier__title { margin-top: 22px; font-size: clamp(2rem, 3.9vw, 3.5rem); max-width: 520px; }
-  .satelier__text { margin-top: 22px; font-size: var(--fs-body); line-height: 1.7; max-width: 520px; }
-
-  .satelier__steps {
+  /* ——— Quelques murs ——— */
+  .sworks { position: relative; }
+  .sworks__sticky {
     display: flex;
     flex-direction: column;
-    margin-top: 44px;
-    border-top: 1px solid var(--ink);
+    justify-content: center;
+    gap: clamp(1.75rem, 3.5vw, 3rem);
+    padding-block: var(--section-y);
+    overflow: hidden;
   }
-  .satelier__steps li {
+  .sworks.is-pinned .sworks__sticky {
+    position: sticky;
+    top: var(--header-h);
+    height: calc(100vh - var(--header-h));
+    padding-block: clamp(1.5rem, 4vh, 3rem);
+  }
+
+  .sworks__head {
     display: flex;
-    gap: 18px;
-    padding: 16px 0;
-    border-bottom: 1px solid var(--rule);
-    font-size: 0.96875rem;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
   }
-  .satelier__steps li:last-child { border-bottom: 0; }
-  .satelier__step-num {
-    font: 600 0.75rem/1.5 var(--font-body);
-    letter-spacing: 0.12em;
-    color: var(--blush);
-  }
+  .sworks__title { font-size: var(--fs-h2-lg); }
+  .sworks__title span { color: var(--accent); }
+  .sworks__all { color: var(--ivory); }
 
-  .satelier__lineart { margin-top: 48px; opacity: 0.6; color: var(--ink); }
-  .satelier__lineart svg { width: min(420px, 100%); height: auto; }
+  /* Repli (petit écran, mouvement réduit, sans JS) : rail horizontal natif. */
+  .sworks__viewport {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-inline: var(--gutter);
+  }
+  .sworks__viewport::-webkit-scrollbar { display: none; }
+  .sworks.is-pinned .sworks__viewport { overflow: visible; padding-inline: 0; }
 
-  .satelier__quote {
-    margin: 48px 0 0;
-    padding-left: 24px;
-    border-left: 2px solid var(--ink);
+  .sworks__track {
+    display: flex;
+    gap: clamp(16px, 2vw, 28px);
+    width: max-content;
+    will-change: transform;
   }
-  .satelier__quote p {
-    font-family: var(--font-display);
-    font-weight: 500;
-    font-size: clamp(1.375rem, 1.94vw, 1.75rem);
-    line-height: 1.3;
-    letter-spacing: -0.02em;
+  .sworks.is-pinned .sworks__track {
+    padding-inline: max(var(--gutter), calc((100vw - var(--maxw)) / 2 + var(--gutter)));
   }
-  .satelier__quote footer {
-    margin-top: 16px;
-    font: 600 0.75rem/1 var(--font-body);
-    letter-spacing: 0.14em;
+  .sworks__item { flex: none; scroll-snap-align: start; }
+
+  .sworks__card {
+    position: relative;
+    display: block;
+    width: clamp(260px, 30vw, 460px);
+    height: clamp(340px, 58vh, 620px);
+    overflow: hidden;
+  }
+  .sworks__card :global(.sworks__media) { width: 100%; height: 100%; }
+  .sworks__card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(11, 11, 11, 0.8), rgba(11, 11, 11, 0) 50%);
+    pointer-events: none;
+  }
+  .sworks__num {
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    z-index: 1;
+    padding: 6px 10px 5px;
+    background: var(--accent);
+    color: var(--ink);
+    font: 800 1rem/1 var(--font-display);
+    letter-spacing: 0.08em;
+  }
+  .sworks__caption {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 18px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 320ms var(--ease-out);
+  }
+  .sworks__card:hover .sworks__caption { transform: translateY(-6px); }
+  .sworks__name {
+    font: 800 clamp(1.75rem, 2.8vw, 2.625rem) / 0.95 var(--font-display);
+    letter-spacing: var(--ls-display);
     text-transform: uppercase;
-    color: var(--muted-on-light);
+    color: var(--ivory);
+  }
+  .sworks__meta {
+    font: 700 0.8125rem/1 var(--font-display);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
   }
 
-  /* ——— Galerie ——— */
-  .sgallery { padding-block: var(--section-y) ; }
-  .sgallery__title { margin-top: 22px; font-size: var(--fs-h2-sm); max-width: 620px; }
+  .sworks__more {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: clamp(220px, 20vw, 300px);
+    height: clamp(340px, 58vh, 620px);
+    padding: 24px;
+    background: var(--accent);
+    color: var(--ink);
+    font: 900 clamp(2.25rem, 3.6vw, 3.5rem) / 0.9 var(--font-display);
+    text-transform: uppercase;
+    transition: background-color 240ms var(--ease);
+  }
+  .sworks__more:hover { background: var(--ivory); }
+  .sworks__more :global(svg) { align-self: flex-end; transition: transform 240ms var(--ease); }
+  .sworks__more:hover :global(svg) { transform: translate(4px, -4px); }
+
+  /* ——— Citation ——— */
+  .squote {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    min-height: 100svh;
+    overflow: hidden;
+  }
+  .squote__inner {
+    margin-block: 0;
+    padding-block: var(--section-y-lg);
+    text-align: center;
+  }
+  .squote__mark {
+    display: block;
+    height: 0.5em;
+    font: 900 clamp(7rem, 16vw, 14rem) / 1 var(--font-display);
+    color: var(--accent);
+  }
+  .squote__text {
+    margin: 0 auto;
+    max-width: 1100px;
+    font: 800 var(--fs-h2) / 0.98 var(--font-display);
+    letter-spacing: var(--ls-display);
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+  .squote__author {
+    margin-top: 28px;
+    font: 700 0.9375rem/1 var(--font-display);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  /* ——— Le geste, en détail ——— */
+  .sgallery { padding-block: var(--section-y-lg); overflow: hidden; }
+  .sgallery__title { font-size: var(--fs-h2-xl); line-height: 0.86; }
+  .sgallery__title span {
+    display: inline-block;
+    margin-top: 0.08em;
+    padding: 0.06em 0.08em 0;
+    background: var(--accent);
+  }
+
   .sgallery__grid {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 24px;
-    margin-top: clamp(2rem, 3.3vw, 3rem);
+    gap: clamp(1.5rem, 3vw, 3rem) clamp(1rem, 2vw, 1.75rem);
+    margin-top: clamp(2.5rem, 5vw, 4.5rem);
   }
-  .sgallery__grid > li { grid-column: span var(--span); }
-  .sgallery__grid :global(.sgallery__media) {
-    border-radius: 22px;
-    border: 1px solid var(--ink);
-  }
+  .sgallery__item--1 { grid-column: 1 / span 7; }
+  .sgallery__item--2 { grid-column: 9 / span 4; margin-top: clamp(4rem, 12vw, 11rem); }
+  .sgallery__item--3 { grid-column: 2 / span 4; }
+  .sgallery__item--4 { grid-column: 7 / span 6; margin-top: clamp(-8rem, -8vw, -3rem); }
+  .sgallery__item--5 { grid-column: 3 / span 8; }
+
+  .sgallery__frame { position: relative; overflow: hidden; }
+  .sgallery__item--1 .sgallery__frame { aspect-ratio: 7 / 8; }
+  .sgallery__item--2 .sgallery__frame { aspect-ratio: 3 / 4; }
+  .sgallery__item--3 .sgallery__frame { aspect-ratio: 4 / 5; }
+  .sgallery__item--4 .sgallery__frame { aspect-ratio: 5 / 4; }
+  .sgallery__item--5 .sgallery__frame { aspect-ratio: 16 / 8; }
+
+  .sgallery__parallax { position: absolute; inset: 0; transform: scale(1.15); will-change: transform; }
+  .sgallery__parallax :global(.sgallery__media) { width: 100%; height: 100%; }
+
   .sgallery__caption {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 14px;
-    font: 500 0.84375rem/1 var(--font-body);
-    color: var(--muted-on-light);
+    align-items: baseline;
+    gap: 14px;
+    margin-top: 16px;
+    font-size: var(--fs-h3);
   }
-  .sgallery__dot { width: 7px; height: 7px; background: var(--blush); flex: none; }
+  .sgallery__index {
+    font: 800 0.9375rem/1 var(--font-display);
+    letter-spacing: 0.12em;
+    color: var(--accent-strong);
+  }
+
+  /* Apparition propre à la mosaïque : l'image se découvre de bas en haut. */
+  :global(.js) .sgallery__item[data-reveal] { opacity: 1; transform: none; }
+  :global(.js) .sgallery__item[data-reveal] .sgallery__frame { clip-path: inset(100% 0 0 0); }
+  :global(.js) .sgallery__item[data-reveal] .sgallery__caption { opacity: 0; transform: translateY(20px); }
+  :global(.js) .sgallery__item[data-reveal].is-revealed .sgallery__frame {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 1100ms cubic-bezier(0.7, 0, 0.2, 1) var(--reveal-delay, 0ms);
+  }
+  :global(.js) .sgallery__item[data-reveal].is-revealed .sgallery__caption {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 700ms var(--ease-out) calc(var(--reveal-delay, 0ms) + 500ms),
+      transform 700ms var(--ease-out) calc(var(--reveal-delay, 0ms) + 500ms);
+  }
 
   @media (max-width: 900px) {
-    .shero { grid-template-columns: 1fr; min-height: 0; }
-    .shero__media { aspect-ratio: 4 / 5; }
-    .shero__scrim { display: none; }
-    .shero__title {
-      position: static;
-      order: -1;
-      padding: 24px var(--gutter) 0;
-      left: auto;
-      right: auto;
-    }
-    .satelier { grid-template-columns: 1fr; }
-    .satelier__media { min-height: 0; aspect-ratio: 4 / 5; border-right: 0; border-bottom: 1px solid var(--ink); }
-    .sintro__grid { grid-template-columns: 1fr; }
-    .sintro__columns { grid-template-columns: 1fr; }
-    .sgallery__grid > li { grid-column: span 12; }
+    .shero__scroll { display: none; }
+    .sgallery__grid { grid-template-columns: 1fr 1fr; }
+    .sgallery__item--1,
+    .sgallery__item--5 { grid-column: 1 / -1; }
+    .sgallery__item--2,
+    .sgallery__item--3,
+    .sgallery__item--4 { grid-column: auto; margin-top: 0; }
+    .sgallery__item--2 .sgallery__frame,
+    .sgallery__item--3 .sgallery__frame,
+    .sgallery__item--4 .sgallery__frame { aspect-ratio: 3 / 4; }
+    .sgallery__item--4 { grid-column: 1 / -1; }
+    .sgallery__item--4 .sgallery__frame { aspect-ratio: 5 / 4; }
+    .sworks__card { width: 78vw; height: auto; aspect-ratio: 4 / 5; }
+    .sworks__more { width: 60vw; height: auto; aspect-ratio: 3 / 5; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .shero :global(.shero__bg .fixed-bg__media),
+    :global(.js) .shero__role,
+    :global(.js) .shero__letter,
+    :global(.js) .shero__scroll :global(svg),
+    :global(.js) .shero__wipe { animation: none; }
+    :global(.js) .sgallery__item[data-reveal] .sgallery__frame { clip-path: none; }
+    :global(.js) .sgallery__item[data-reveal] .sgallery__caption { opacity: 1; transform: none; }
   }
 </style>
 
 <script>
   import { initReveal } from '../scripts/reveal';
+  import { initScrollFx } from '../scripts/scroll-fx';
   initReveal();
+  initScrollFx();
 </script>

@@ -50,10 +50,10 @@ import { positioning, testimonial } from '../../data/content';
     font-weight: 500;
     font-size: var(--fs-statement);
     line-height: 1.14;
-    letter-spacing: -0.035em;
+    letter-spacing: var(--ls-display);
   }
   .positioning__text mark {
-    background: var(--blush);
+    background: var(--accent);
     color: inherit;
     padding: 0 6px;
   }
@@ -78,7 +78,7 @@ import { positioning, testimonial } from '../../data/content';
     left: 0;
     top: -34px;
     font: 700 clamp(5rem, 9.7vw, 8.75rem) / 1 var(--font-display);
-    color: var(--blush);
+    color: var(--accent);
   }
   .positioning__blockquote {
     margin: 0;
@@ -86,7 +86,7 @@ import { positioning, testimonial } from '../../data/content';
     font-weight: 500;
     font-size: var(--fs-quote);
     line-height: 1.22;
-    letter-spacing: -0.025em;
+    letter-spacing: var(--ls-display);
   }
   .positioning__author { display: block; margin-top: 24px; font: 600 var(--fs-body-sm) / 1.4 var(--font-body); }
   .positioning__role { display: block; margin-top: 5px; font-size: var(--fs-small); }

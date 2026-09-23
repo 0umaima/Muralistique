@@ -2,53 +2,66 @@
 
 /* ==========================================================================
    MURALISTIQUE — feuille de style globale
-   Jetons de design repris de la maquette (palette ivoire / encre / blush,
-   Bricolage Grotesque + Manrope). Modifiez les variables ci-dessous pour
-   retoucher l'ensemble du site d'un seul endroit.
+   Identité reprise du logo : noir, blanc et le jaune exact du « M »
+   (#FBBE67), Big Shoulders Display (titres) + Manrope (texte courant).
+   Modifiez les variables ci-dessous pour retoucher l'ensemble du site d'un
+   seul endroit.
    ========================================================================== */
 
 :root {
   /* — Palette ————————————————————————————————————————————————— */
-  --ink: #0f0e0d;          /* encre : fonds sombres, texte sur ivoire */
-  --ink-2: #1c1a18;        /* encre secondaire : cartes sur fond sombre */
-  --ink-line: #2a2724;     /* filets sur fond encre */
-  --ink-line-2: #3a342e;
-  --ink-line-3: #4a443d;
-  --ink-stroke: #6e665c;   /* contour des grands chiffres évidés */
+  --ink: #0b0b0b;          /* noir : fonds sombres, texte sur blanc */
+  --ink-2: #171717;        /* noir secondaire : cartes sur fond sombre */
+  --ink-line: #282828;     /* filets sur fond noir */
+  --ink-line-2: #333;
+  --ink-line-3: #474747;
+  --ink-stroke: #6a6a6a;   /* contour des grands chiffres évidés */
 
-  --ivory: #fff;        /* ivoire : fond principal */
-  --ivory-2: #ffe8e8;      /* ivoire soutenu : champs, sections alternées */
-  --ivory-3: #ddd8ce;      /* ivoire profond : fond de planche */
-  --rule: #fff4e2;         /* filet clair */
+  --ivory: #fff;           /* blanc : fond principal */
+  --ivory-2: #fff5e6;      /* crème (jaune du logo très dilué) : sections alternées */
+  --ivory-3: #f3e6cf;      /* crème profond : fond de planche */
+  --rule: #ecdcc0;         /* filet clair */
 
-  --blush: #ae1717;        /* accent blush */
-  --blush-ink: #4a3d39;    /* texte secondaire sur blush */
+  --accent: #fbbe67;       /* jaune du « M » du logo — l'accent du site */
+  --accent-strong: #b87314;/* ambre : texte / icône d'accent sur fond clair (contraste ≥ 3:1) */
+  --accent-ink: #4a3412;   /* texte secondaire sur jaune */
 
-  --muted-on-light: #625b53;
-  --muted-on-dark: #b8b0a6;
+  --muted-on-light: #5c5c5c;
+  --muted-on-dark: #a9a9a9;
 
-  --focus: var(--blush);
+  /* Anneau de focus : noir sur les fonds clairs, jaune sur les fonds sombres
+     (voir .theme-ink plus bas). */
+  --focus: var(--ink);
 
   /* — Typographie ——————————————————————————————————————————— */
-  --font-display: 'Bricolage Grotesque', 'Manrope', system-ui, sans-serif;
+  /* Big Shoulders Display : l'alternative libre la plus proche d'Editorial
+     Comment JNL (police commerciale). Si vous achetez la licence web, déposez
+     le .woff2 dans public/fonts/, déclarez-le dans fonts.css et placez
+     'Editorial Comment JNL' en tête de --font-display. */
+  --font-display: 'Big Shoulders Display', 'Arial Narrow', system-ui, sans-serif;
   --font-body: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   /* Échelle fluide : la borne haute correspond exactement à la maquette 1440 px */
-  --fs-hero: clamp(2.75rem, 7.78vw, 7rem);          /* 112 px @1440 */
-  --fs-h1: clamp(2.5rem, 6.1vw, 5.5rem);            /*  88 px @1440 */
-  --fs-h1-portfolio: clamp(2.5rem, 7.22vw, 6.5rem); /* 104 px @1440 */
-  --fs-h1-studio: clamp(3.25rem, 10.97vw, 9.875rem);/* 158 px @1440 */
-  --fs-h2-xl: clamp(2.75rem, 7.5vw, 6.75rem);       /* 108 px @1440 */
-  --fs-h2-lg: clamp(2.375rem, 5.28vw, 4.75rem);     /*  76 px @1440 */
-  --fs-h2: clamp(2.375rem, 5vw, 4.5rem);            /*  72 px @1440 */
-  --fs-h2-sm: clamp(2.125rem, 4.44vw, 4rem);        /*  64 px @1440 */
-  --fs-h3-xl: clamp(1.75rem, 2.5vw, 2.5rem);        /*  40 px @1440 */
-  --fs-h3: clamp(1.5rem, 2.36vw, 2.125rem);         /*  34 px @1440 */
-  --fs-h3-sm: clamp(1.375rem, 1.81vw, 1.625rem);    /*  26 px @1440 */
-  --fs-statement: clamp(1.75rem, 3.61vw, 3.25rem);  /*  52 px @1440 */
-  --fs-statement-lg: clamp(1.875rem, 3.75vw, 3.375rem); /* 54 px @1440 */
-  --fs-quote: clamp(1.5rem, 2.5vw, 2.25rem);        /*  36 px @1440 */
-  --fs-stat: clamp(2.125rem, 3.75vw, 3.375rem);     /*  54 px @1440 */
+  /* Les titres sont en capitales étroites : l'échelle est un peu plus haute
+     que pour une linéale classique, à largeur de ligne comparable. */
+  --fs-hero: clamp(3.5rem, 12.2vw, 11rem);          /* 176 px @1440 */
+  --fs-h1: clamp(2.75rem, 7vw, 6.5rem);             /* 104 px @1440 */
+  --fs-h1-portfolio: clamp(2.75rem, 8.3vw, 7.5rem); /* 120 px @1440 */
+  --fs-h1-studio: clamp(3.75rem, 14.2vw, 13rem);    /* 204 px @1440 */
+  --fs-h2-xl: clamp(3rem, 8.6vw, 7.75rem);          /* 124 px @1440 */
+  --fs-h2-lg: clamp(2.625rem, 6.1vw, 5.5rem);       /*  88 px @1440 */
+  --fs-h2: clamp(2.625rem, 5.8vw, 5.25rem);         /*  84 px @1440 */
+  --fs-h2-sm: clamp(2.375rem, 5.1vw, 4.625rem);     /*  74 px @1440 */
+  --fs-h3-xl: clamp(2rem, 2.9vw, 2.875rem);         /*  46 px @1440 */
+  --fs-h3: clamp(1.75rem, 2.7vw, 2.5rem);           /*  40 px @1440 */
+  --fs-h3-sm: clamp(1.5rem, 2.1vw, 1.875rem);       /*  30 px @1440 */
+  --fs-statement: clamp(2rem, 4.1vw, 3.75rem);      /*  60 px @1440 */
+  --fs-statement-lg: clamp(2.125rem, 4.3vw, 3.875rem); /* 62 px @1440 */
+  --fs-quote: clamp(1.75rem, 2.9vw, 2.625rem);      /*  42 px @1440 */
+  --fs-stat: clamp(2.5rem, 4.6vw, 4.25rem);         /*  68 px @1440 */
+
+  /* Approche des titres : les capitales étroites respirent, jamais serrées. */
+  --ls-display: 0.01em;
 
   --fs-body-lg: clamp(1rem, 1.25vw, 1.125rem);      /*  18 px */
   --fs-body: clamp(0.9375rem, 1.18vw, 1.0625rem);   /*  17 px */
@@ -101,9 +114,10 @@ body {
 h1, h2, h3, h4 {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: -0.045em;
-  line-height: 1;
+  font-weight: 800;
+  letter-spacing: var(--ls-display);
+  line-height: 0.95;
+  text-transform: uppercase;
   text-wrap: balance;
 }
 
@@ -143,9 +157,11 @@ button { cursor: pointer; }
   z-index: 200;
   padding: 12px 20px;
   border-radius: 100px;
-  background: var(--blush);
+  background: var(--accent);
   color: var(--ink);
-  font: 600 0.875rem/1 var(--font-body);
+  font: 700 0.9375rem/1 var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   transform: translateY(-200%);
   transition: transform 180ms var(--ease);
 }
@@ -164,7 +180,7 @@ button { cursor: pointer; }
 /* Thèmes de section — pilotent aussi la couleur de l'en-tête (voir header.js) */
 .theme-ivory { background: var(--ivory); color: var(--ink); }
 .theme-ivory-2 { background: var(--ivory-2); color: var(--ink); }
-.theme-ink { background: var(--ink); color: var(--ivory); }
+.theme-ink { background: var(--ink); color: var(--ivory); --focus: var(--accent); }
 .theme-ink h1, .theme-ink h2, .theme-ink h3, .theme-ink h4 { color: var(--ivory); }
 
 .muted { color: var(--muted-on-light); }
@@ -178,13 +194,14 @@ button { cursor: pointer; }
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  font: 600 var(--fs-eyebrow)/1 var(--font-body);
-  letter-spacing: 0.2em;
+  font: 700 0.875rem/1 var(--font-display);
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--muted-on-light);
 }
 .theme-ink .eyebrow { color: var(--muted-on-dark); }
-.eyebrow svg { color: var(--blush); flex: none; }
+.eyebrow svg { color: var(--accent-strong); flex: none; }
+.theme-ink .eyebrow svg { color: var(--accent); }
 
 .section-head {
   display: flex;
@@ -207,15 +224,17 @@ button { cursor: pointer; }
   padding: 18px 32px;
   border: 1px solid transparent;
   border-radius: 100px;
-  font: 600 var(--fs-body-sm)/1 var(--font-body);
+  font: 700 1.0625rem/1 var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   text-align: center;
   transition: background-color 200ms var(--ease), color 200ms var(--ease), border-color 200ms var(--ease);
 }
 .btn svg { flex: none; transition: transform 200ms var(--ease); }
 .btn:hover svg { transform: translate(2px, -2px); }
 
-.btn--blush { background: var(--blush); color: var(--ink); }
-.btn--blush:hover { background: var(--ivory); }
+.btn--accent { background: var(--accent); color: var(--ink); }
+.btn--accent:hover { background: var(--ivory); border-color: var(--ink); }
 
 .btn--ink { background: var(--ink); color: var(--ivory); }
 .btn--ink:hover { background: var(--ink-2); }
@@ -225,13 +244,13 @@ button { cursor: pointer; }
 .theme-ivory-2 .btn--outline:hover { background: var(--ivory); }
 
 .btn--ghost-light {
-  border-color: rgba(244, 240, 231, 0.55);
+  border-color: rgba(255, 255, 255, 0.55);
   color: var(--ivory);
 }
-.btn--ghost-light:hover { background: rgba(244, 240, 231, 0.1); }
+.btn--ghost-light:hover { background: rgba(255, 255, 255, 0.1); }
 
-.btn--sm { padding: 13px 20px; font-size: var(--fs-small); }
-.btn--md { padding: 16px 28px; font-size: var(--fs-small); }
+.btn--sm { padding: 13px 20px; font-size: 0.9375rem; }
+.btn--md { padding: 16px 28px; font-size: 0.9375rem; }
 .btn--block { display: flex; width: 100%; }
 
 /* Lien souligné « Voir le projet » */
@@ -241,7 +260,9 @@ button { cursor: pointer; }
   gap: 9px;
   padding-bottom: 4px;
   border-bottom: 1px solid currentColor;
-  font: 600 var(--fs-small)/1 var(--font-body);
+  font: 700 0.9375rem/1 var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 /* — Cartes image ——————————————————————————————————————————— */

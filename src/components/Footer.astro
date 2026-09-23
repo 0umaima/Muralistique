@@ -20,10 +20,7 @@ const year = new Date().getFullYear();
 <footer class="footer" data-section-theme="ink">
   <div class="footer__grid shell pad">
     <div class="footer__brand">
-      <div class="footer__brand-row">
-        <Logo size={38} />
-        <span class="footer__wordmark">{site.name}</span>
-      </div>
+      <Logo class="footer__wordmark" />
       <p class="footer__tagline">{site.tagline}</p>
       {
         socials.length > 0 && (
@@ -97,6 +94,7 @@ const year = new Date().getFullYear();
 
 <style>
   .footer {
+    --focus: var(--accent);
     background: var(--ink);
     color: var(--muted-on-dark);
     border-top: 1px solid var(--ink-line);
@@ -111,15 +109,8 @@ const year = new Date().getFullYear();
     font-size: var(--fs-small);
   }
 
-  .footer__brand-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .footer__wordmark {
-    font: 700 0.875rem/1 var(--font-display);
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
+  .footer__brand :global(.footer__wordmark) {
+    font-size: 1.75rem;
     color: var(--ivory);
   }
   .footer__tagline {
@@ -143,7 +134,7 @@ const year = new Date().getFullYear();
     color: var(--ivory);
     transition: background-color 200ms var(--ease), border-color 200ms var(--ease);
   }
-  .footer__socials a:hover { background: var(--blush); border-color: var(--blush); color: var(--ink); }
+  .footer__socials a:hover { background: var(--accent); border-color: var(--accent); color: var(--ink); }
 
   .footer__col ul {
     display: flex;
@@ -152,10 +143,10 @@ const year = new Date().getFullYear();
   }
   .footer__col-title {
     margin-bottom: 11px;
-    font-family: var(--font-body);
-    font-weight: 600;
-    font-size: var(--fs-eyebrow);
-    letter-spacing: 0.14em;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.9375rem;
+    letter-spacing: 0.2em;
     line-height: 1.4;
     text-transform: uppercase;
     color: var(--ivory);
@@ -166,15 +157,15 @@ const year = new Date().getFullYear();
     gap: 6px;
     transition: color 180ms var(--ease);
   }
-  .footer__col a:hover { color: var(--blush); }
+  .footer__col a:hover { color: var(--accent); }
 
   /* Signale les valeurs encore à renseigner (voir src/data/site.mjs) */
-  .footer__todo { color: var(--blush); font-style: italic; }
+  .footer__todo { color: var(--accent); font-style: italic; }
 
   .footer__giant {
     padding-bottom: 40px;
-    font: 700 clamp(2.5rem, 10.7vw, 9.625rem) / 0.9 var(--font-display);
-    letter-spacing: -0.055em;
+    font: 800 clamp(3.5rem, 15.5vw, 14rem) / 0.9 var(--font-display);
+    letter-spacing: var(--ls-display);
     text-transform: uppercase;
     color: var(--ink-2);
     white-space: nowrap;
@@ -190,7 +181,7 @@ const year = new Date().getFullYear();
     border-top: 1px solid var(--ink-line);
     font-size: var(--fs-xs);
   }
-  .footer__legal a:hover { color: var(--blush); }
+  .footer__legal a:hover { color: var(--accent); }
 
   @media (max-width: 1000px) {
     .footer__grid { grid-template-columns: 1fr 1fr; gap: 40px; }

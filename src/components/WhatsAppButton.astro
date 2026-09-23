@@ -14,13 +14,13 @@ import { whatsappUrl } from '../data/site.mjs';
 interface Props {
   label?: string;
   class?: string;
-  /** Style du bouton : 'blush' | 'outline-light' */
-  variant?: 'blush' | 'outline-light';
+  /** Style du bouton : 'accent' | 'outline-light' */
+  variant?: 'accent' | 'outline-light';
   block?: boolean;
 }
 const { label = 'Ouvrir WhatsApp', class: className = '', variant = 'outline-light', block = false } = Astro.props;
 const url = whatsappUrl();
-const variantClass = variant === 'blush' ? 'btn--blush' : 'btn--ghost-light';
+const variantClass = variant === 'accent' ? 'btn--accent' : 'btn--ghost-light';
 ---
 
 {
@@ -51,15 +51,15 @@ const variantClass = variant === 'blush' ? 'btn--blush' : 'btn--ghost-light';
     align-items: flex-start;
     gap: 12px;
     padding: 16px 18px;
-    border: 1px dashed var(--blush);
+    border: 1px dashed var(--accent);
     border-radius: 14px;
-    background: rgba(242, 179, 166, 0.1);
+    background: rgba(251, 190, 103, 0.1);
     color: inherit;
     font-size: var(--fs-xs);
     line-height: 1.5;
     text-align: left;
   }
-  .wa-missing :global(svg) { flex: none; color: var(--blush); margin-top: 1px; }
+  .wa-missing :global(svg) { flex: none; color: var(--accent); margin-top: 1px; }
   .wa-missing code {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.95em;

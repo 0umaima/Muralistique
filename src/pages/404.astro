@@ -21,7 +21,7 @@ const suggestions = projects.slice(0, 3);
       </p>
 
       <div class="nf__actions">
-        <a class="btn btn--blush" href="/">
+        <a class="btn btn--accent" href="/">
           Retour à l’accueil
           <Icon name="arrow-up-right" size={14} stroke={2.2} />
         </a>
@@ -52,7 +52,7 @@ const suggestions = projects.slice(0, 3);
     margin-top: 24px;
     font-size: var(--fs-h1);
     line-height: 0.94;
-    letter-spacing: -0.05em;
+    letter-spacing: var(--ls-display);
     color: var(--ivory);
   }
   .nf__lead { margin-top: 22px; max-width: 520px; font-size: var(--fs-body-lg); }
@@ -73,9 +73,9 @@ const suggestions = projects.slice(0, 3);
     padding: 18px 0;
     border-bottom: 1px solid var(--ink-line);
     font: 600 1.25rem/1.2 var(--font-display);
-    letter-spacing: -0.03em;
+    letter-spacing: var(--ls-display);
     color: var(--ivory);
   }
-  .nf__links a:hover { color: var(--blush); }
-  .nf__links :global(svg) { color: var(--blush); }
+  .nf__links a:hover { color: var(--accent); }
+  .nf__links :global(svg) { color: var(--accent); }
 </style>

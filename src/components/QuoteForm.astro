@@ -226,7 +226,7 @@ const mb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1).replace('.', ',
     color: var(--muted-on-light);
     padding: 0;
   }
-  .field__label abbr { color: var(--blush); text-decoration: none; border: 0; }
+  .field__label abbr { color: var(--accent-strong); text-decoration: none; border: 0; }
 
   .field__input {
     height: 56px;
@@ -268,7 +268,7 @@ const mb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1).replace('.', ',
   }
   .pill:hover { background: var(--ivory-2); }
   .pill input { width: 15px; height: 15px; accent-color: var(--ink); margin: 0; }
-  .pill:has(input:checked) { background: var(--blush); }
+  .pill:has(input:checked) { background: var(--accent); }
   .pill:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 3px; }
 
   .qf__budgets {
@@ -290,7 +290,7 @@ const mb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1).replace('.', ',
   .choice:hover { background: var(--ivory-2); }
   .choice--wide { grid-column: span 2; }
   .choice input { width: 17px; height: 17px; accent-color: var(--ink); margin: 0; flex: none; }
-  .choice:has(input:checked) { background: var(--blush); }
+  .choice:has(input:checked) { background: var(--accent); }
   .choice:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 3px; }
 
   .qf__date { max-width: 260px; }
@@ -355,7 +355,7 @@ const mb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1).replace('.', ',
     font: 600 var(--fs-xs) / 1 var(--font-body);
     flex: none;
   }
-  .qf-files__list :global(.qf-files__remove:hover) { background: var(--blush); }
+  .qf-files__list :global(.qf-files__remove:hover) { background: var(--accent); }
 
   /* ——— Consentement & envoi ——— */
   .check {
@@ -368,7 +368,7 @@ const mb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1).replace('.', ',
     line-height: 1.5;
   }
   .check input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--ink); flex: none; }
-  .check abbr { color: var(--blush); text-decoration: none; border: 0; }
+  .check abbr { color: var(--accent-strong); text-decoration: none; border: 0; }
 
   .qf__actions { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
   .qf__submit { padding: 19px 34px; font-size: var(--fs-body-sm); }
@@ -381,7 +381,7 @@ const mb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1).replace('.', ',
   .qf__submit[data-state='done'] :global(.qf__submit-arrow) { display: none; }
   @keyframes qf-spin { to { transform: rotate(360deg); } }
   .qf__required { font-size: var(--fs-xs); }
-  .qf__required abbr { color: var(--blush); text-decoration: none; border: 0; }
+  .qf__required abbr { color: var(--accent-strong); text-decoration: none; border: 0; }
 
   .qf-status {
     display: flex;
@@ -394,10 +394,10 @@ const mb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1).replace('.', ',
   }
   .qf-status[hidden] { display: none; }
   .qf-status[data-tone='error'] { border: 1px solid #a8341f; background: #f6e6e0; color: #6d2415; }
-  .qf-status[data-tone='success'] { border: 1px solid var(--ink); background: var(--blush); color: var(--ink); }
+  .qf-status[data-tone='success'] { border: 1px solid var(--ink); background: var(--accent); color: var(--ink); }
   .qf-status a { text-decoration: underline; text-underline-offset: 3px; }
   .qf-status :global(svg) { flex: none; margin-top: 2px; }
-  .qf-closed :global(svg) { flex: none; margin-top: 2px; color: var(--blush); }
+  .qf-closed :global(svg) { flex: none; margin-top: 2px; color: var(--accent-strong); }
 
   .qf-closed {
     display: flex;
@@ -408,7 +408,7 @@ const mb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1).replace('.', ',
     border-radius: 16px;
     background: var(--ivory-2);
   }
-  .qf-closed :global(svg) { flex: none; margin-top: 2px; color: var(--blush); }
+  .qf-closed :global(svg) { flex: none; margin-top: 2px; color: var(--accent-strong); }
   .qf-closed__title { font-size: var(--fs-h3-sm); margin-bottom: 8px; }
   .qf-closed p { font-size: var(--fs-body-sm); color: var(--muted-on-light); }
 

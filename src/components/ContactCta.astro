@@ -6,6 +6,7 @@
 import Icon from './Icon.astro';
 import BrandIcon from './BrandIcon.astro';
 import WhatsAppButton from './WhatsAppButton.astro';
+import FixedBg from './FixedBg.astro';
 import { site } from '../data/site.mjs';
 
 interface Props {
@@ -14,11 +15,14 @@ interface Props {
   /** Deuxième carte : contact WhatsApp, ou renvoi vers le portfolio. */
   secondary?: 'whatsapp' | 'portfolio';
   id?: string;
+  /** Photo de fond fixe (chemin dans src/assets/images/), facultative. */
+  bg?: string;
 }
-const { eyebrow = 'Contact', title, secondary = 'whatsapp', id = 'contact' } = Astro.props;
+const { eyebrow = 'Contact', title, secondary = 'whatsapp', id = 'contact', bg } = Astro.props;
 ---
 
 <section class="cta theme-ink section--lg" id={id} data-section-theme="ink">
+  {bg && <FixedBg src={bg} scrim={0.8} />}
   <div class="shell pad">
     <div data-reveal>
       <p class="eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />{eyebrow}</p>
@@ -33,7 +37,7 @@ const { eyebrow = 'Contact', title, secondary = 'whatsapp', id = 'contact' } = A
     </div>
 
     <div class="cta__cards">
-      <div class="cta__card cta__card--blush" data-reveal>
+      <div class="cta__card cta__card--accent" data-reveal>
         <Icon name="message-square-text" size={26} stroke={1.7} />
         <div>
           <h3>Demander un devis</h3>
@@ -80,14 +84,14 @@ const { eyebrow = 'Contact', title, secondary = 'whatsapp', id = 'contact' } = A
 </section>
 
 <style>
-  .cta { position: relative; overflow: hidden; }
+  .cta { position: relative; isolation: isolate; overflow: hidden; }
 
   .cta__title {
     margin-top: 26px;
     max-width: 1000px;
     font-size: var(--fs-h2-xl);
     line-height: 0.94;
-    letter-spacing: -0.05em;
+    letter-spacing: var(--ls-display);
   }
 
   .cta__lineart {
@@ -123,8 +127,8 @@ const { eyebrow = 'Contact', title, secondary = 'whatsapp', id = 'contact' } = A
   .cta__card h3 { font-size: var(--fs-h3); }
   .cta__card p { margin-top: 12px; max-width: 340px; font-size: var(--fs-body-sm); }
 
-  .cta__card--blush { background: var(--blush); color: var(--ink); }
-  .cta__card--blush h3 { color: var(--ink); }
+  .cta__card--accent { background: var(--accent); color: var(--ink); }
+  .cta__card--accent h3 { color: var(--ink); }
   .cta__card--ink {
     background: var(--ink-2);
     border: 1px solid var(--ink-line-2);
@@ -142,7 +146,7 @@ const { eyebrow = 'Contact', title, secondary = 'whatsapp', id = 'contact' } = A
     color: var(--muted-on-dark);
     word-break: break-all;
   }
-  .cta__mail:hover { color: var(--blush); }
+  .cta__mail:hover { color: var(--accent); }
 
   @media (max-width: 860px) {
     .cta__cards { grid-template-columns: 1fr; }

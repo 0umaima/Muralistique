@@ -1,35 +1,39 @@
 ---
 /**
- * Logo de l'atelier.
- *
- * ▶ POUR METTRE VOTRE LOGO : remplacez src/assets/images/brand/logo.png
- *   (256 × 256 px, fond transparent conseillé) en gardant le même nom.
- *   Aucun autre fichier n'est à modifier.
+ * Logo de l'atelier : un mot-symbole purement typographique, repris du logo
+ * « MURALISTIQUE » — capitales étroites très espacées, « M » initial plus
+ * haut et en jaune (--accent). Aucune image : il suit la couleur du texte
+ * de son conteneur (noir sur fond clair, blanc sur fond sombre).
  */
-import { Image } from 'astro:assets';
-import { asset } from '../lib/images';
 import { site } from '../data/site.mjs';
 
 interface Props {
-  size?: number;
   class?: string;
 }
-const { size = 44, class: className = '' } = Astro.props;
+const { class: className = '' } = Astro.props;
+
+const [initial, ...rest] = site.name.toUpperCase();
 ---
 
-<Image
-  src={asset('brand/logo.png')}
-  alt={`Logo ${site.name}`}
-  width={size}
-  height={size}
-  densities={[1, 2]}
-  loading="eager"
-  class:list={['logo', className]}
-/>
+<span class:list={['wordmark', className]}>
+  <span class="wordmark__initial">{initial}</span>{rest.join('')}
+</span>
 
 <style>
-  .logo {
-    border-radius: 50%;
-    object-fit: cover;
+  .wordmark {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1;
+    letter-spacing: 0.34em;
+    /* L'espacement s'ajoute aussi après la dernière lettre : on le reprend
+       pour que le mot reste optiquement centré / aligné à droite. */
+    margin-right: -0.34em;
+    white-space: nowrap;
+  }
+  .wordmark__initial {
+    font-size: 1.26em;
+    color: var(--accent);
   }
 </style>

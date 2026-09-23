@@ -56,7 +56,6 @@ Formats d'origine conseillés (le double des dimensions d'affichage, JPEG ou PNG
 - `projects/siege-aurea/cover.jpg` — 2640 × 1280 px — Siège Aurea
 - `projects/siege-aurea/1.jpg` — 1600 × 1200 px — Siège Aurea — détail
 - `projects/siege-aurea/2.jpg` — 1600 × 1067 px — Siège Aurea — vue d’ensemble
-- `brand/logo.png` — 256 × 256 px — logo (fond transparent conseillé)
 - `brand/og.jpg` — 1200 × 630 px — image de partage sur les réseaux sociaux
 
 Les textes alternatifs (`alt`) se modifient dans `src/data/`.
