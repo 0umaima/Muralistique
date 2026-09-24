@@ -85,7 +85,7 @@ export const services = [
     heading: 'Peinture murale sur mesure, réalisée directement sur vos murs.',
     text: 'Du croquis à la finition, sur site. Surface lessivable et protégée, chantier calé sur vos horaires d’ouverture.',
     shortText: 'Peinture murale sur mesure, du croquis à la finition, réalisée sur site.',
-    image: { src: 'services/fresque.jpg', alt: 'Fresque murale en cours de réalisation — photo à remplacer' },
+    image: { src: 'services/fresque.png', alt: 'Fresque murale en cours de réalisation — photo à remplacer' },
   },
   {
     number: '02',
@@ -94,7 +94,7 @@ export const services = [
     heading: 'Œuvres peintes en atelier, pensées pour un mur précis.',
     text: 'Format, palette et sujet définis avec vous, puis livrées prêtes à accrocher. La solution pour les murs qu’on ne peut pas peindre.',
     shortText: 'Œuvres peintes en atelier, livrées prêtes à accrocher.',
-    image: { src: 'services/toile.jpg', alt: 'Toile peinte en atelier — photo à remplacer' },
+    image: { src: 'services/toile.png', alt: 'Toile peinte en atelier — photo à remplacer' },
   },
   {
     number: '03',
@@ -103,7 +103,7 @@ export const services = [
     heading: 'Peinture en direct, devant votre public.',
     text: 'Pour une ouverture, une inauguration ou un événement : l’œuvre se construit sous les yeux des invités et reste sur place.',
     shortText: 'Peinture en direct devant votre public, l’œuvre reste sur place.',
-    image: { src: 'services/performance.jpg', alt: 'Séance de live painting devant un public — photo à remplacer' },
+    image: { src: 'services/performance.png', alt: 'Séance de live painting devant un public — photo à remplacer' },
   },
 ];
 
