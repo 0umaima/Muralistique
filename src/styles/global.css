@@ -2,8 +2,9 @@
 
 /* ==========================================================================
    MURALISTIQUE — feuille de style globale
-   Identité reprise du logo : noir, blanc et le jaune exact du « M »
-   (#FBBE67), Big Shoulders Display (titres) + Manrope (texte courant).
+   Identité reprise du logo : noir et blanc, le jaune du « M » (#FBBE67)
+   réservé au logo, et un vermillon de peintre comme unique accent.
+   Big Shoulders Display (titres) + Manrope (texte courant).
    Modifiez les variables ci-dessous pour retoucher l'ensemble du site d'un
    seul endroit.
    ========================================================================== */
@@ -18,18 +19,19 @@
   --ink-stroke: #6a6a6a;   /* contour des grands chiffres évidés */
 
   --ivory: #fff;           /* blanc : fond principal */
-  --ivory-2: #fff5e6;      /* crème (jaune du logo très dilué) : sections alternées */
-  --ivory-3: #f3e6cf;      /* crème profond : fond de planche */
-  --rule: #ecdcc0;         /* filet clair */
+  --ivory-2: #f3f3f2;      /* gris très clair neutre : champs, survols (jamais de crème) */
+  --ivory-3: #e7e7e5;
+  --rule: #e2e2e0;         /* filet clair */
 
-  --accent: #fbbe67;       /* jaune du « M » du logo — l'accent du site */
-  --accent-strong: #b87314;/* ambre : texte / icône d'accent sur fond clair (contraste ≥ 3:1) */
-  --accent-ink: #4a3412;   /* texte secondaire sur jaune */
+  --brand: #fbbe67;        /* jaune du « M » — réservé au logo */
+  --accent: #ff4a1c;       /* vermillon : l'accent du site, à doser */
+  --accent-strong: #c42d0c;/* vermillon profond : texte / icône d'accent sur fond clair (≥ 4.5:1) */
+  --accent-ink: #0b0b0b;   /* texte posé sur le vermillon */
 
   --muted-on-light: #5c5c5c;
   --muted-on-dark: #a9a9a9;
 
-  /* Anneau de focus : noir sur les fonds clairs, jaune sur les fonds sombres
+  /* Anneau de focus : noir sur les fonds clairs, vermillon sur les fonds sombres
      (voir .theme-ink plus bas). */
   --focus: var(--ink);
 
@@ -211,6 +213,30 @@ button { cursor: pointer; }
   flex-wrap: wrap;
 }
 .section-head h2 { margin-top: 22px; }
+
+/* Repère de section de l'accueil : un numéro et un court trait d'accent,
+   au-dessus d'un titre de deux ou trois mots. */
+.section-index {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font: 700 0.875rem/1 var(--font-display);
+  letter-spacing: 0.24em;
+  color: var(--muted-on-light);
+}
+.section-index::after {
+  content: '';
+  width: 36px;
+  height: 2px;
+  background: var(--accent);
+}
+.theme-ink .section-index { color: var(--muted-on-dark); }
+
+.section-title {
+  margin-top: 18px;
+  font-size: var(--fs-h2-xl);
+  line-height: 0.9;
+}
 .section-head__aside { max-width: 360px; font-size: var(--fs-body); color: var(--muted-on-light); }
 .theme-ink .section-head__aside { color: var(--muted-on-dark); }
 
@@ -311,6 +337,23 @@ button { cursor: pointer; }
     transform 820ms var(--ease-out) var(--reveal-delay, 0ms);
 }
 
+/* Images découvertes de bas en haut (Réalisations, pages projet).
+   L'élément observé garde sa taille ; c'est son enfant direct qui est
+   découpé (un élément entièrement découpé n'est jamais « visible » pour
+   IntersectionObserver). L'image, elle, se resserre. Le zoom au survol se
+   pose sur le cadre `.media` intermédiaire : aucune transformation ne se
+   marche dessus. */
+.js [data-reveal-clip] > * { clip-path: inset(100% 0 0 0); }
+.js [data-reveal-clip] img { transform: scale(1.2); }
+.js [data-reveal-clip].is-revealed > * {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1000ms cubic-bezier(0.7, 0, 0.2, 1) var(--reveal-delay, 0ms);
+}
+.js [data-reveal-clip].is-revealed img {
+  transform: none;
+  transition: transform 1400ms var(--ease-out) var(--reveal-delay, 0ms);
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
@@ -321,6 +364,8 @@ button { cursor: pointer; }
   }
   .js [data-reveal],
   .js [data-reveal-rotate] { opacity: 1 !important; transform: none !important; }
+  .js [data-reveal-clip] > * { clip-path: none !important; }
+  .js [data-reveal-clip] img { transform: none !important; }
 }
 
 /* ==========================================================================

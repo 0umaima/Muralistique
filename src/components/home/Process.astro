@@ -1,7 +1,6 @@
 ---
 import Icon from '../Icon.astro';
-import Media from '../Media.astro';
-import { processSteps, processImages } from '../../data/content';
+import { processSteps } from '../../data/content';
 ---
 
 <section class="process theme-ivory section" id="processus" data-section-theme="ivory">
@@ -16,13 +15,11 @@ import { processSteps, processImages } from '../../data/content';
   <div class="shell pad process__inner">
     <div class="section-head" data-reveal>
       <div class="process__intro">
-        <p class="eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />Processus</p>
-        <h2 class="process__title">Cinq étapes. Du premier trait au mur livré.</h2>
+        <p class="section-index">02</p>
+        <h2 class="section-title">Notre processus</h2>
       </div>
       <div class="process__aside">
-        <p class="muted">
-          Chaque projet suit un processus clair, construit autour du lieu, de son public et de l’identité du client.
-        </p>
+        <p class="muted">Cinq étapes, du premier trait au mur livré.</p>
         <a class="btn btn--outline btn--md" href="/devis">
           Demander un devis
           <Icon name="arrow-up-right" size={13} stroke={2.2} />
@@ -57,23 +54,6 @@ import { processSteps, processImages } from '../../data/content';
       }
     </ol>
 
-    <ul class="process__gallery">
-      {
-        processImages.map((image, i) => (
-          <li data-reveal data-reveal-delay={i * 80}>
-            <Media
-              src={image.src}
-              alt={image.alt}
-              ratio="53 / 40"
-              widths={[400, 640, 848]}
-              sizes="(max-width: 800px) 100vw, 33vw"
-              zoom
-              class="process__image"
-            />
-          </li>
-        ))
-      }
-    </ul>
   </div>
 </section>
 
@@ -92,7 +72,6 @@ import { processSteps, processImages } from '../../data/content';
   }
   .process__lineart svg { width: 1520px; max-width: none; height: auto; }
 
-  .process__title { margin-top: 22px; font-size: var(--fs-h2-lg); }
   .process__intro { max-width: 860px; }
   .process__aside {
     display: flex;
@@ -157,24 +136,12 @@ import { processSteps, processImages } from '../../data/content';
   .process__text { margin-top: 14px; font-size: 0.84375rem; line-height: 1.55; }
   .process__card--ivory .process__text { color: var(--muted-on-light); }
 
-  .process__gallery {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 24px;
-    margin-top: clamp(2.5rem, 5.5vw, 5rem);
-  }
-  .process__gallery :global(.process__image) {
-    border-radius: 24px;
-    border: 1px solid var(--ink);
-  }
-
   @media (max-width: 1100px) {
     .process__steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .process__frame { height: auto; min-height: 300px; }
   }
   @media (max-width: 760px) {
     .process__steps { grid-template-columns: 1fr; }
-    .process__gallery { grid-template-columns: 1fr; }
     .process__lineart { top: 220px; }
   }
 </style>

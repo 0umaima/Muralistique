@@ -17,11 +17,12 @@ import { dirname, join } from 'node:path';
 
 const ROOT = new URL('../src/assets/images/', import.meta.url).pathname;
 
-// Palette du site (voir src/styles/global.css) : noir, blanc, jaune du logo.
+// Palette du site (voir src/styles/global.css) : noir, blanc, gris neutre,
+// vermillon d'accent.
 const INK = '#0B0B0B';
 const IVORY = '#FFFFFF';
-const IVORY_2 = '#F3ECDF';
-const ACCENT = '#FBBE67';
+const IVORY_2 = '#F3F3F2';
+const ACCENT = '#FF4A1C';
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -132,25 +133,12 @@ const JOBS = [
   ['home/hero-left.jpg', 816, 1020, 'Chantier ou croquis', { tone: 'dark' }],
   ['home/hero-center.jpg', 1176, 1410, 'Geste de peinture', { tone: 'dark' }],
   ['home/hero-right.jpg', 816, 1020, 'Mur fini ou détail', { tone: 'dark' }],
-  // — Secteurs ——————————————————————————————————————————
-  ['sectors/hotellerie.jpg', 632, 790, 'Hôtellerie'],
-  ['sectors/sante.jpg', 632, 790, 'Santé'],
-  ['sectors/ecoles.jpg', 632, 790, 'Écoles & enfants'],
-  ['sectors/restaurants.jpg', 632, 790, 'Restaurants & commerces'],
-  ['sectors/bureaux.jpg', 632, 790, 'Bureaux'],
-  ['sectors/prives.jpg', 632, 790, 'Espaces privés'],
-  // — Processus ——————————————————————————————————————————
-  ['process/croquis.jpg', 848, 640, 'Croquis sur papier'],
-  ['process/trace.jpg', 848, 640, 'Tracé au mur'],
-  ['process/couleur.jpg', 848, 640, 'Mise en couleur'],
   // — Services ————————————————————————————————————————————
   ['services/fresque.jpg', 1236, 680, 'Fresque', { tone: 'dark' }],
   ['services/toile.jpg', 1236, 680, 'Toile', { tone: 'dark' }],
   ['services/performance.jpg', 1236, 680, 'Performance', { tone: 'dark' }],
   // — Témoignage ————————————————————————————————————————
   ['people/temoignage.jpg', 520, 520, 'Portrait client'],
-  // — Réalisations ————————————————————————————————————
-  ['portfolio/hero-bg.jpg', 2560, 1460, 'Fresque terminée — pleine largeur', { tone: 'dark' }],
   // — Studio ————————————————————————————————————————————
   ['studio/hero.jpg', 2132, 1760, 'Amine en train de peindre', { tone: 'dark' }],
   ['studio/founder.jpg', 1440, 1640, 'Amine en train de dessiner'],

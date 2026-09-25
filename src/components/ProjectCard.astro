@@ -4,6 +4,12 @@ import Media from './Media.astro';
 import { sectorBySlug } from '../data/sectors';
 import type { Project } from '../data/projects';
 
+/**
+ * Tuile de la grille Réalisations : l'image seule, en grand. Le titre, le
+ * secteur et le résumé n'apparaissent qu'au survol (ou au focus clavier),
+ * sur un voile sombre qui garde le texte lisible quelle que soit la photo.
+ * Sur écran tactile, le titre reste visible en bas de l'image.
+ */
 interface Props {
   project: Project;
   index?: number;
@@ -11,103 +17,168 @@ interface Props {
 }
 const { project, index = 0, priority = false } = Astro.props;
 const sector = sectorBySlug(project.sector);
+const meta = [sector?.label, project.city].filter(Boolean);
 ---
 
-<article
-  class:list={['card', project.wide && 'card--wide']}
-  data-project
-  data-sector={project.sector}
-  data-index={index}
->
-  <a class="card__link" href={`/realisations/${project.slug}`}>
-    <div class="card__frame">
-      <Media
-        src={project.cover.src}
-        alt={project.cover.alt}
-        ratio={project.ratio}
-        widths={project.wide ? [640, 1000, 1400, 2000] : [400, 640, 900, 1200]}
-        sizes={project.wide ? '(max-width: 900px) 100vw, 1320px' : '(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw'}
-        priority={priority}
-        class="card__media"
-      />
-      <span class="card__badge">{sector?.label ?? project.sector}</span>
+<article class="tile" data-project data-sector={project.sector} data-index={index}>
+  <a class="tile__link" href={`/realisations/${project.slug}`} data-tile>
+    <div class="tile__frame" data-reveal-clip data-reveal-delay={(index % 2) * 120}>
+      <div class="tile__clip">
+        <Media
+          src={project.cover.src}
+          alt={project.cover.alt}
+          widths={[480, 720, 1000, 1400, 2000]}
+          sizes="(max-width: 700px) 100vw, (max-width: 1500px) 50vw, 720px"
+          priority={priority}
+          eager={!priority && index < 2}
+          class="tile__media"
+        />
+      </div>
     </div>
 
-    <div class="card__body">
-      <h3 class="card__title">{project.title}</h3>
-      <p class="card__excerpt muted">{project.excerpt}</p>
-      <span class="card__meta">
-        <span class="card__city muted">{project.city}</span>
-        <span class="card__cta">
-          Voir le projet
-          <Icon name="arrow-up-right" size={14} stroke={2.2} />
-        </span>
+    <span class="tile__shade" aria-hidden="true"></span>
+
+    <span class="tile__info">
+      <span class="tile__meta">
+        {meta.map((item, i) => <span class:list={[i === 0 && 'tile__sector']}>{item}</span>)}
       </span>
-    </div>
+      <h2 class="tile__title">{project.title}</h2>
+      <span class="tile__excerpt">{project.excerpt}</span>
+      <span class="tile__cta">
+        Voir le projet
+        <Icon name="arrow-up-right" size={16} stroke={2.2} />
+      </span>
+    </span>
   </a>
 </article>
 
 <style>
-  .card { min-width: 0; }
-  .card[hidden] { display: none; }
-  .card__link { display: block; }
+  .tile { position: relative; min-width: 0; aspect-ratio: 4 / 3; }
+  .tile[hidden] { display: none; }
+  /* Tuile pleine largeur : format panoramique. */
+  .tile.is-wide { grid-column: 1 / -1; aspect-ratio: 21 / 9; }
 
-  .card__frame {
+  .tile__link {
     position: relative;
+    display: block;
+    height: 100%;
     overflow: hidden;
-    border-radius: 20px;
-    border: 1px solid var(--ink);
-  }
-  .card__frame :global(.card__media) { width: 100%; }
-  .card__frame :global(.card__media img) {
-    transition: transform 400ms var(--ease-out);
-  }
-  .card__link:hover :global(.card__media img) { transform: scale(1.035) translateY(-5px); }
-
-  .card__badge {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    padding: 8px 13px 7px;
-    border-radius: 100px;
-    border: 1px solid var(--ivory);
-    background: rgba(15, 14, 13, 0.55);
+    background: var(--ink-2);
     color: var(--ivory);
-    font: 600 var(--fs-eyebrow) / 1 var(--font-body);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    transition:
-      background-color 400ms var(--ease-out),
-      color 400ms var(--ease-out),
-      border-color 400ms var(--ease-out);
-  }
-  .card__link:hover .card__badge {
-    background: var(--accent);
-    color: var(--ink);
-    border-color: var(--accent);
+    --mx: 0;
+    --my: 0;
   }
 
-  .card__body { margin-top: 18px; }
-  .card__title { font-size: clamp(1.5rem, 2.08vw, 1.875rem); }
-  .card--wide .card__title { font-size: clamp(1.75rem, 2.64vw, 2.375rem); }
-  .card__excerpt { margin-top: 8px; font-size: 0.90625rem; }
+  .tile__frame, .tile__clip { position: absolute; inset: 0; }
+  .tile__frame :global(.tile__media) {
+    width: 100%;
+    height: 100%;
+    background: var(--ink-2);
+    transform: scale(1) translate(0, 0);
+    transition: transform 900ms var(--ease-out);
+  }
+  /* Au survol : léger zoom, et l'image suit un peu le pointeur. */
+  .tile__link:hover .tile__frame :global(.tile__media),
+  .tile__link:focus-visible .tile__frame :global(.tile__media) {
+    transform: scale(1.07) translate(calc(var(--mx) * -1.2%), calc(var(--my) * -1.2%));
+    transition: transform 600ms var(--ease-out);
+  }
 
-  .card__meta {
+  .tile__shade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to top, rgba(11, 11, 11, 0.9) 0%, rgba(11, 11, 11, 0.55) 45%, rgba(11, 11, 11, 0.35) 100%);
+    opacity: 0;
+    transition: opacity 450ms var(--ease);
+  }
+  .tile__link:hover .tile__shade,
+  .tile__link:focus-visible .tile__shade { opacity: 1; }
+
+  .tile__info {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid var(--ink);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: clamp(1.25rem, 2.6vw, 2.5rem);
   }
-  .card__city { font: 500 0.84375rem/1 var(--font-body); }
-  .card__cta {
+  .tile__info > * {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 350ms var(--ease), transform 500ms var(--ease-out);
+  }
+  .tile__link:hover .tile__info > *,
+  .tile__link:focus-visible .tile__info > * { opacity: 1; transform: none; }
+  .tile__link:hover .tile__info > :nth-child(2),
+  .tile__link:focus-visible .tile__info > :nth-child(2) { transition-delay: 50ms; }
+  .tile__link:hover .tile__info > :nth-child(3),
+  .tile__link:focus-visible .tile__info > :nth-child(3) { transition-delay: 100ms; }
+  .tile__link:hover .tile__info > :nth-child(4),
+  .tile__link:focus-visible .tile__info > :nth-child(4) { transition-delay: 150ms; }
+
+  .tile__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    font: 700 0.8125rem/1 var(--font-display);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72);
+  }
+  .tile__sector { color: var(--ivory); }
+  .tile__sector::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 10px;
+    background: var(--accent);
+    vertical-align: 1px;
+  }
+
+  .tile__title {
+    font-size: clamp(2rem, 3.6vw, 3.5rem);
+    line-height: 0.92;
+    color: var(--ivory);
+  }
+  .tile.is-wide .tile__title { font-size: clamp(2.25rem, 5vw, 5rem); }
+
+  .tile__excerpt {
+    max-width: 52ch;
+    font-size: var(--fs-body-sm);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .tile__cta {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    font: 600 0.84375rem/1 var(--font-body);
+    gap: 10px;
+    margin-top: 6px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--accent);
+    font: 700 0.9375rem/1 var(--font-display);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
   }
-  .card__link:hover .card__cta :global(svg) { transform: translate(2px, -2px); }
-  .card__cta :global(svg) { transition: transform 200ms var(--ease); }
+
+  /* Écrans tactiles : pas de survol, le titre reste lisible en permanence. */
+  @media (hover: none) {
+    .tile__shade {
+      opacity: 1;
+      background: linear-gradient(to top, rgba(11, 11, 11, 0.85) 0%, rgba(11, 11, 11, 0) 55%);
+    }
+    .tile__info > * { opacity: 1; transform: none; }
+    .tile__excerpt, .tile__cta { display: none; }
+  }
+
+  @media (max-width: 700px) {
+    .tile, .tile.is-wide { aspect-ratio: 4 / 3; }
+    .tile__title, .tile.is-wide .tile__title { font-size: clamp(1.75rem, 8vw, 2.5rem); }
+    .tile__info { gap: 8px; }
+  }
 </style>

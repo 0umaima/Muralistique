@@ -1,4 +1,5 @@
 ---
+import { getImage } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
 import Media from '../../components/Media.astro';
@@ -6,16 +7,18 @@ import BeforeAfter from '../../components/BeforeAfter.astro';
 import ContactCta from '../../components/ContactCta.astro';
 import { projects } from '../../data/projects';
 import { sectorBySlug } from '../../data/sectors';
+import { asset } from '../../lib/images';
 
 export function getStaticPaths() {
   return projects.map((project, index) => ({
     params: { slug: project.slug },
-    props: { project, next: projects[(index + 1) % projects.length] },
+    props: { project, index, next: projects[(index + 1) % projects.length] },
   }));
 }
 
-const { project, next } = Astro.props;
+const { project, index, next } = Astro.props;
 const sector = sectorBySlug(project.sector);
+const pad = (n: number) => String(n).padStart(2, '0');
 
 // Seuls les faits réellement renseignés sont affichés — rien n'est inventé.
 const facts = [
@@ -26,84 +29,101 @@ const facts = [
   { label: 'Durée', value: project.facts.duration },
   { label: 'Année', value: project.facts.year },
 ].filter((fact) => Boolean(fact.value));
+
+// Version grand format de chaque image de la galerie, pour la visionneuse
+// (et pour le lien direct quand JavaScript est absent).
+const gallery = await Promise.all(
+  project.gallery.map(async (image) => {
+    const source = asset(image.src);
+    const full = await getImage({ src: source, width: Math.min(2200, source.width), format: 'webp' });
+    return { ...image, full: full.src };
+  })
+);
+const galleryWide = gallery.length % 2 === 1;
 ---
 
 <BaseLayout
   title={project.title}
-  description={`${project.title} — ${project.excerpt} Fresque murale réalisée par Muralistique à ${project.city}.`}
+  description={`${project.title} — ${project.excerpt} Fresque murale réalisée par Muralistique${project.city ? ` à ${project.city}` : ''}.`}
   headerTheme="ink"
   activeNav="/realisations"
   ogImage={project.cover.src}
 >
-  <article>
-    <header class="detail-hero theme-ink" data-section-theme="ink">
-      <div class="detail-hero__inner shell pad">
-        <nav class="detail-hero__crumbs" aria-label="Fil d’Ariane">
+  <article class="project">
+    <!-- ——— Couverture plein écran, titre posé dessus ——— -->
+    <header class="phead theme-ink" data-section-theme="ink">
+      <div class="phead__media" data-parallax="-0.12">
+        <Media
+          src={project.cover.src}
+          alt={project.cover.alt}
+          widths={[700, 1100, 1600, 2200, 2800]}
+          sizes="100vw"
+          priority
+          class="phead__cover"
+        />
+      </div>
+      <div class="phead__shade" aria-hidden="true"></div>
+
+      <div class="phead__inner shell pad">
+        <nav class="phead__crumbs" aria-label="Fil d’Ariane">
           <a href="/realisations">Réalisations</a>
           <Icon name="chevron-right" size={13} stroke={2} />
           <span aria-current="page">{project.title}</span>
         </nav>
 
-        <p class="eyebrow detail-hero__eyebrow">
-          <Icon name="sparkle" size={13} stroke={1.6} />
-          {sector?.label}
-        </p>
-        <h1 class="detail-hero__title">{project.title}</h1>
-        <p class="detail-hero__lead">{project.excerpt}</p>
-      </div>
-
-      <div class="detail-hero__media shell pad">
-        <Media
-          src={project.cover.src}
-          alt={project.cover.alt}
-          ratio="16 / 9"
-          widths={[700, 1100, 1600, 2200]}
-          sizes="(max-width: 1500px) 100vw, 1320px"
-          priority
-          class="detail-hero__cover"
-        />
+        <div class="phead__bottom">
+          <p class="phead__meta">
+            <span class="phead__index">{pad(index + 1)} / {pad(projects.length)}</span>
+            {sector && <span class="phead__sector">{sector.label}</span>}
+            {project.city && <span>{project.city}</span>}
+          </p>
+          <h1 class="phead__title">
+            <span class="phead__mask"><span class="phead__line">{project.title}</span></span>
+          </h1>
+        </div>
       </div>
     </header>
 
-    <section class="detail-body theme-ivory section" data-section-theme="ivory">
-      <div class="shell pad detail-body__grid">
-        <dl class="detail-facts" data-reveal>
-          {
-            facts.map((fact) => (
-              <div class="detail-facts__row">
-                <dt>{fact.label}</dt>
-                <dd>{fact.value}</dd>
-              </div>
-            ))
-          }
-          <div class="detail-facts__cta">
-            <a class="btn btn--outline btn--md btn--block" href="/devis">
-              Un projet similaire ?
-              <Icon name="arrow-up-right" size={13} stroke={2.2} />
-            </a>
-          </div>
-        </dl>
+    <!-- ——— L'essentiel : une phrase, le texte, les faits ——— -->
+    <section class="pinfo theme-ink" data-section-theme="ink">
+      <div class="shell pad pinfo__grid">
+        <p class="pinfo__lead" data-reveal>{project.excerpt}</p>
 
-        <div class="detail-text" data-reveal data-reveal-delay="80">
-          {project.body.map((paragraph) => <p>{paragraph}</p>)}
+        <div class="pinfo__side" data-reveal data-reveal-delay="100">
+          <div class="pinfo__text">
+            {project.body.map((paragraph) => <p>{paragraph}</p>)}
+          </div>
+
+          {
+            facts.length > 0 && (
+              <dl class="pinfo__facts">
+                {facts.map((fact) => (
+                  <div class="pinfo__fact">
+                    <dt>{fact.label}</dt>
+                    <dd>{fact.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )
+          }
+
+          <a class="btn btn--accent btn--md pinfo__cta" href="/devis">
+            Un projet similaire ?
+            <Icon name="arrow-up-right" size={13} stroke={2.2} />
+          </a>
         </div>
       </div>
     </section>
 
     {
       project.beforeAfter && (
-        <section class="detail-ba theme-ivory-2 section" data-section-theme="ivory">
+        <section class="pba theme-ink" data-section-theme="ink">
           <div class="shell pad">
-            <div class="section-head" data-reveal>
-              <div>
-                <p class="eyebrow">
-                  <Icon name="sparkle" size={13} stroke={1.6} />
-                  Avant / après
-                </p>
-                <h2 class="detail-ba__title">La transformation, curseur en main.</h2>
-              </div>
+            <div class="pblock__head" data-reveal>
+              <h2 class="pblock__title">Avant / Après</h2>
+              <p class="pblock__hint">Glissez pour comparer</p>
             </div>
-            <div class="detail-ba__frame" data-reveal>
+            <div data-reveal>
               <BeforeAfter
                 id={`ba-${project.slug}`}
                 before={project.beforeAfter.before}
@@ -117,181 +137,440 @@ const facts = [
     }
 
     {
-      project.gallery.length > 0 && (
-        <section class="detail-gallery theme-ivory section" data-section-theme="ivory">
+      gallery.length > 0 && (
+        <section class="pgallery theme-ink" data-section-theme="ink">
           <div class="shell pad">
-            <div class="section-head" data-reveal>
-              <div>
-                <p class="eyebrow">
-                  <Icon name="sparkle" size={13} stroke={1.6} />
-                  En images
-                </p>
-                <h2 class="detail-gallery__title">Le projet en détail.</h2>
-              </div>
+            <div class="pblock__head" data-reveal>
+              <h2 class="pblock__title">En images</h2>
+              <p class="pblock__hint only-js">Cliquez pour agrandir</p>
             </div>
-            <ul class="detail-gallery__grid">
-              {project.gallery.map((image, i) => (
-                <li data-reveal data-reveal-delay={i * 80}>
-                  <Media
-                    src={image.src}
-                    alt={image.alt}
-                    ratio="4 / 3"
-                    widths={[500, 800, 1200, 1600]}
-                    sizes="(max-width: 800px) 100vw, 50vw"
-                    zoom
-                    class="detail-gallery__media"
-                  />
-                  {image.caption && (
-                    <p class="detail-gallery__caption">
-                      <span class="detail-gallery__dot" />
-                      {image.caption}
-                    </p>
-                  )}
-                </li>
-              ))}
-            </ul>
           </div>
+          <ul class="pgallery__grid">
+            {gallery.map((image, i) => (
+              <li class:list={['pgallery__item', galleryWide && i === 0 && 'is-wide']}>
+                <a
+                  class="pgallery__link"
+                  href={image.full}
+                  data-lightbox-item
+                  data-alt={image.alt}
+                  data-caption={image.caption ?? ''}
+                >
+                  <div class="pgallery__frame" data-reveal-clip data-reveal-delay={(i % 2) * 120}>
+                    <div class="pgallery__clip">
+                      <Media
+                        src={image.src}
+                        alt={image.alt}
+                        widths={[500, 800, 1200, 1600, 2200]}
+                        sizes={galleryWide && i === 0 ? '100vw' : '(max-width: 700px) 100vw, 50vw'}
+                        class="pgallery__media"
+                      />
+                    </div>
+                  </div>
+                  {image.caption && <span class="pgallery__caption">{image.caption}</span>}
+                  <span class="pgallery__zoom" aria-hidden="true">
+                    <Icon name="plus" size={20} stroke={2} />
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
         </section>
       )
     }
 
-    <nav class="detail-next theme-ivory-2" aria-label="Projet suivant" data-section-theme="ivory">
-      <a class="detail-next__link shell pad" href={`/realisations/${next.slug}`}>
-        <span>
-          <span class="detail-next__label">Projet suivant</span>
-          <span class="detail-next__title">{next.title}</span>
-        </span>
-        <Icon name="arrow-right" size={26} stroke={2} />
+    <!-- ——— Projet suivant : une grande image à traverser ——— -->
+    <nav class="pnext theme-ink" aria-label="Projet suivant" data-section-theme="ink">
+      <a class="pnext__link" href={`/realisations/${next.slug}`}>
+        <div class="pnext__media">
+          <Media src={next.cover.src} alt="" widths={[700, 1100, 1600, 2200]} sizes="100vw" class="pnext__cover" />
+        </div>
+        <span class="pnext__shade" aria-hidden="true"></span>
+        <div class="pnext__content shell pad">
+          <span class="pnext__label">Projet suivant</span>
+          <span class="pnext__row">
+            <span class="pnext__title">{next.title}</span>
+            <span class="pnext__arrow"><Icon name="arrow-right" size={28} stroke={2} /></span>
+          </span>
+        </div>
       </a>
     </nav>
   </article>
 
-  <ContactCta title="Votre mur, la prochaine transformation." />
+  <ContactCta title="Parlons projet." />
+
+  {
+    gallery.length > 0 && (
+      <dialog class="lightbox" data-lightbox aria-label="Visionneuse d’images">
+        <figure class="lightbox__figure">
+          <img class="lightbox__img" src="" alt="" data-lightbox-img />
+          <figcaption class="lightbox__caption">
+            <span data-lightbox-caption />
+            <span class="lightbox__count" data-lightbox-count />
+          </figcaption>
+        </figure>
+        <button class="lightbox__btn lightbox__close" type="button" data-lightbox-close aria-label="Fermer">
+          <Icon name="x" size={22} stroke={2} />
+        </button>
+        {gallery.length > 1 && (
+          <>
+            <button class="lightbox__btn lightbox__prev" type="button" data-lightbox-prev aria-label="Image précédente">
+              <Icon name="arrow-left" size={22} stroke={2} />
+            </button>
+            <button class="lightbox__btn lightbox__next" type="button" data-lightbox-next aria-label="Image suivante">
+              <Icon name="arrow-right" size={22} stroke={2} />
+            </button>
+          </>
+        )}
+      </dialog>
+    )
+  }
 </BaseLayout>
 
 <style>
-  .detail-hero { padding-block: clamp(2.5rem, 4.4vw, 4rem) 0; }
-  .detail-hero__crumbs {
+  /* ——— Couverture ——— */
+  .phead {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    height: calc(100svh - var(--header-h));
+    min-height: 460px;
+    max-height: 1000px;
+    overflow: hidden;
+  }
+  .phead__media { position: absolute; inset: 0; z-index: -2; transform: scale(1.15); }
+  .phead__media :global(.phead__cover) { width: 100%; height: 100%; background: var(--ink); }
+  .phead__shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(to top, rgba(11, 11, 11, 0.92) 0%, rgba(11, 11, 11, 0.35) 45%, rgba(11, 11, 11, 0.5) 100%);
+  }
+
+  .phead__inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-block: clamp(1.5rem, 3vw, 2.5rem) clamp(2rem, 4.5vw, 4rem);
+  }
+  .phead__crumbs {
     display: flex;
     align-items: center;
     gap: 8px;
     font: 500 var(--fs-xs) / 1 var(--font-body);
-    color: var(--muted-on-dark);
+    color: rgba(255, 255, 255, 0.72);
   }
-  .detail-hero__crumbs a:hover { color: var(--accent); }
-  .detail-hero__eyebrow { margin-top: 28px; color: var(--muted-on-dark); }
-  .detail-hero__title {
-    margin-top: 22px;
-    font-size: var(--fs-h1);
-    line-height: 0.94;
-    letter-spacing: var(--ls-display);
-    color: var(--ivory);
-    max-width: 16ch;
-  }
-  .detail-hero__lead {
-    margin-top: 22px;
-    max-width: 620px;
-    font-size: var(--fs-body-lg);
-    color: var(--muted-on-dark);
-  }
-  .detail-hero__media { margin-top: clamp(2rem, 4.4vw, 4rem); transform: translateY(clamp(1.75rem, 3.3vw, 3rem)); }
-  .detail-hero__media :global(.detail-hero__cover) {
-    border-radius: 24px;
-    border: 1px solid var(--ink-line-2);
-  }
+  .phead__crumbs a:hover { color: var(--ivory); text-decoration: underline; text-underline-offset: 3px; }
 
-  .detail-body { padding-top: clamp(4.5rem, 10vw, 9rem); }
-  .detail-body__grid {
-    display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: clamp(2rem, 5.5vw, 5rem);
-    align-items: start;
-  }
-
-  .detail-facts { margin: 0; border-top: 1px solid var(--ink); }
-  .detail-facts__row {
+  .phead__meta {
     display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--rule);
-  }
-  .detail-facts dt {
-    font: 600 var(--fs-eyebrow) / 1.4 var(--font-body);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted-on-light);
-  }
-  .detail-facts dd { margin: 0; font-size: var(--fs-body-sm); font-weight: 500; text-align: right; }
-  .detail-facts__cta { margin-top: 28px; }
-
-  .detail-text {
-    display: flex;
-    flex-direction: column;
-    gap: 22px;
-    font-size: var(--fs-body);
-    line-height: 1.7;
-    color: var(--muted-on-light);
-    max-width: 66ch;
-  }
-
-  .detail-ba { border-top: 1px solid var(--ink); }
-  .detail-ba__title, .detail-gallery__title { margin-top: 22px; font-size: var(--fs-h2-sm); }
-  .detail-ba__frame { margin-top: clamp(2rem, 3.3vw, 3rem); }
-
-  .detail-gallery__grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px;
-    margin-top: clamp(2rem, 3.3vw, 3rem);
-  }
-  .detail-gallery__grid :global(.detail-gallery__media) {
-    border-radius: 22px;
-    border: 1px solid var(--ink);
-  }
-  .detail-gallery__caption {
-    display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
-    margin-top: 14px;
-    font: 500 0.84375rem/1 var(--font-body);
-    color: var(--muted-on-light);
-  }
-  .detail-gallery__dot { width: 7px; height: 7px; background: var(--accent); flex: none; }
-
-  .detail-next { border-top: 1px solid var(--ink); }
-  .detail-next__link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    padding-block: clamp(2rem, 3.9vw, 3.5rem);
-    transition: background-color 240ms var(--ease);
-  }
-  .detail-next__link:hover { background: var(--accent); }
-  .detail-next__label {
-    display: block;
-    font: 600 var(--fs-eyebrow) / 1 var(--font-body);
+    gap: 8px 22px;
+    font: 700 0.875rem/1 var(--font-display);
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--muted-on-light);
+    color: rgba(255, 255, 255, 0.75);
   }
-  .detail-next__title {
-    display: block;
-    margin-top: 14px;
-    font: 700 var(--fs-h2-sm) / 1 var(--font-display);
+  .phead__index { color: var(--ivory); }
+  .phead__sector::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 10px;
+    background: var(--accent);
+    vertical-align: 1px;
+  }
+  .phead__title {
+    margin-top: 18px;
+    max-width: 14ch;
+    font-size: clamp(3rem, 9vw, 9rem);
+    font-weight: 900;
+    line-height: 0.86;
+    color: var(--ivory);
+  }
+  .phead__mask { display: block; overflow: hidden; padding-top: 0.06em; }
+  .phead__line { display: block; }
+
+  :global(.js) .phead :global(.phead__cover img) { animation: ph-settle 1600ms var(--ease-out) both; }
+  :global(.js) .phead__crumbs { animation: ph-fade 700ms var(--ease-out) 300ms both; }
+  :global(.js) .phead__meta { animation: ph-fade 700ms var(--ease-out) 450ms both; }
+  :global(.js) .phead__line { animation: ph-rise 900ms var(--ease-out) 250ms both; }
+
+  @keyframes ph-settle {
+    from { transform: scale(1.18); opacity: 0.2; }
+    to { transform: none; opacity: 1; }
+  }
+  @keyframes ph-rise {
+    from { transform: translateY(105%); }
+    to { transform: none; }
+  }
+  @keyframes ph-fade {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* ——— L'essentiel ——— */
+  .pinfo { padding-block: clamp(3.5rem, 8vw, 7rem); }
+  .pinfo__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: start;
+  }
+  .pinfo__lead {
+    font: 500 var(--fs-statement) / 1.1 var(--font-display);
     letter-spacing: var(--ls-display);
+    text-wrap: balance;
   }
-  .detail-next__link :global(svg) { flex: none; transition: transform 240ms var(--ease); }
-  .detail-next__link:hover :global(svg) { transform: translateX(6px); }
+  .pinfo__text {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    font-size: var(--fs-body);
+    line-height: 1.7;
+    color: var(--muted-on-dark);
+  }
+  .pinfo__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 20px 28px;
+    margin: 36px 0 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--ink-line-2);
+  }
+  .pinfo__fact dt {
+    font: 700 0.75rem/1 var(--font-display);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted-on-dark);
+  }
+  .pinfo__fact dd {
+    margin: 10px 0 0;
+    font: 700 clamp(1.25rem, 1.8vw, 1.625rem) / 1.05 var(--font-display);
+    letter-spacing: var(--ls-display);
+    text-transform: uppercase;
+  }
+  .pinfo__cta { margin-top: 36px; }
+
+  /* ——— Blocs (avant / après, galerie) ——— */
+  .pba { padding-bottom: clamp(3.5rem, 8vw, 7rem); }
+  .pblock__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding-top: clamp(2rem, 3.5vw, 3rem);
+    margin-bottom: clamp(1.25rem, 2.2vw, 2rem);
+    border-top: 1px solid var(--ink-line-2);
+  }
+  .pblock__title { font-size: var(--fs-h2-sm); }
+  .pblock__hint {
+    font: 700 0.8125rem/1 var(--font-display);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted-on-dark);
+  }
+  .pba :global(.ba__control-label) { color: var(--muted-on-dark); }
+
+  /* ——— Galerie bord à bord ——— */
+  .pgallery { padding-bottom: 6px; }
+  .pgallery__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    padding-inline: 6px;
+  }
+  .pgallery__item { aspect-ratio: 4 / 3; min-width: 0; }
+  .pgallery__item.is-wide { grid-column: 1 / -1; aspect-ratio: 16 / 9; }
+
+  .pgallery__link {
+    position: relative;
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    background: var(--ink-2);
+    cursor: zoom-in;
+  }
+  .pgallery__frame, .pgallery__clip { position: absolute; inset: 0; display: block; }
+  .pgallery__clip :global(.pgallery__media) {
+    width: 100%;
+    height: 100%;
+    background: var(--ink-2);
+    transition: transform 900ms var(--ease-out);
+  }
+  .pgallery__link:hover :global(.pgallery__media),
+  .pgallery__link:focus-visible :global(.pgallery__media) { transform: scale(1.05); }
+
+  .pgallery__caption {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    padding: 10px 14px 9px;
+    background: var(--ink);
+    color: var(--ivory);
+    font: 700 0.8125rem/1 var(--font-display);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .pgallery__zoom {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    background: var(--ivory);
+    color: var(--ink);
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 250ms var(--ease), transform 350ms var(--ease-out);
+  }
+  .pgallery__link:hover .pgallery__zoom,
+  .pgallery__link:focus-visible .pgallery__zoom { opacity: 1; transform: none; }
+
+  /* ——— Projet suivant ——— */
+  .pnext { border-top: 6px solid var(--ink); }
+  .pnext__link {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: flex-end;
+    height: clamp(320px, 52vh, 560px);
+    overflow: hidden;
+    color: var(--ivory);
+  }
+  .pnext__media { position: absolute; inset: 0; z-index: -2; }
+  .pnext__media :global(.pnext__cover) {
+    width: 100%;
+    height: 100%;
+    transition: transform 1100ms var(--ease-out);
+  }
+  .pnext__link:hover .pnext__media :global(.pnext__cover) { transform: scale(1.06); }
+  .pnext__shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgba(11, 11, 11, 0.62);
+    transition: background-color 500ms var(--ease);
+  }
+  .pnext__link:hover .pnext__shade { background: rgba(11, 11, 11, 0.4); }
+
+  .pnext__content { padding-block: clamp(2rem, 4vw, 3.5rem); }
+  .pnext__label {
+    display: block;
+    font: 700 0.875rem/1 var(--font-display);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+  }
+  .pnext__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 14px;
+  }
+  .pnext__title {
+    font: 900 clamp(2.5rem, 7vw, 7rem) / 0.88 var(--font-display);
+    letter-spacing: var(--ls-display);
+    text-transform: uppercase;
+  }
+  .pnext__arrow {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: clamp(56px, 6vw, 84px);
+    height: clamp(56px, 6vw, 84px);
+    background: var(--accent);
+    color: var(--accent-ink);
+    transition: transform 400ms var(--ease-out);
+  }
+  .pnext__link:hover .pnext__arrow { transform: translateX(8px); }
+
+  /* ——— Visionneuse ——— */
+  .lightbox {
+    width: 100vw;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: clamp(3.5rem, 6vw, 5rem) clamp(1rem, 6vw, 6rem);
+    border: 0;
+    background: rgba(11, 11, 11, 0.96);
+    color: var(--ivory);
+  }
+  .lightbox::backdrop { background: transparent; }
+  .lightbox[open] { display: grid; place-items: center; animation: lb-in 300ms var(--ease-out); }
+  .lightbox__figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
+  .lightbox__img {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    object-fit: contain;
+  }
+  .lightbox[open] .lightbox__img { animation: lb-img 450ms var(--ease-out); }
+  .lightbox__caption {
+    display: flex;
+    gap: 20px;
+    font: 700 0.875rem/1 var(--font-display);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .lightbox__count { color: var(--muted-on-dark); }
+
+  .lightbox__btn {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    border: 1px solid var(--ink-line-3);
+    background: var(--ink);
+    color: var(--ivory);
+    transition: background-color 200ms var(--ease), color 200ms var(--ease);
+  }
+  .lightbox__btn:hover { background: var(--ivory); color: var(--ink); }
+  .lightbox__close { top: 16px; right: 16px; }
+  .lightbox__prev { left: 16px; top: 50%; transform: translateY(-50%); }
+  .lightbox__next { right: 16px; top: 50%; transform: translateY(-50%); }
+
+  @keyframes lb-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes lb-img { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+
+  :global(html:has(.lightbox[open])) { overflow: hidden; }
 
   @media (max-width: 900px) {
-    .detail-body__grid { grid-template-columns: 1fr; }
-    .detail-gallery__grid { grid-template-columns: 1fr; }
+    .pinfo__grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 700px) {
+    .pgallery__grid { grid-template-columns: 1fr; }
+    .pgallery__item.is-wide { aspect-ratio: 4 / 3; }
+    .pgallery__zoom { display: none; }
+    .lightbox__prev, .lightbox__next { top: auto; bottom: 16px; transform: none; }
+  }
+  @media (hover: none) {
+    .pgallery__zoom { display: none; }
   }
 </style>
 
 <script>
   import { initReveal } from '../../scripts/reveal';
+  import { initScrollFx } from '../../scripts/scroll-fx';
+  import { initLightbox } from '../../scripts/lightbox';
   initReveal();
+  initScrollFx();
+  initLightbox();
 </script>

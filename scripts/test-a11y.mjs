@@ -6,7 +6,7 @@
 import { launchBrowser } from './browser.mjs';
 
 const BASE = process.env.BASE || 'http://localhost:4321';
-const PAGES = ['/', '/realisations', '/realisations/hotel-rivage', '/studio', '/devis', '/mentions-legales', '/404'];
+const PAGES = ['/', '/realisations', '/realisations/robotique-en-mouvement', '/studio', '/devis', '/mentions-legales', '/404'];
 const WIDTHS = [360, 768, 1024, 1440];
 
 const browser = await launchBrowser();

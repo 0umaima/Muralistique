@@ -8,8 +8,8 @@ import { services } from '../../data/content';
   <div class="shell pad">
     <div class="section-head" data-reveal>
       <div>
-        <p class="eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />Services</p>
-        <h2 class="services__title">Trois manières de<br />faire entrer l’art.</h2>
+        <p class="section-index">03</p>
+        <h2 class="section-title">Nos services</h2>
       </div>
       <p class="section-head__aside">Sur le mur, sur toile ou en direct devant votre public.</p>
     </div>
@@ -78,8 +78,6 @@ import { services } from '../../data/content';
 </section>
 
 <style>
-  .services__title { margin-top: 22px; font-size: var(--fs-h2-lg); max-width: 900px; }
-
   .services__list {
     display: flex;
     flex-direction: column;
@@ -89,13 +87,12 @@ import { services } from '../../data/content';
 
   .services__item {
     border: 1px solid var(--ink-line-2);
-    border-radius: 22px;
     background: var(--ink-2);
     overflow: hidden;
     transition: border-color 240ms var(--ease);
   }
-  .services__item:hover { border-color: var(--accent); }
-  .services__item:focus-within { border-color: var(--accent); }
+  .services__item:hover,
+  .services__item:focus-within { border-color: var(--ink-stroke); }
 
   .services__heading { font: inherit; margin: 0; }
 
@@ -176,7 +173,6 @@ import { services } from '../../data/content';
     padding: 8px clamp(20px, 2.4vw, 34px) clamp(20px, 2.4vw, 34px);
   }
   .services__panel-grid :global(.services__image) {
-    border-radius: 18px;
     border: 1px solid var(--ink-line-2);
   }
   .services__panel-title {

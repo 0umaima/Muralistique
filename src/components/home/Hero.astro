@@ -8,8 +8,8 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
  * Hero de l'accueil : un collage de trois grands visuels à angles francs,
  * le titre posé par-dessus leur bas, sur un fond photo fixe.
  *
- * À l'ouverture, les visuels apparaissent l'un après l'autre (gauche,
- * centre, droite) derrière un volet jaune, puis le titre monte.
+ * À l'ouverture, les visuels se découvrent en cascade rapide (gauche,
+ * centre, droite), directement sur le fond, puis le titre monte.
  * Pour changer une image : remplacez le fichier dans src/assets/images/home/
  * en gardant son nom.
  */
@@ -116,7 +116,9 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
     width: var(--w);
     aspect-ratio: var(--ar);
     overflow: hidden;
-    background: var(--ink-2);
+    /* Aucun aplat derrière l'image : pendant l'ouverture, on voit le fond
+       du hero, jamais une couleur. */
+    background: transparent;
     box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.65);
   }
   .hero__shot--left { --x: 2%; --y: 7%; --w: 25%; --ar: 3 / 4; z-index: 1; }
@@ -132,7 +134,7 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
   }
   .hero__gif { object-position: center 45%; }
 
-  /* Traits jaunes, à la manière d'un coup de pinceau autour du collage */
+  /* Traits d'accent, à la manière d'un coup de pinceau autour du collage */
   .hero__stroke {
     position: absolute;
     z-index: 4;
@@ -196,45 +198,30 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
     .hero__actions :global(.btn) { width: 100%; }
   }
 
-  /* ——— Entrée : un visuel à la fois ———
-     Chaque cadre s'ouvre de gauche à droite sur un aplat jaune, qui se
-     retire à son tour pour découvrir l'image. Les trois cadres passent
-     l'un après l'autre, puis le titre monte. Uniquement quand JavaScript
-     est actif : sans lui, tout est déjà en place. */
-  .hero__shot--left { --d: 150ms; }
-  .hero__shot--center { --d: 900ms; }
-  .hero__shot--right { --d: 1650ms; }
+  /* ——— Entrée : cascade rapide ———
+     Chaque cadre se découvre de bas en haut pendant que son image se
+     resserre ; les trois cadres se chevauchent dans le temps (120 ms
+     d'écart) et le titre monte avant la fin. Tout est en place en ~1,2 s.
+     Uniquement quand JavaScript est actif : sans lui, tout est déjà là. */
+  .hero__shot--left { --d: 0ms; }
+  .hero__shot--center { --d: 120ms; }
+  .hero__shot--right { --d: 240ms; }
 
-  .hero__shot::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--accent);
-    transform: scaleX(0);
-    transform-origin: right;
-    pointer-events: none;
-  }
-
-  :global(.js) .hero__shot { animation: shot-open 650ms var(--ease-out) var(--d) both; }
-  :global(.js) .hero__shot::after { animation: shot-cover 700ms cubic-bezier(0.7, 0, 0.3, 1) calc(var(--d) + 380ms) both; }
+  :global(.js) .hero__shot { animation: shot-open 750ms cubic-bezier(0.7, 0, 0.2, 1) var(--d) both; }
   :global(.js) .hero__shot :global(.hero__media),
-  :global(.js) .hero__gif { animation: shot-zoom 1500ms var(--ease-out) calc(var(--d) + 380ms) both; }
+  :global(.js) .hero__gif { animation: shot-zoom 1000ms var(--ease-out) var(--d) both; }
 
-  :global(.js) .hero__stroke path { animation: stroke-draw 1100ms var(--ease-out) 2500ms both; }
-  :global(.js) .hero__line--1 { animation: h-line 800ms var(--ease-out) 2350ms both; }
-  :global(.js) .hero__line--2 { animation: h-line 800ms var(--ease-out) 2480ms both; }
-  :global(.js) .hero__actions { animation: h-line 700ms var(--ease-out) 2700ms both; }
+  :global(.js) .hero__stroke path { animation: stroke-draw 700ms var(--ease-out) 650ms both; }
+  :global(.js) .hero__line--1 { animation: h-line 650ms var(--ease-out) 380ms both; }
+  :global(.js) .hero__line--2 { animation: h-line 650ms var(--ease-out) 460ms both; }
+  :global(.js) .hero__actions { animation: h-line 600ms var(--ease-out) 600ms both; }
 
   @keyframes shot-open {
-    from { clip-path: inset(0 100% 0 0); }
-    to { clip-path: inset(0 0 0 0); }
-  }
-  @keyframes shot-cover {
-    from { transform: scaleX(1); }
-    to { transform: scaleX(0); }
+    from { clip-path: inset(100% 0 0 0); transform: translateY(48px); }
+    to { clip-path: inset(0 0 0 0); transform: none; }
   }
   @keyframes shot-zoom {
-    from { transform: scale(1.22); }
+    from { transform: scale(1.18); }
     to { transform: none; }
   }
   @keyframes stroke-draw {
@@ -242,13 +229,12 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
     to { stroke-dasharray: 1; stroke-dashoffset: 0; }
   }
   @keyframes h-line {
-    from { opacity: 0; transform: translateY(40px); }
+    from { opacity: 0; transform: translateY(32px); }
     to { opacity: 1; transform: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     :global(.js) .hero__shot,
-    :global(.js) .hero__shot::after,
     :global(.js) .hero__shot :global(.hero__media),
     :global(.js) .hero__gif,
     :global(.js) .hero__stroke path,
