@@ -1,14 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Icon from '../../components/Icon.astro';
-import Media from '../../components/Media.astro';
 import ProjectsBrowser from '../../components/ProjectsBrowser.astro';
-import MarqueeBand from '../../components/MarqueeBand.astro';
 import ContactCta from '../../components/ContactCta.astro';
-import { heroProjects } from '../../data/projects';
-import { sectorBySlug } from '../../data/sectors';
+import { projects } from '../../data/projects';
 
-const featured = heroProjects();
+const title = 'Réalisations';
 ---
 
 <BaseLayout
@@ -18,151 +14,86 @@ const featured = heroProjects();
   activeNav="/realisations"
 >
   <section class="phero theme-ink" data-section-theme="ink">
-    <div class="phero__bg" aria-hidden="true">
-      <Media
-        src="portfolio/hero-bg.jpg"
-        alt=""
-        widths={[900, 1400, 1920, 2560]}
-        sizes="100vw"
-        priority
-        class="phero__bg-media"
-      />
-    </div>
-    <div class="phero__scrim" aria-hidden="true"></div>
-
     <div class="phero__inner shell pad">
-      <div class="phero__head">
-        <p class="eyebrow phero__eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />Réalisations</p>
-        <h1 class="phero__title">Des murs avant.<br />Des œuvres après.</h1>
-        <p class="phero__lead">
-          Découvrez des fresques imaginées pour des hôtels, cabinets, écoles, commerces et espaces privés.
+      <h1 class="phero__title" aria-label={title}>
+        <span class="phero__mask" aria-hidden="true">
+          {[...title].map((letter, i) => <span class="phero__letter" style={`--i:${i}`}>{letter}</span>)}
+        </span>
+      </h1>
+      <div class="phero__side">
+        <p class="phero__count">
+          <span class="phero__num">{String(projects.length).padStart(2, '0')}</span>
+          projets
         </p>
+        <p class="phero__lead">Nos murs, en grand. Survolez une image pour découvrir le projet.</p>
       </div>
-
-      <ul class="phero__featured">
-        {
-          featured.map((project, i) => (
-            <li style={`--i:${i}`}>
-              <a class="phero__link" href={`/realisations/${project.slug}`}>
-                <span class="phero__link-head">
-                  <span class="phero__link-title">{project.title}</span>
-                  <Icon name="arrow-up-right" size={14} stroke={2.2} />
-                </span>
-                <span class="phero__rule" />
-                <span class="phero__link-meta">
-                  <span class="phero__link-sector">{sectorBySlug(project.sector)?.label}</span>
-                  <span>{project.city}</span>
-                </span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
     </div>
   </section>
 
   <ProjectsBrowser />
-  <MarqueeBand />
-  <ContactCta title="Transformons votre espace." />
+  <ContactCta title="Parlons projet." />
 </BaseLayout>
 
 <style>
-  .phero {
-    position: relative;
-    min-height: clamp(520px, 57vw, 820px);
-    display: flex;
-    overflow: hidden;
-    background: var(--ink);
-  }
-  .phero__bg { position: absolute; inset: 0; }
-  .phero__bg :global(.phero__bg-media) { width: 100%; height: 100%; }
-  .js .phero__bg { animation: bg-settle 1000ms var(--ease-out) both; }
-  @keyframes bg-settle {
-    from { transform: scale(1.04); }
-    to { transform: none; }
-  }
-  .phero__scrim { position: absolute; inset: 0; background: rgba(15, 14, 13, 0.64); }
+  .phero { padding-block: clamp(2.5rem, 5vw, 4.5rem) clamp(2rem, 3.5vw, 3rem); }
 
   .phero__inner {
-    position: relative;
-    z-index: 1;
     display: flex;
-    flex-direction: column;
+    align-items: flex-end;
     justify-content: space-between;
-    gap: clamp(3rem, 6vw, 5rem);
-    width: 100%;
-    padding-block: clamp(3rem, 5.8vw, 5.25rem) clamp(2.5rem, 4.4vw, 4rem);
+    gap: 16px clamp(2rem, 4vw, 4rem);
+    flex-wrap: wrap;
   }
 
-  .phero__head { max-width: 920px; }
   .phero__title {
-    margin-top: 26px;
-    font-size: var(--fs-h1-portfolio);
-    line-height: 0.92;
-    letter-spacing: var(--ls-display);
+    font-size: clamp(3.75rem, 13vw, 12.5rem);
+    font-weight: 900;
+    line-height: 0.82;
+    letter-spacing: 0;
     color: var(--ivory);
   }
-  .phero__lead {
-    margin-top: 28px;
-    max-width: 620px;
-    font-size: var(--fs-body-lg);
-    color: var(--ivory);
-  }
-  .phero__eyebrow { color: var(--muted-on-dark); }
+  .phero__mask { display: block; overflow: hidden; padding-top: 0.08em; }
+  .phero__letter { display: inline-block; }
 
-  .phero__featured {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(1.5rem, 2.8vw, 2.5rem);
-  }
-  .phero__link {
+  .phero__side {
     display: flex;
     flex-direction: column;
     gap: 14px;
-    color: var(--ivory);
+    max-width: 300px;
+    padding-bottom: 0.6em;
   }
-  .phero__link-head {
+  .phero__count {
     display: flex;
     align-items: baseline;
-    justify-content: space-between;
-    gap: 16px;
-  }
-  .phero__link-title { font: 700 clamp(1.375rem, 2.08vw, 1.875rem) / 1 var(--font-display); letter-spacing: var(--ls-display); }
-  .phero__link-head :global(svg) { color: var(--accent); flex: none; transition: transform 200ms var(--ease); }
-  .phero__link:hover :global(svg) { transform: translate(3px, -3px); }
-
-  .phero__rule {
-    display: block;
-    height: 1px;
-    background: var(--ivory);
-    transform-origin: left;
-  }
-  .phero__link-meta {
-    display: flex;
-    gap: 14px;
-    font: 500 var(--fs-xs) / 1 var(--font-body);
+    gap: 10px;
+    font: 700 0.875rem/1 var(--font-display);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
     color: var(--muted-on-dark);
   }
-  .phero__link-sector { color: var(--accent); }
+  .phero__num {
+    font: 800 clamp(2.5rem, 4vw, 3.75rem) / 1 var(--font-display);
+    letter-spacing: 0;
+    color: var(--accent);
+  }
+  .phero__lead { font-size: var(--fs-body-sm); color: var(--muted-on-dark); }
 
-  .js .phero__eyebrow { animation: p-fade 750ms var(--ease-out) both; }
-  .js .phero__title { animation: p-line 750ms var(--ease-out) 120ms both; }
-  .js .phero__lead { animation: p-line 750ms var(--ease-out) 240ms both; }
-  .js .phero__featured li { animation: p-line 700ms var(--ease-out) calc(700ms + var(--i) * 80ms) both; }
-  .js .phero__rule { animation: rule-draw 500ms var(--ease-out) calc(900ms + var(--i) * 80ms) both; }
+  /* Entrée : les lettres montent une à une derrière leur masque. */
+  :global(.js) .phero__letter { animation: p-rise 800ms var(--ease-out) calc(var(--i) * 35ms) both; }
+  :global(.js) .phero__side { animation: p-fade 700ms var(--ease-out) 450ms both; }
+  :global(.js) .phero + :global(.browser) :global(.browser__bar) { animation: p-fade 700ms var(--ease-out) 550ms both; }
 
-  @keyframes p-fade { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes p-line {
-    from { opacity: 0; transform: translateY(30px); }
+  @keyframes p-rise {
+    from { transform: translateY(105%); }
+    to { transform: none; }
+  }
+  @keyframes p-fade {
+    from { opacity: 0; transform: translateY(16px); }
     to { opacity: 1; transform: none; }
   }
-  @keyframes rule-draw {
-    from { opacity: 0; transform: scaleX(0); }
-    to { opacity: 1; transform: none; }
-  }
 
-  @media (max-width: 900px) {
-    .phero__featured { grid-template-columns: 1fr; gap: 20px; }
+  @media (max-width: 700px) {
+    .phero__side { padding-bottom: 0; }
   }
 </style>
 

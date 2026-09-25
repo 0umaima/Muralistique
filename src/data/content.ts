@@ -24,7 +24,7 @@ export const processSteps = [
     number: '01',
     title: 'Visite & brief',
     text: 'Relevé du mur, contraintes du lieu, attentes du public.',
-    /** Ambiance de la carte : 'ivory' | 'ink' | 'accent' (jaune du logo). */
+    /** Ambiance de la carte : 'ivory' | 'ink' | 'accent' (vermillon). */
     tone: 'ivory' as const,
     icon: 'map' as const,
     /** Rotation de départ de l'animation d'entrée. */
@@ -67,13 +67,6 @@ export const processSteps = [
     rotate: 4,
     translate: 38,
   },
-];
-
-/** Images d'illustration sous les cinq étapes. */
-export const processImages = [
-  { src: 'process/croquis.jpg', alt: 'Croquis préparatoire sur papier — photo à remplacer', caption: 'Croquis sur papier' },
-  { src: 'process/trace.jpg', alt: 'Tracé de la composition sur le mur — photo à remplacer', caption: 'Tracé au mur' },
-  { src: 'process/couleur.jpg', alt: 'Mise en couleur de la fresque — photo à remplacer', caption: 'Mise en couleur' },
 ];
 
 /** Les trois services de l'accordéon (accueil). */

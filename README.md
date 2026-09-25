@@ -35,7 +35,6 @@ confirmés ou remplacés.
 | **Domaine définitif** | `src/data/site.mjs` → `url` | Sitemap, `robots.txt` et URL canoniques pointent vers le mauvais domaine |
 | **Mentions légales** | `src/data/site.mjs` → `legal` | La page `/mentions-legales` affiche « à compléter » et reste `noindex` tant qu'il manque une information |
 | **Chiffres clés** (120+, 6, 100 %, 15 j) | `src/data/content.ts` → `stats` | Chiffres de la maquette, non vérifiés |
-| **Nombre de projets par secteur** | `src/data/sectors.ts` → `count` | Chiffres de la maquette, non vérifiés |
 | **Témoignage client** | `src/data/content.ts` → `testimonial` | Passez `enabled: false` pour masquer le bloc tant que le témoignage n'est pas validé |
 | **Fourchettes de budget** | `src/data/content.ts` → `quoteOptions.budgets` | Montants en dirhams repris de la maquette, à adapter |
 | **Vos projets** | `src/data/projects.ts` | Les 7 projets sont ceux de la maquette, textes marqués « TEXTE À REMPLACER » |
@@ -52,7 +51,7 @@ dur dans les composants.
 src/data/
   site.mjs      Coordonnées, WhatsApp, réseaux, domaine, réglages du formulaire, mentions légales
   projects.ts   Les projets (page Réalisations + pages projet + avant/après de l'accueil)
-  sectors.ts    Les six secteurs (carrousel de l'accueil + filtres des Réalisations)
+  sectors.ts    Les secteurs (carrousel de l'accueil + filtres des Réalisations)
   content.ts    Chiffres clés, processus, services, témoignage, page Studio, options du formulaire
   nav.ts        Liens du menu et du pied de page
 ```
@@ -70,11 +69,14 @@ src/data/
 
 ### Options utiles
 
-- `wide: true` → carte pleine largeur dans la grille (format panoramique).
 - `featuredOnHome: true` + `beforeAfter` → alimente le comparateur de l'accueil.
-- `featuredInHero: true` → apparaît dans les trois liens du hero des Réalisations
-  (les trois premiers sont retenus).
-- `ratio` → proportion de la carte dans la grille, reprise de la maquette.
+- L'ordre du tableau est l'ordre de la grille Réalisations. Toutes les tuiles
+  ont le même format ; quand le nombre de projets affichés est impair, le
+  premier passe en pleine largeur (placez donc en tête un projet dont la
+  couverture est panoramique).
+- Le carrousel « Nos secteurs » de l'accueil se remplit tout seul : couverture
+  du premier projet de chaque secteur et nombre réel de projets. Un secteur
+  sans projet s'affiche en carte « Premier projet ? » qui renvoie au devis.
 
 ---
 
@@ -91,11 +93,8 @@ Résumé :
 | --- | --- |
 | `brand/` | `og.jpg` (1200 × 630, partage réseaux sociaux). Le logo, lui, est du texte (`src/components/Logo.astro`) |
 | `home/` | Fond fixe du hero + les trois visuels du collage (gauche, GIF central, droite) |
-| `sectors/` | Une image par secteur (6) |
-| `process/` | Croquis, tracé, mise en couleur |
 | `services/` | Fresque, toile, performance |
 | `people/` | Portrait du témoignage |
-| `portfolio/` | Fond du hero de la page Réalisations |
 | `studio/` | Photo du hero (les images d'atelier restent disponibles pour la mosaïque, voir `studio.gallery` dans `src/data/content.ts`) |
 | `projects/<slug>/` | `cover.jpg`, `avant.jpg`, `apres.jpg`, `1.jpg`, `2.jpg` |
 
@@ -252,10 +251,12 @@ scripts/             Outils de développement (placeholders, captures, tests)
 
 ### Design
 
-- Identité reprise du logo : **noir / blanc** et le **jaune exact du « M »**
-  (`--accent: #FBBE67`) comme accent, plus une crème très claire pour les
-  sections alternées et un ambre (`--accent-strong`) pour les petits éléments
-  d'accent sur fond blanc.
+- Identité reprise du logo : **noir / blanc**, le **jaune du « M »**
+  (`--brand: #FBBE67`) réservé au logo, et un **vermillon de peintre**
+  (`--accent: #FF4A1C`) comme unique accent, utilisé avec parcimonie (boutons
+  principaux, repères de section, survols). `--accent-strong` (#C42D0C) sert
+  aux petits éléments d'accent sur fond blanc. Aucun fond crème ou jaune :
+  les sections alternent blanc, noir et photos assombries.
 - Typographies : **Big Shoulders Display** (titres, navigation, boutons — en
   capitales étroites, comme le logo) + **Manrope** (textes courants). La police
   du logo, *Editorial Comment JNL*, est commerciale : Big Shoulders Display est
@@ -263,7 +264,7 @@ scripts/             Outils de développement (placeholders, captures, tests)
   le `.woff2` dans `public/fonts/`, déclarez-le dans `src/styles/fonts.css` et
   placez-le en tête de `--font-display`.
 - Logo purement typographique (`src/components/Logo.astro`) : « MURALISTIQUE »
-  très espacé, « M » plus haut et jaune.
+  très espacé, « M » plus haut et jaune (`--brand`).
 - Toutes les valeurs sont des variables CSS en haut de `src/styles/global.css` :
   changez-les là et tout le site suit.
 - Échelle typographique fluide en `clamp()` : la borne haute correspond
@@ -290,8 +291,16 @@ fermeture par Échap, focus rendu au bouton, défilement de page bloqué.
 
 - Apparitions au défilement : fondu + 24 px vers le haut, 700 ms, léger
   décalage en cascade, **une seule fois par chargement**.
-- Hero de l'accueil : les trois visuels (angles francs) apparaissent **l'un
-  après l'autre** derrière un volet jaune, puis le titre monte par-dessus.
+- Hero de l'accueil : les trois visuels (angles francs) se découvrent **en
+  cascade rapide** (120 ms d'écart, sans aplat de couleur), puis le titre
+  monte par-dessus — tout est en place en ~1,2 s.
+- Carrousel des secteurs (`src/scripts/carousel.ts`) : rail défilant natif,
+  flèches, glisser à la souris, compteur et barre de progression ; parallaxe
+  de l'image dans chaque carte et légère inclinaison selon la vitesse.
+- Réalisations et pages projet : images découvertes de bas en haut
+  (`data-reveal-clip`), rejouées en cascade à chaque filtre ; infos du projet
+  au survol sur voile sombre ; visionneuse plein écran (`<dialog>`) sur la
+  galerie des pages projet (`src/scripts/lightbox.ts`).
 - Fonds fixes (`FixedBg.astro`) : la photo reste immobile et la section glisse
   dessus, dans les deux sens de défilement (hero, chiffres clés, contact,
   hero et citation du Studio). Technique `clip` + `position: fixed`, qui
@@ -299,7 +308,7 @@ fermeture par Échap, focus rendu au bouton, défilement de page bloqué.
 - Chiffres clés : comptage jusqu'à la valeur exacte à la première apparition,
   suffixes conservés (`+`, `%`, ` j`).
 - Cartes du processus : légère rotation au départ, alignement à l'arrivée.
-- Studio (`src/scripts/scroll-fx.ts`) : volet jaune et nom lettre par lettre
+- Studio (`src/scripts/scroll-fx.ts`) : volet sombre et nom lettre par lettre
   à l'ouverture, phrase d'intro révélée mot à mot au défilement, défilé
   horizontal épinglé des murs (grands écrans ; rail au doigt sur mobile),
   étapes en bandeau défilant, mosaïque découverte au clip avec léger parallaxe.
@@ -312,15 +321,26 @@ contenu n'est masqué** (les règles d'apparition ne s'appliquent que si
 
 ### Réalisations
 
-Filtres par secteur et bouton « voir plus », entièrement côté client :
-6 projets au départ, 6 de plus par clic. Le filtre parcourt **tout** le jeu de
-données et **remet la limite à la première page** ; le compteur suit, le bouton
-disparaît quand il n'y a plus rien à montrer, et un état vide s'affiche s'il
-n'y a aucun résultat. L'URL reste partageable (`?secteur=sante`).
+Grille bord à bord de grandes images **toutes au même format** (deux
+colonnes, une seule en mobile) ; quand le nombre de projets affichés est
+impair, le premier passe en pleine largeur, pour ne jamais laisser de trou.
+Titre, secteur, ville et résumé n'apparaissent qu'au survol, sur un voile
+sombre (toujours visibles en bas de l'image sur écran tactile).
 
-**Sans JavaScript**, toutes les cartes sont affichées : **tous les liens projet
+Filtres par secteur et bouton « voir plus », entièrement côté client :
+8 projets par page. Le filtre parcourt **tout** le jeu de données et **remet la
+limite à la première page** ; le compteur suit, le bouton disparaît quand il
+n'y a plus rien à montrer, et un état vide s'affiche s'il n'y a aucun
+résultat. L'URL reste partageable (`?secteur=sante`).
+
+**Sans JavaScript**, toutes les tuiles sont affichées : **tous les liens projet
 restent accessibles** ; seuls les filtres et le bouton « voir plus » sont
 masqués.
+
+Pages projet : couverture plein écran avec le titre posé dessus, résumé,
+texte et faits (seuls les faits renseignés s'affichent), avant / après s'il
+existe, galerie bord à bord avec visionneuse, puis le projet suivant en grande
+image.
 
 ---
 
@@ -378,8 +398,9 @@ npx playwright install chromium
 Puis, **avec `npm run preview` lancé dans un autre terminal** :
 
 ```bash
-npm run test:interactions   # filtres, « voir plus », accordéon, comparateur,
-                            # navigation mobile, mouvement réduit, sans JavaScript
+npm run test:interactions   # filtres et grille, visionneuse, carrousel, accordéon,
+                            # comparateur, navigation mobile, mouvement réduit,
+                            # sans JavaScript
 npm run test:form           # formulaire : validation, états d'envoi, limites de
                             # fichiers, erreurs serveur — réponses SIMULÉES
 npm run test:a11y           # 360/768/1024/1440 px, clavier, sémantique, métadonnées

@@ -2,49 +2,101 @@
 import Icon from '../Icon.astro';
 import Media from '../Media.astro';
 import { sectors } from '../../data/sectors';
+import { projectsInSector } from '../../data/projects';
 
-// Le défilement infini a besoin d'une copie exacte de la série.
-const loop = [...sectors, ...sectors];
+/**
+ * Carrousel des secteurs, nourri uniquement par les vrais projets :
+ * chaque carte montre la couverture du premier projet du secteur, le nombre
+ * réel de projets et leurs titres. Un secteur encore sans projet devient une
+ * carte d'appel vers le devis, posée sur une photo de mur.
+ *
+ * Le rail se fait défiler au doigt, à la souris (glisser), au clavier, ou
+ * avec les flèches. Sans JavaScript, c'est un simple rail défilant.
+ */
+const withWork = sectors
+  .map((sector) => ({ sector, projects: projectsInSector(sector.slug) }))
+  .sort((a, b) => Number(b.projects.length > 0) - Number(a.projects.length > 0));
+const total = withWork.length;
+const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
-<section class="sectors theme-ivory" id="secteurs" data-section-theme="ivory">
+<section class="sectors theme-ivory section" id="secteurs" data-section-theme="ivory" data-carousel>
   <div class="shell pad">
     <div class="section-head" data-reveal>
       <div>
-        <p class="eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />Secteurs</p>
-        <h2 class="sectors__title">Une fresque pensée<br />pour chaque lieu.</h2>
+        <p class="section-index">04</p>
+        <h2 class="section-title">Nos secteurs</h2>
       </div>
-      <p class="section-head__aside">
-        Chaque projet part du métier, du public et de l’identité du lieu. Le dessin s’adapte à l’espace, jamais
-        l’inverse.
-      </p>
+      <div class="sectors__nav only-js">
+        <p class="sectors__counter" aria-hidden="true">
+          <span data-carousel-current>01</span><span class="sectors__counter-total">/ {pad(total)}</span>
+        </p>
+        <button class="sectors__arrow" type="button" data-carousel-prev aria-controls="secteurs-rail" aria-label="Secteur précédent">
+          <Icon name="arrow-left" size={20} stroke={2} />
+        </button>
+        <button class="sectors__arrow" type="button" data-carousel-next aria-controls="secteurs-rail" aria-label="Secteur suivant">
+          <Icon name="arrow-right" size={20} stroke={2} />
+        </button>
+      </div>
     </div>
   </div>
 
-  <div class="sectors__viewport">
-    <ul class="sectors__track" data-marquee>
+  <div
+    class="sectors__viewport"
+    id="secteurs-rail"
+    role="region"
+    aria-label="Secteurs — faire défiler horizontalement"
+    tabindex="0"
+    data-carousel-viewport
+  >
+    <ul class="sectors__track" data-carousel-track>
       {
-        loop.map((sector, index) => {
-          const isClone = index >= sectors.length;
+        withWork.map(({ sector, projects }, i) => {
+          const cover = projects[0]?.cover;
+          const count = projects.length;
           return (
-            <li class="sectors__item" aria-hidden={isClone ? 'true' : undefined}>
+            <li class="sectors__item" data-carousel-item data-reveal data-reveal-delay={Math.min(i, 4) * 80}>
               <a
-                class="sectors__card"
-                href={`/realisations?secteur=${sector.slug}`}
-                tabindex={isClone ? -1 : undefined}
+                class:list={['sectors__card', !cover && 'sectors__card--open']}
+                href={cover ? `/realisations?secteur=${sector.slug}` : '/devis'}
+                draggable="false"
               >
-                <Media
-                  src={sector.image}
-                  alt={isClone ? '' : sector.imageAlt}
-                  widths={[280, 400, 632]}
-                  sizes="(max-width: 700px) 232px, 316px"
-                  zoom
-                  class="sectors__media"
-                />
-                <span class="sectors__tag">{sector.label}</span>
-                <span class="sectors__foot">
-                  <span class="sectors__count">{sector.count} projets</span>
-                  <span class="sectors__blurb">{sector.blurb}</span>
+                <div class="sectors__image" data-carousel-parallax>
+                  <Media
+                    src={cover?.src ?? 'home/hero-bg.jpg'}
+                    alt=""
+                    widths={[320, 480, 760]}
+                    sizes="(max-width: 700px) 78vw, 380px"
+                    class="sectors__media"
+                  />
+                </div>
+
+                <span class="sectors__top">
+                  <span class="sectors__num">{pad(i + 1)}</span>
+                  <span class="sectors__count">
+                    {count > 0 ? `${count} projet${count > 1 ? 's' : ''}` : 'Premier projet ?'}
+                  </span>
+                </span>
+
+                <span class="sectors__body">
+                  <span class="sectors__name">{sector.label}</span>
+                  <span class="sectors__more">
+                    <span class="sectors__more-inner">
+                      {count > 0 ? (
+                        <span class="sectors__projects">
+                          {projects.map((project) => (
+                            <span>{project.title}</span>
+                          ))}
+                        </span>
+                      ) : (
+                        <span class="sectors__blurb">{sector.blurb} Votre lieu peut être le premier.</span>
+                      )}
+                    </span>
+                  </span>
+                </span>
+
+                <span class="sectors__go" aria-hidden="true">
+                  <Icon name="arrow-up-right" size={20} stroke={2.2} />
                 </span>
               </a>
             </li>
@@ -54,116 +106,234 @@ const loop = [...sectors, ...sectors];
     </ul>
   </div>
 
-  <div class="sectors__controls shell pad">
-    <button class="btn btn--outline btn--sm only-js" type="button" data-marquee-toggle aria-pressed="false">
-      <Icon name="pause" size={14} stroke={2} />
-      <span data-marquee-label>Mettre en pause</span>
-    </button>
-    <p class="sectors__hint muted">Défilement lent — la lecture s’arrête au survol.</p>
+  <div class="shell pad">
+    <div class="sectors__progress only-js" aria-hidden="true"><span data-carousel-bar></span></div>
   </div>
 </section>
 
 <style>
-  .sectors { padding-block: var(--section-y) 0; }
-  .sectors__title { margin-top: 22px; font-size: var(--fs-h2); max-width: 760px; }
-
-  .sectors__viewport {
-    margin-top: clamp(1.5rem, 3vw, 2.75rem);
-    padding-left: var(--gutter);
+  .sectors {
+    --edge: max(var(--gutter), calc((100% - var(--maxw)) / 2 + var(--gutter)));
     overflow: hidden;
   }
+
+  /* ——— Navigation ——— */
+  .sectors__nav { display: flex; align-items: center; gap: 10px; }
+  .sectors__counter {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-right: 14px;
+    font: 800 clamp(1.75rem, 2.6vw, 2.5rem) / 1 var(--font-display);
+    letter-spacing: var(--ls-display);
+    font-variant-numeric: tabular-nums;
+  }
+  .sectors__counter-total { font-size: 0.5em; color: var(--muted-on-light); }
+
+  .sectors__arrow {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border: 1px solid var(--ink);
+    background: var(--ivory);
+    color: var(--ink);
+    transition: background-color 200ms var(--ease), color 200ms var(--ease), opacity 200ms var(--ease);
+  }
+  .sectors__arrow:hover:not(:disabled) { background: var(--ink); color: var(--ivory); }
+  .sectors__arrow:disabled { opacity: 0.3; cursor: default; }
+
+  /* ——— Rail ——— */
+  .sectors__viewport {
+    margin-top: clamp(2rem, 3.9vw, 3.5rem);
+    padding-inline: var(--edge);
+    scroll-padding-inline: var(--edge);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    cursor: grab;
+  }
+  .sectors__viewport::-webkit-scrollbar { display: none; }
+  .sectors__viewport:focus-visible { outline-offset: -3px; }
+  .sectors__viewport.is-dragging { scroll-snap-type: none; cursor: grabbing; user-select: none; }
+  .sectors__viewport.is-dragging .sectors__card { pointer-events: none; }
 
   .sectors__track {
     display: flex;
-    gap: 22px;
+    align-items: flex-start;
+    gap: clamp(14px, 1.6vw, 22px);
     width: max-content;
-    padding-right: 22px;
-    animation: marquee 60s linear infinite;
-  }
-  .sectors__viewport:hover .sectors__track,
-  .sectors__viewport:focus-within .sectors__track { animation-play-state: paused; }
-  .sectors__track[data-paused='true'] { animation-play-state: paused; }
-
-  @keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+    /* Place pour le décalage des cartes paires. */
+    padding-bottom: clamp(2rem, 4vw, 3.5rem);
+    transform-origin: 50% 50%;
+    will-change: transform;
   }
 
-  .sectors__item { flex: 0 0 auto; }
+  .sectors__item { flex: 0 0 auto; scroll-snap-align: start; }
+  /* Rythme en escalier : une carte sur deux descend d'un cran. */
+  .sectors__item:nth-child(even) { margin-top: clamp(2rem, 4vw, 3.5rem); }
 
+  /* ——— Carte : angles francs, image pleine ——— */
   .sectors__card {
     position: relative;
-    display: block;
-    width: clamp(232px, 21.9vw, 316px);
-    height: clamp(290px, 27.4vw, 395px);
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: clamp(250px, 26vw, 380px);
+    aspect-ratio: 3 / 4;
     overflow: hidden;
-    border-radius: clamp(18px, 1.67vw, 24px);
-    border: 1px solid var(--ink);
-  }
-  .sectors__card :global(.media) { width: 100%; height: 100%; }
-
-  .sectors__tag {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    padding: 9px 14px 8px;
+    border-radius: 0;
     background: var(--ink);
     color: var(--ivory);
-    font: 600 0.75rem/1 var(--font-body);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
   }
 
-  .sectors__foot {
+  .sectors__image {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: 16px 18px;
-    background: var(--ivory);
-    border-top: 1px solid var(--ink);
+    inset: 0 -10%;
+    z-index: -2;
+    transform: translate3d(var(--px, 0%), 0, 0);
+    will-change: transform;
+  }
+  .sectors__image :global(.sectors__media) { width: 100%; height: 100%; background: transparent; }
+  .sectors__image :global(img) {
+    transition: transform 700ms var(--ease-out), filter 500ms var(--ease);
+    -webkit-user-drag: none;
+  }
+  .sectors__card:hover .sectors__image :global(img),
+  .sectors__card:focus-visible .sectors__image :global(img) { transform: scale(1.08); }
+
+  /* Voile : un dégradé en bas pour le titre, qui s'assombrit au survol
+     pour rendre la liste des projets lisible. */
+  .sectors__card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to top, rgba(11, 11, 11, 0.88) 0%, rgba(11, 11, 11, 0.15) 55%, rgba(11, 11, 11, 0.35) 100%);
+    transition: background-color 400ms var(--ease);
+  }
+  .sectors__card:hover::after,
+  .sectors__card:focus-visible::after { background-color: rgba(11, 11, 11, 0.45); }
+  .sectors__card--open::after { background-color: rgba(11, 11, 11, 0.55); }
+
+  .sectors__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px;
+  }
+  .sectors__num {
+    font: 800 1.125rem/1 var(--font-display);
+    letter-spacing: 0.08em;
   }
   .sectors__count {
-    display: block;
+    padding: 8px 11px 7px;
+    background: var(--ivory);
+    color: var(--ink);
     font: 600 0.6875rem/1 var(--font-body);
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--muted-on-light);
   }
-  .sectors__blurb {
+  .sectors__card--open .sectors__count { background: var(--accent); color: var(--accent-ink); }
+
+  .sectors__body { display: block; padding: 0 18px 20px; }
+  .sectors__name {
     display: block;
-    margin-top: 6px;
-    font-size: 0.84375rem;
-    color: var(--ink);
+    font: 800 clamp(2rem, 3vw, 2.875rem) / 0.92 var(--font-display);
+    letter-spacing: var(--ls-display);
+    text-transform: uppercase;
   }
 
-  .sectors__controls {
+  /* Liste des projets : repliée, elle se déplie au survol (0fr -> 1fr). */
+  .sectors__more {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 450ms var(--ease-out);
+  }
+  .sectors__more-inner { overflow: hidden; }
+  .sectors__card:hover .sectors__more,
+  .sectors__card:focus-visible .sectors__more { grid-template-rows: 1fr; }
+  .sectors__projects,
+  .sectors__blurb {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 14px;
-    padding-top: 24px;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 14px;
+    font: 500 0.875rem/1.4 var(--font-body);
+    color: rgba(255, 255, 255, 0.82);
   }
-  .sectors__hint { font-size: var(--fs-xs); }
+  .sectors__projects span::before { content: '— '; color: var(--accent); }
 
-  @media (max-width: 900px) {
-    /* Sur petit écran, le rail se parcourt au doigt : pas d'animation. */
-    .sectors__viewport { overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; }
-    .sectors__track { animation: none; }
-    .sectors__item { scroll-snap-align: start; }
-    .sectors__item[aria-hidden='true'] { display: none; }
-    .sectors__tag { top: 12px; left: 12px; padding: 7px 11px 6px; font-size: 0.625rem; }
-    .sectors__foot { padding: 12px 14px; }
-    .sectors__controls [data-marquee-toggle] { display: none; }
+  .sectors__go {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    transform: translate(100%, 100%);
+    transition: transform 380ms var(--ease-out);
+  }
+  .sectors__card:hover .sectors__go,
+  .sectors__card:focus-visible .sectors__go { transform: none; }
+  .sectors__body { padding-right: 64px; }
+
+  /* Écrans tactiles : pas de survol, la liste reste visible. */
+  @media (hover: none) {
+    .sectors__more { grid-template-rows: 1fr; }
+    .sectors__go { transform: none; }
+  }
+
+  /* ——— Barre de progression ——— */
+  .sectors__progress {
+    position: relative;
+    height: 2px;
+    margin-top: 8px;
+    background: var(--ivory-3);
+    overflow: hidden;
+  }
+  .sectors__progress span {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--thumb, 30%);
+    background: var(--ink);
+    transform: translateX(var(--shift, 0%));
+  }
+
+  /* ——— Apparition : chaque carte se découvre de bas en haut ——— */
+  :global(.js) .sectors__item[data-reveal] { opacity: 1; transform: none; }
+  :global(.js) .sectors__item[data-reveal] .sectors__card { clip-path: inset(100% 0 0 0); }
+  :global(.js) .sectors__item[data-reveal] :global(.sectors__media) { transform: scale(1.25); }
+  :global(.js) .sectors__item[data-reveal].is-revealed .sectors__card {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 900ms cubic-bezier(0.7, 0, 0.2, 1) var(--reveal-delay, 0ms);
+  }
+  :global(.js) .sectors__item[data-reveal].is-revealed :global(.sectors__media) {
+    transform: none;
+    transition: transform 1200ms var(--ease-out) var(--reveal-delay, 0ms);
+  }
+
+  @media (max-width: 700px) {
+    .sectors__card { width: 78vw; }
+    .sectors__nav { width: 100%; }
+    .sectors__counter { margin-right: auto; }
+    .sectors__arrow { width: 48px; height: 48px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .sectors__viewport { overflow-x: auto; }
-    .sectors__track { animation: none; }
+    .sectors__track { will-change: auto; }
+    .sectors__image { transform: none; }
   }
 </style>
 
 <script>
-  import { initMarquee } from '../../scripts/marquee';
-  initMarquee();
+  import { initCarousel } from '../../scripts/carousel';
+  initCarousel();
 </script>

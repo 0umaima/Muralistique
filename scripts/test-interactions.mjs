@@ -19,7 +19,7 @@ const ok = (label, cond, extra = '') => {
   if (!cond) fails.push(label);
 };
 
-// ─── 1. Filtres + voir plus ──────────────────────────────────────────────
+// ─── 1. Filtres + grille ─────────────────────────────────────────────────
 {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   page.on('pageerror', (e) => fails.push('JS error: ' + e.message));
@@ -27,23 +27,29 @@ const ok = (label, cond, extra = '') => {
   const visible = () => page.$$eval('[data-project]:not([hidden])', (n) => n.length);
   const count = () => page.$eval('[data-project-count]', (n) => n.textContent.trim());
   const moreHidden = () => page.$eval('[data-project-more]', (n) => n.hidden);
+  const wide = () => page.$$eval('[data-project].is-wide:not([hidden])', (n) => n.map((e) => e.dataset.index));
 
-  console.log('\n— Réalisations : filtres et « voir plus »');
-  ok('6 projets visibles au chargement', (await visible()) === 6, `vu ${await visible()}`);
+  console.log('\n— Réalisations : filtres et grille');
+  ok('7 projets visibles au chargement', (await visible()) === 7, `vu ${await visible()}`);
   ok('compteur = 7 projets', (await count()) === '7 projets', await count());
-  ok('bouton « voir plus » visible', (await moreHidden()) === false);
+  ok('bouton « voir plus » masqué (tout tient sur une page)', (await moreHidden()) === true);
+  ok('nombre impair : 1re tuile en pleine largeur', (await wide()).join() === '0', (await wide()).join());
 
-  await page.click('[data-project-more-button]');
-  await page.waitForTimeout(200);
-  ok('7 projets après « voir plus »', (await visible()) === 7, `vu ${await visible()}`);
-  ok('bouton masqué une fois épuisé', (await moreHidden()) === true);
+  const sizes = await page.$$eval('[data-project]:not([hidden]):not(.is-wide)', (n) =>
+    n.map((e) => `${Math.round(e.getBoundingClientRect().width)}x${Math.round(e.getBoundingClientRect().height)}`)
+  );
+  ok('toutes les autres tuiles ont la même taille', new Set(sizes).size === 1, [...new Set(sizes)].join(' '));
 
   await page.click('[data-filter="sante"]');
   await page.waitForTimeout(250);
-  ok('filtre Santé : 2 projets', (await visible()) === 2, `vu ${await visible()}`);
-  ok('compteur suit le filtre', (await count()) === '2 projets', await count());
-  ok('limite réinitialisée (bouton masqué)', (await moreHidden()) === true);
+  ok('filtre Santé : 1 projet', (await visible()) === 1, `vu ${await visible()}`);
+  ok('compteur suit le filtre', (await count()) === '1 projet', await count());
   ok('URL partageable', page.url().includes('secteur=sante'), page.url());
+
+  await page.click('[data-filter="bureaux"]');
+  await page.waitForTimeout(250);
+  ok('filtre Bureaux : 2 projets', (await visible()) === 2, `vu ${await visible()}`);
+  ok('nombre pair : aucune tuile pleine largeur', (await wide()).length === 0, (await wide()).join());
 
   await page.click('[data-filter="hotellerie"]');
   await page.waitForTimeout(200);
@@ -51,7 +57,17 @@ const ok = (label, cond, extra = '') => {
 
   await page.click('[data-filter="tous"]');
   await page.waitForTimeout(200);
-  ok('retour à Tous : limite remise à 6', (await visible()) === 6, `vu ${await visible()}`);
+  ok('retour à Tous : 7 projets', (await visible()) === 7, `vu ${await visible()}`);
+
+  const tile = await page.$('[data-project]:not(.is-wide) .tile__link');
+  await tile.scrollIntoViewIfNeeded();
+  await page.mouse.move(5, 5); // pointeur sur l'en-tête, hors des tuiles
+  await page.waitForTimeout(1300);
+  const hidden = await tile.$eval('.tile__title', (n) => getComputedStyle(n).opacity);
+  await tile.hover();
+  await page.waitForTimeout(700);
+  const shown = await tile.$eval('.tile__title', (n) => getComputedStyle(n).opacity);
+  ok('infos du projet masquées puis affichées au survol', hidden === '0' && shown === '1', `${hidden} -> ${shown}`);
 
   await page.evaluate(() => {
     document.querySelectorAll('[data-project]').forEach((c) => (c.dataset.sector = 'inexistant'));
@@ -60,6 +76,32 @@ const ok = (label, cond, extra = '') => {
   await page.waitForTimeout(250);
   ok('état vide affiché', (await page.$eval('[data-project-empty]', (n) => n.hidden)) === false);
   ok('compteur à 0', (await count()) === '0 projet', await count());
+  await page.close();
+}
+
+// ─── 1b. Page projet : visionneuse ──────────────────────────────────────
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  page.on('pageerror', (e) => fails.push('JS error: ' + e.message));
+  await page.goto(BASE + '/realisations/ecole-les-tilleuls', { waitUntil: 'networkidle' });
+  console.log('\n— Page projet : visionneuse');
+  const isOpen = () => page.$eval('[data-lightbox]', (n) => n.open);
+  const first = await page.$('[data-lightbox-item]');
+  await first.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(1200);
+  await first.click();
+  await page.waitForTimeout(300);
+  ok('ouverture au clic', await isOpen());
+  const src1 = await page.$eval('[data-lightbox-img]', (n) => n.getAttribute('src'));
+  await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(150);
+  const src2 = await page.$eval('[data-lightbox-img]', (n) => n.getAttribute('src'));
+  ok('flèche → : image suivante', src1 !== src2 && Boolean(src2));
+  ok('compteur « 2 / 2 »', (await page.$eval('[data-lightbox-count]', (n) => n.textContent)) === '2 / 2');
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(200);
+  ok('Échap referme', !(await isOpen()));
+  ok('focus rendu à la vignette', await page.evaluate(() => document.activeElement?.hasAttribute('data-lightbox-item')));
   await page.close();
 }
 
@@ -118,6 +160,36 @@ const ok = (label, cond, extra = '') => {
   });
   await page.waitForTimeout(500);
   ok('en-tête encre sur section sombre', (await page.$eval('[data-header]', (n) => n.dataset.theme)) === 'ink');
+
+  const order = await page.$$eval('main > section[id], main > section', (n) =>
+    n.map((s) => s.id || s.className.split(' ')[0])
+  );
+  const want = ['transformations', 'processus', 'services', 'secteurs', 'positioning', 'contact'];
+  const got = order.filter((id) => want.includes(id));
+  ok('ordre des sections', got.join() === want.join(), got.join(' > '));
+
+  // Carrousel des secteurs : flèches, compteur, glisser sans ouvrir de carte.
+  await page.evaluate(() => document.querySelector('#secteurs').scrollIntoView());
+  await page.waitForTimeout(600);
+  const current = () => page.$eval('[data-carousel-current]', (n) => n.textContent);
+  ok('carrousel : flèche précédente inactive au départ', await page.$eval('[data-carousel-prev]', (n) => n.disabled));
+  await page.click('[data-carousel-next]');
+  await page.waitForTimeout(700);
+  ok('carrousel : flèche suivante avance', (await current()) === '02', await current());
+  const rail = await (await page.$('[data-carousel-viewport]')).boundingBox();
+  const before = await page.$eval('[data-carousel-viewport]', (n) => n.scrollLeft);
+  await page.mouse.move(rail.x + rail.width * 0.7, rail.y + rail.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(rail.x + rail.width * 0.3, rail.y + rail.height / 2, { steps: 10 });
+  await page.mouse.up();
+  await page.waitForTimeout(800);
+  const after = await page.$eval('[data-carousel-viewport]', (n) => n.scrollLeft);
+  ok('carrousel : glisser à la souris fait défiler', after > before, `${before} -> ${after}`);
+  ok('carrousel : un glisser n’ouvre pas la carte', new URL(page.url()).pathname === '/', page.url());
+  const cards = await page.$$eval('.sectors__card', (n) => n.map((c) => getComputedStyle(c).borderTopLeftRadius));
+  ok('cartes secteurs à angles francs', cards.every((r) => r === '0px'), cards.join());
+  const imgs = await page.$$eval('.sectors__card img', (n) => n.map((i) => i.currentSrc || i.src));
+  ok('cartes secteurs : aucune image de remplacement', imgs.every((src) => !/sectors\//.test(src)), imgs.length + ' images');
 
   await page.close();
 }
@@ -180,7 +252,18 @@ const ok = (label, cond, extra = '') => {
   ok('aucun contenu masqué', hidden === 0, `${hidden} éléments à opacité < 1`);
   const stats = await page.$$eval('[data-count]', (n) => n.map((e) => e.textContent.trim()));
   ok('compteurs affichent la valeur finale', stats.join('|') === '120+|6|100%|15 j', stats.join('|'));
-  ok('carrousel en pause', (await page.$eval('[data-marquee]', (n) => n.dataset.paused)) === 'true');
+  await page.evaluate(() => document.querySelector('#secteurs').scrollIntoView());
+  await page.click('[data-carousel-next]');
+  await page.waitForTimeout(300);
+  ok(
+    'carrousel sans effet de mouvement',
+    (await page.$eval('[data-carousel-track]', (n) => n.style.transform)) === '' &&
+      (await page.$$eval('[data-carousel-parallax]', (n) => n.every((e) => !e.style.getPropertyValue('--px'))))
+  );
+  const clipped = await page.$$eval('[data-reveal-clip] > *', (n) =>
+    n.filter((e) => getComputedStyle(e).clipPath !== 'none').length
+  );
+  ok('aucune image découpée', clipped === 0, `${clipped} images découpées`);
   await ctx.close();
 }
 
@@ -199,6 +282,9 @@ const ok = (label, cond, extra = '') => {
   ok('les 7 cartes sont visibles', visibleCards === 7, `${visibleCards} visibles`);
   ok('barre de filtres masquée', await page.$eval('.browser__filters', (n) => getComputedStyle(n).display === 'none'));
   ok('bouton « voir plus » masqué', await page.$eval('[data-project-more]', (n) => getComputedStyle(n).display === 'none'));
+  const full = await page.$eval('[data-project]', (n) => Math.round(n.getBoundingClientRect().width));
+  const grid = await page.$eval('[data-project-grid]', (n) => Math.round(n.clientWidth));
+  ok('1re tuile pleine largeur sans JavaScript', full > grid * 0.9, `${full}/${grid}`);
 
   await page.goto(BASE + '/', { waitUntil: 'load' });
   const dim = await page.$$eval('[data-reveal], [data-reveal-rotate]', (n) =>

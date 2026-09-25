@@ -139,7 +139,7 @@ const works = studio.works.flatMap(({ slug, image }) => {
     <h2>Les étapes</h2>
     <ol>{studio.steps.map((step) => <li>{step}</li>)}</ol>
   </div>
-  <MarqueeBand words={studio.steps} />
+  <MarqueeBand words={studio.steps} bg="projects/hotel-kaan-misti/cover.png" />
 
   <!-- ——— Citation sur photo fixe ——— -->
   <section class="squote theme-ink" data-section-theme="ink">
@@ -267,7 +267,7 @@ const works = studio.works.flatMap(({ slug, image }) => {
     position: absolute;
     inset: 0;
     z-index: 2;
-    background: var(--accent);
+    background: var(--ink);
     clip-path: inset(0 0 0 100%);
     pointer-events: none;
   }
@@ -379,7 +379,7 @@ const works = studio.works.flatMap(({ slug, image }) => {
     left: 16px;
     z-index: 1;
     padding: 6px 10px 5px;
-    background: var(--accent);
+    background: var(--ivory);
     color: var(--ink);
     font: 800 1rem/1 var(--font-display);
     letter-spacing: 0.08em;
@@ -406,7 +406,7 @@ const works = studio.works.flatMap(({ slug, image }) => {
     font: 700 0.8125rem/1 var(--font-display);
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--accent);
+    color: rgba(255, 255, 255, 0.75);
   }
 
   .sworks__more {
@@ -416,13 +416,13 @@ const works = studio.works.flatMap(({ slug, image }) => {
     width: clamp(220px, 20vw, 300px);
     height: clamp(340px, 58vh, 620px);
     padding: 24px;
-    background: var(--accent);
+    background: var(--ivory);
     color: var(--ink);
     font: 900 clamp(2.25rem, 3.6vw, 3.5rem) / 0.9 var(--font-display);
     text-transform: uppercase;
     transition: background-color 240ms var(--ease);
   }
-  .sworks__more:hover { background: var(--ivory); }
+  .sworks__more:hover { background: var(--accent); }
   .sworks__more :global(svg) { align-self: flex-end; transition: transform 240ms var(--ease); }
   .sworks__more:hover :global(svg) { transform: translate(4px, -4px); }
 
@@ -459,7 +459,7 @@ const works = studio.works.flatMap(({ slug, image }) => {
     font: 700 0.9375rem/1 var(--font-display);
     letter-spacing: 0.24em;
     text-transform: uppercase;
-    color: var(--accent);
+    color: var(--muted-on-dark);
   }
 
   /* ——— Le geste, en détail ——— */
@@ -468,8 +468,8 @@ const works = studio.works.flatMap(({ slug, image }) => {
   .sgallery__title span {
     display: inline-block;
     margin-top: 0.08em;
-    padding: 0.06em 0.08em 0;
-    background: var(--accent);
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--ink);
   }
 
   .sgallery__grid {

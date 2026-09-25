@@ -1,13 +1,18 @@
 ---
-/** Bandeau typographique défilant, repris de la maquette Réalisations. */
+/** Bandeau typographique défilant, posé sur une photo fixe assombrie. */
+import FixedBg from './FixedBg.astro';
+
 interface Props {
   words?: string[];
+  /** Photo de fond (chemin dans src/assets/images/). */
+  bg?: string;
 }
-const { words = ['Muralistique', 'Murs en mouvement'] } = Astro.props;
+const { words = ['Muralistique', 'Murs en mouvement'], bg = 'projects/cafe-nord/cover.jpeg' } = Astro.props;
 const sequence = [...words, ...words];
 ---
 
-<div class="band theme-ivory-2" data-section-theme="ivory" aria-hidden="true">
+<div class="band theme-ink" data-section-theme="ink" aria-hidden="true">
+  <FixedBg src={bg} scrim={0.78} />
   <div class="band__track">
     {
       [0, 1].map(() => (
@@ -26,11 +31,11 @@ const sequence = [...words, ...words];
 
 <style>
   .band {
-    padding-block: clamp(2.5rem, 5.5vw, 5rem);
+    position: relative;
+    isolation: isolate;
+    padding-block: clamp(3rem, 6.5vw, 6rem);
     overflow: hidden;
-    border-top: 1px solid var(--ink);
-    border-bottom: 1px solid var(--ink);
-    background: var(--ivory-2);
+    background: var(--ink);
   }
   .band__track {
     display: flex;
@@ -53,12 +58,12 @@ const sequence = [...words, ...words];
     font: 700 clamp(2.75rem, 6.67vw, 6rem) / 1 var(--font-display);
     letter-spacing: var(--ls-display);
     text-transform: uppercase;
-    color: var(--ink);
+    color: var(--ivory);
     white-space: nowrap;
   }
   .band__word--outline {
-    color: var(--ivory);
-    -webkit-text-stroke: 1.4px var(--ink);
+    color: transparent;
+    -webkit-text-stroke: 1.4px var(--ivory);
   }
 
   @media (prefers-reduced-motion: reduce) {

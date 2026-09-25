@@ -1,13 +1,16 @@
 /**
  * Filtres par secteur + « voir plus » sur la page Réalisations.
  *
- * – le filtre parcourt TOUT le jeu de données, pas seulement les cartes déjà
+ * – le filtre parcourt TOUT le jeu de données, pas seulement les tuiles déjà
  *   affichées, et remet la limite d'affichage à la première page ;
  *   – le compteur, l'état vide et le bouton « voir plus » suivent ;
- * – sans JavaScript, ce script n'est jamais exécuté et toutes les cartes (donc
- *   tous les liens) restent visibles.
+ * – la grille compte deux colonnes : si le nombre de projets affichés est
+ *   impair, le premier passe en pleine largeur (`.is-wide`), sans trou ;
+ * – à chaque filtre, les tuiles se redécouvrent en cascade ;
+ * – sans JavaScript, ce script n'est jamais exécuté et toutes les tuiles
+ *   (donc tous les liens) restent visibles.
  */
-const COLUMNS_WITH_OFFSET = 3;
+import { revealNow } from './reveal';
 
 export function initProjectFilters() {
   const grid = document.querySelector<HTMLElement>('[data-project-grid]');
@@ -22,7 +25,7 @@ export function initProjectFilters() {
   const remainingEl = document.querySelector<HTMLElement>('[data-project-remaining]');
   const resetButton = document.querySelector<HTMLButtonElement>('[data-filter-reset]');
 
-  const pageSize = Math.max(1, parseInt(grid.dataset.pageSize || '6', 10));
+  const pageSize = Math.max(2, parseInt(grid.dataset.pageSize || '8', 10));
   grid.dataset.jsFlow = '';
 
   let filter = 'tous';
@@ -32,22 +35,50 @@ export function initProjectFilters() {
 
   const plural = (n: number) => `${n} projet${n > 1 ? 's' : ''}`;
 
-  const render = () => {
+  // Tuiles remises à zéro sous la ligne de flottaison : elles s'ouvriront
+  // quand elles entreront à l'écran, comme au premier chargement.
+  const later =
+    typeof IntersectionObserver === 'function'
+      ? new IntersectionObserver(
+          (entries) =>
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              later?.unobserve(entry.target);
+              revealNow(entry.target as HTMLElement);
+            }),
+          { threshold: 0.1 }
+        )
+      : null;
+
+  /** Rejoue l'ouverture de l'image d'une tuile, avec un décalage donné. */
+  const replay = (card: HTMLElement, delay: number) => {
+    const frame = card.querySelector<HTMLElement>('[data-reveal-clip]');
+    if (!frame) return;
+    later?.unobserve(frame);
+    frame.classList.remove('is-revealed');
+    delete frame.dataset.revealed;
+    void frame.offsetWidth; // repart de l'état fermé
+    frame.dataset.revealDelay = String(delay);
+    if (later && frame.getBoundingClientRect().top > window.innerHeight) later.observe(frame);
+    else revealNow(frame);
+  };
+
+  const render = ({ animate = [] as HTMLElement[] } = {}) => {
     const matched = matching();
-    const shown = matched.slice(0, visibleLimit);
+    // Une tuile pleine largeur en tête quand le total est impair : la page
+    // affiche alors une tuile de plus, pour garder des rangées complètes.
+    const wide = matched.length % 2 === 1;
+    const shown = matched.slice(0, visibleLimit + (wide ? 1 : 0));
     const shownSet = new Set(shown);
 
     cards.forEach((card) => {
       card.hidden = !shownSet.has(card);
-      card.classList.remove('is-offset');
+      card.classList.toggle('is-wide', wide && card === shown[0]);
     });
 
-    // Rétablit le décalage vertical de la maquette sur les cartes visibles.
-    shown
-      .filter((card) => !card.classList.contains('card--wide'))
-      .forEach((card, index) => {
-        if (index % COLUMNS_WITH_OFFSET === 1) card.classList.add('is-offset');
-      });
+    animate
+      .filter((card) => shownSet.has(card))
+      .forEach((card, i) => replay(card, Math.min(i, 5) * 80));
 
     if (countEl) countEl.textContent = plural(matched.length);
     if (emptyEl) emptyEl.hidden = matched.length > 0;
@@ -60,7 +91,7 @@ export function initProjectFilters() {
     }
   };
 
-  const setFilter = (next: string, { focusGrid = false } = {}) => {
+  const setFilter = (next: string, { initial = false } = {}) => {
     filter = next;
     // Un changement de filtre repart toujours de la première page.
     visibleLimit = pageSize;
@@ -69,34 +100,48 @@ export function initProjectFilters() {
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-pressed', String(active));
     });
-    render();
+    render({ animate: initial ? [] : cards });
 
     // Garde l'URL partageable sans recharger la page.
     const url = new URL(window.location.href);
     if (next === 'tous') url.searchParams.delete('secteur');
     else url.searchParams.set('secteur', next);
     window.history.replaceState({}, '', url);
-
-    if (focusGrid) grid.querySelector<HTMLElement>('[data-project]:not([hidden]) a')?.focus();
   };
 
   buttons.forEach((button) => {
-    button.addEventListener('click', () => setFilter(button.dataset.filter || 'tous'));
+    button.addEventListener('click', () => {
+      if (button.dataset.filter === filter) return;
+      setFilter(button.dataset.filter || 'tous');
+    });
   });
 
   resetButton?.addEventListener('click', () => setFilter('tous'));
 
   moreButton?.addEventListener('click', () => {
-    const before = matching().slice(0, visibleLimit).length;
+    const before = cards.filter((card) => !card.hidden);
     visibleLimit += pageSize;
-    render();
-    // Le focus part sur la première carte nouvellement révélée.
-    const revealed = matching().slice(0, visibleLimit);
-    revealed[before]?.querySelector<HTMLElement>('a')?.focus();
+    const fresh = matching().filter((card) => !before.includes(card));
+    render({ animate: fresh });
+    // Le focus part sur la première tuile nouvellement révélée.
+    fresh.find((card) => !card.hidden)?.querySelector<HTMLElement>('a')?.focus();
   });
+
+  // Au survol, l'image suit légèrement le pointeur (souris uniquement).
+  const fine = window.matchMedia?.('(hover: hover) and (pointer: fine)').matches;
+  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  if (fine && !reduced) {
+    grid.addEventListener('pointermove', (event) => {
+      const link = (event.target as HTMLElement).closest<HTMLElement>('[data-tile]');
+      if (!link) return;
+      const rect = link.getBoundingClientRect();
+      link.style.setProperty('--mx', (((event.clientX - rect.left) / rect.width) * 2 - 1).toFixed(3));
+      link.style.setProperty('--my', (((event.clientY - rect.top) / rect.height) * 2 - 1).toFixed(3));
+    });
+  }
 
   // Filtre initial issu de l'URL (?secteur=sante), pour des liens partageables.
   const requested = new URLSearchParams(window.location.search).get('secteur');
-  if (requested && buttons.some((b) => b.dataset.filter === requested)) setFilter(requested);
+  if (requested && buttons.some((b) => b.dataset.filter === requested)) setFilter(requested, { initial: true });
   else render();
 }

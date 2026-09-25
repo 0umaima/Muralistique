@@ -34,8 +34,8 @@ export interface Project {
   /** Image de couverture (carte + haut de la page projet). */
   cover: ProjectImage;
   /**
-   * Proportion de la carte dans la grille (largeur / hauteur), reprise de la
-   * maquette pour conserver le rythme vertical de la grille.
+   * Proportion d'origine de la couverture (largeur / hauteur). Indicatif :
+   * la grille Réalisations recadre toutes les tuiles au même format.
    */
   ratio: string;
   /** Couple avant / après. Laissez `undefined` s'il n'y en a pas. */
@@ -54,12 +54,8 @@ export interface Project {
    * les lignes vides ne sont pas affichées.
    */
   facts: { surface: string; duration: string; year: string; client: string };
-  /** Carte pleine largeur dans la grille Réalisations (format panoramique). */
-  wide?: boolean;
   /** Mis en avant dans le comparateur avant/après de l'accueil. */
   featuredOnHome?: boolean;
-  /** Mis en avant dans les trois liens du hero de la page Réalisations. */
-  featuredInHero?: boolean;
 }
 
 export const projects: Project[] = [
@@ -119,7 +115,6 @@ title: 'Robotique en mouvement',
   },
 
   featuredOnHome: true,
-  featuredInHero: true,
 },
 {
   slug: 'harmonie-verte',
@@ -178,7 +173,6 @@ title: 'Robotique en mouvement',
     client: 'KOON',
   },
 
-  featuredInHero: true,
 },
  {
   slug: 'ecole-les-tilleuls',
@@ -319,7 +313,7 @@ title: 'Robotique en mouvement',
 
   title: 'Hôtel Kaan — Misti Rooftop',
 
-  sector: 'hotels',
+  sector: 'hotellerie',
 
   city: 'Casablanca',
 
@@ -399,4 +393,3 @@ title: 'Robotique en mouvement',
 export const projectBySlug = (slug: string) => projects.find((p) => p.slug === slug);
 export const projectsInSector = (sectorSlug: string) => projects.filter((p) => p.sector === sectorSlug);
 export const homeBeforeAfter = () => projects.find((p) => p.featuredOnHome && p.beforeAfter);
-export const heroProjects = () => projects.filter((p) => p.featuredInHero).slice(0, 3);

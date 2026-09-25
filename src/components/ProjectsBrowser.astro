@@ -5,43 +5,45 @@ import { projects } from '../data/projects';
 import { sectors } from '../data/sectors';
 
 /**
- * Grille des réalisations : filtres par secteur + « voir plus », entièrement
- * côté client.
+ * Grille des réalisations : de grandes images de même format, bord à bord,
+ * filtres par secteur et « voir plus », entièrement côté client.
  *
- * Sans JavaScript : toutes les cartes sont rendues et visibles, les liens vers
- * les pages projet restent donc tous accessibles ; seuls les filtres et le
- * bouton « voir plus » disparaissent.
+ * Deux colonnes égales ; quand le nombre de projets affichés est impair, le
+ * premier passe en pleine largeur (format panoramique) : jamais de trou.
+ *
+ * Sans JavaScript : toutes les tuiles sont rendues et visibles, les liens
+ * vers les pages projet restent donc tous accessibles ; seuls les filtres et
+ * le bouton « voir plus » disparaissent.
  */
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 8;
 const counts = new Map<string, number>();
 projects.forEach((p) => counts.set(p.sector, (counts.get(p.sector) ?? 0) + 1));
 const usedSectors = sectors.filter((s) => counts.has(s.slug));
 ---
 
-<section class="browser theme-ivory" id="projets" data-section-theme="ivory">
-  <div class="browser__bar">
-    <div class="browser__bar-inner shell pad">
-      <div class="browser__filters only-js" role="group" aria-label="Filtrer par secteur">
-        <button class="filter is-active" type="button" data-filter="tous" aria-pressed="true">Tous</button>
-        {
-          usedSectors.map((sector) => (
-            <button class="filter" type="button" data-filter={sector.slug} aria-pressed="false">
-              {sector.label}
-            </button>
-          ))
-        }
-      </div>
-      <p class="browser__count" data-project-count aria-live="polite">
-        {projects.length} projet{projects.length > 1 ? 's' : ''}
-      </p>
+<section class="browser theme-ink" id="projets" data-section-theme="ink">
+  <div class="browser__bar shell pad">
+    <div class="browser__filters only-js" role="group" aria-label="Filtrer par secteur">
+      <button class="filter is-active" type="button" data-filter="tous" aria-pressed="true">Tous</button>
+      {
+        usedSectors.map((sector) => (
+          <button class="filter" type="button" data-filter={sector.slug} aria-pressed="false">
+            {sector.label}
+            <sup class="filter__count" aria-hidden="true">{counts.get(sector.slug)}</sup>
+          </button>
+        ))
+      }
     </div>
+    <p class="browser__count" data-project-count aria-live="polite">
+      {projects.length} projet{projects.length > 1 ? 's' : ''}
+    </p>
+  </div>
+
+  <div class="browser__grid" data-project-grid data-page-size={PAGE_SIZE}>
+    {projects.map((project, i) => <ProjectCard project={project} index={i} priority={i === 0} />)}
   </div>
 
   <div class="shell pad">
-    <div class="browser__grid" data-project-grid data-page-size={PAGE_SIZE}>
-      {projects.map((project, i) => <ProjectCard project={project} index={i} priority={i === 0} />)}
-    </div>
-
     <p class="browser__empty" data-project-empty hidden>
       <Icon name="search-x" size={22} stroke={1.8} />
       <span>
@@ -51,7 +53,7 @@ const usedSectors = sectors.filter((s) => counts.has(s.slug));
     </p>
 
     <div class="browser__more only-js" data-project-more hidden>
-      <button class="btn btn--outline" type="button" data-project-more-button>
+      <button class="btn btn--ghost-light" type="button" data-project-more-button>
         Voir plus de projets
         <Icon name="chevron-down" size={16} stroke={2.2} />
       </button>
@@ -61,71 +63,84 @@ const usedSectors = sectors.filter((s) => counts.has(s.slug));
 </section>
 
 <style>
-  .browser { padding-bottom: clamp(3rem, 6.9vw, 6.25rem); }
+  .browser { padding-bottom: clamp(3rem, 6vw, 5.5rem); }
 
+  /* ——— Filtres ——— */
   .browser__bar {
-    border-top: 1px solid var(--ink);
-    border-bottom: 1px solid var(--ink);
-    background: var(--ivory);
-  }
-  .browser__bar-inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    padding-block: 24px;
+    padding-block: 0 clamp(1.5rem, 2.8vw, 2.5rem);
   }
-  html:not(.js) .browser__bar-inner { justify-content: flex-end; }
+  html:not(.js) .browser__bar { justify-content: flex-end; }
 
-  .browser__filters { display: flex; flex-wrap: wrap; gap: 10px; }
+  .browser__filters { display: flex; flex-wrap: wrap; gap: 4px 26px; }
   .filter {
-    padding: 12px 20px;
-    border-radius: 100px;
-    border: 1px solid var(--ink);
-    background: transparent;
-    color: var(--ink);
-    font: 500 0.84375rem/1 var(--font-body);
-    transition: background-color 200ms var(--ease), color 200ms var(--ease);
+    position: relative;
+    padding: 8px 0;
+    border: 0;
+    background: none;
+    color: var(--muted-on-dark);
+    font: 700 clamp(1rem, 1.3vw, 1.1875rem) / 1 var(--font-display);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: color 200ms var(--ease);
   }
-  .filter:hover { background: var(--ivory-2); }
-  .filter.is-active {
-    background: var(--ink);
-    color: var(--ivory);
-    font-weight: 600;
+  .filter::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 350ms var(--ease-out);
+  }
+  .filter:hover { color: var(--ivory); }
+  .filter.is-active { color: var(--ivory); }
+  .filter.is-active::after { transform: scaleX(1); transform-origin: left; }
+  .filter__count {
+    margin-left: 4px;
+    font-size: 0.65em;
+    letter-spacing: 0.05em;
+    vertical-align: super;
+    line-height: 0;
   }
 
   .browser__count {
-    font: 500 0.84375rem/1 var(--font-body);
-    color: var(--muted-on-light);
+    font: 700 0.875rem/1 var(--font-display);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted-on-dark);
     white-space: nowrap;
   }
 
+  /* ——— Grille bord à bord ——— */
   .browser__grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 32px;
-    align-items: start;
-    padding-top: clamp(3rem, 6.7vw, 6rem);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    padding-inline: 6px;
   }
-  .browser__grid :global(.card--wide) { grid-column: 1 / -1; }
-
-  /* Décalage vertical repris de la maquette. Sans JavaScript, la règle
-     structurelle suffit ; avec JavaScript, le script repositionne le décalage
-     sur les cartes réellement visibles après filtrage. */
-  .browser__grid :global(.card:nth-child(3n + 2):not(.card--wide)) { margin-top: 72px; }
-  .browser__grid[data-js-flow] :global(.card) { margin-top: 0; }
-  .browser__grid[data-js-flow] :global(.card.is-offset) { margin-top: 72px; }
+  /* Sans JavaScript : premier projet en pleine largeur si leur nombre est
+     impair. Avec JavaScript, le script pose `.is-wide` après filtrage. */
+  .browser__grid:not([data-js-flow]) :global(.tile:first-child:nth-last-child(odd)) {
+    grid-column: 1 / -1;
+    aspect-ratio: 21 / 9;
+  }
 
   .browser__empty {
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    margin-top: 64px;
+    margin-top: 32px;
     padding: 28px;
-    border: 1px dashed var(--ink);
-    border-radius: 18px;
-    background: var(--ivory-2);
+    border: 1px dashed var(--ink-line-3);
     font-size: var(--fs-body);
+    color: var(--muted-on-dark);
   }
   .browser__empty[hidden] { display: none; }
   .browser__reset {
@@ -133,6 +148,7 @@ const usedSectors = sectors.filter((s) => counts.has(s.slug));
     padding: 0;
     border: none;
     background: none;
+    color: var(--ivory);
     font: inherit;
     font-weight: 600;
     text-decoration: underline;
@@ -149,15 +165,17 @@ const usedSectors = sectors.filter((s) => counts.has(s.slug));
   .browser__more[hidden] { display: none; }
   .browser__more-count { font-size: var(--fs-xs); }
 
-  @media (max-width: 1100px) {
-    .browser__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .browser__grid :global(.card:nth-child(3n + 2):not(.card--wide)) { margin-top: 0; }
-    .browser__grid[data-js-flow] :global(.card.is-offset) { margin-top: 0; }
-  }
   @media (max-width: 700px) {
-    .browser__grid { grid-template-columns: 1fr; gap: 40px; }
-    .browser__bar-inner { flex-direction: column; align-items: flex-start; }
-    .browser__filters { width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+    .browser__grid { grid-template-columns: 1fr; }
+    .browser__grid:not([data-js-flow]) :global(.tile:first-child:nth-last-child(odd)) { aspect-ratio: 4 / 3; }
+    .browser__bar { flex-direction: column; align-items: flex-start; }
+    .browser__filters {
+      width: 100%;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
     .filter { white-space: nowrap; }
   }
 </style>

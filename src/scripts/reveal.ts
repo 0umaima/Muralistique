@@ -13,7 +13,7 @@ const REDUCED =
   window.matchMedia &&
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function revealNow(el: HTMLElement) {
+export function revealNow(el: HTMLElement) {
   if (el.dataset.revealed) return;
   el.dataset.revealed = '1';
   const delay = Math.min(400, parseInt(el.dataset.revealDelay || '0', 10) || 0);
@@ -70,7 +70,7 @@ function drawPaths(wrapper: HTMLElement) {
 
 export function initReveal() {
   const reveals = Array.from(
-    document.querySelectorAll<HTMLElement>('[data-reveal], [data-reveal-rotate]')
+    document.querySelectorAll<HTMLElement>('[data-reveal], [data-reveal-rotate], [data-reveal-clip]')
   );
   const counters = Array.from(document.querySelectorAll<HTMLElement>('[data-count]'));
   const draws = Array.from(document.querySelectorAll<HTMLElement>('[data-draw]'));
