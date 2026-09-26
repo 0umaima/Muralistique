@@ -14,7 +14,6 @@ Formats d'origine conseillés (le double des dimensions d'affichage, JPEG ou PNG
 - `services/fresque.jpg` — 1236 × 680 px — Fresque
 - `services/toile.jpg` — 1236 × 680 px — Toile
 - `services/performance.jpg` — 1236 × 680 px — Performance
-- `people/temoignage.jpg` — 520 × 520 px — Portrait client
 - `studio/hero.jpg` — 2132 × 1760 px — Amine en train de peindre
 - `studio/founder.jpg` — 1440 × 1640 px — Amine en train de dessiner
 - `studio/croquis.jpg` — 1776 × 960 px — Croquis

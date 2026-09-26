@@ -57,7 +57,7 @@ import { site, phoneIsPlaceholder } from '../data/site.mjs';
         </div>
 
         <div class="devis__channels">
-          <WhatsAppButton variant="accent" label="WhatsApp" block />
+          <WhatsAppButton variant="primary" label="WhatsApp" block />
           {
             site.social.instagram ? (
               <a class="btn btn--ghost-light btn--block" href={site.social.instagram} target="_blank" rel="noopener noreferrer">
@@ -126,7 +126,8 @@ import { site, phoneIsPlaceholder } from '../data/site.mjs';
     letter-spacing: var(--ls-display);
     color: var(--ivory);
   }
-  .devis__number a:hover { color: var(--accent); }
+  .devis__number a { transition: opacity 180ms var(--ease); }
+  .devis__number a:hover { opacity: 0.7; }
   .devis__hours { margin-top: 12px; font-size: var(--fs-body-sm); }
   .devis__todo {
     display: inline-flex;
@@ -135,7 +136,7 @@ import { site, phoneIsPlaceholder } from '../data/site.mjs';
     margin-top: 14px;
     font-size: var(--fs-xs);
     font-style: italic;
-    color: var(--accent);
+    color: var(--ivory);
   }
   .devis__todo code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-style: normal; }
 

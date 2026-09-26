@@ -2,8 +2,9 @@
 
 /* ==========================================================================
    MURALISTIQUE — feuille de style globale
-   Identité reprise du logo : noir et blanc, le jaune du « M » (#FBBE67)
-   réservé au logo, et un vermillon de peintre comme unique accent.
+   Identité reprise du logo : noir et blanc avant tout. Le jaune du « M »
+   (#FBBE67) n'apparaît que par touches minuscules (le logo, un filet, un
+   point, une étincelle), jamais en fond de carte ou de bouton.
    Big Shoulders Display (titres) + Manrope (texte courant).
    Modifiez les variables ci-dessous pour retoucher l'ensemble du site d'un
    seul endroit.
@@ -23,15 +24,17 @@
   --ivory-3: #e7e7e5;
   --rule: #e2e2e0;         /* filet clair */
 
-  --brand: #fbbe67;        /* jaune du « M » — réservé au logo */
-  --accent: #ff4a1c;       /* vermillon : l'accent du site, à doser */
-  --accent-strong: #c42d0c;/* vermillon profond : texte / icône d'accent sur fond clair (≥ 4.5:1) */
-  --accent-ink: #0b0b0b;   /* texte posé sur le vermillon */
+  --brand: #fbbe67;        /* jaune du « M » : logo et minuscules repères seulement */
+
+  /* Aplat « plein » d'un bouton : l'inverse du fond de la section.
+     Noir sur les fonds clairs, blanc sur les fonds sombres (voir .theme-ink). */
+  --solid: var(--ink);
+  --solid-text: var(--ivory);
 
   --muted-on-light: #5c5c5c;
   --muted-on-dark: #a9a9a9;
 
-  /* Anneau de focus : noir sur les fonds clairs, vermillon sur les fonds sombres
+  /* Anneau de focus : noir sur les fonds clairs, blanc sur les fonds sombres
      (voir .theme-ink plus bas). */
   --focus: var(--ink);
 
@@ -158,8 +161,9 @@ button { cursor: pointer; }
   left: var(--gutter); top: 8px;
   z-index: 200;
   padding: 12px 20px;
+  border: 1px solid var(--ink);
   border-radius: 100px;
-  background: var(--accent);
+  background: var(--ivory);
   color: var(--ink);
   font: 700 0.9375rem/1 var(--font-display);
   letter-spacing: 0.1em;
@@ -182,7 +186,13 @@ button { cursor: pointer; }
 /* Thèmes de section — pilotent aussi la couleur de l'en-tête (voir header.js) */
 .theme-ivory { background: var(--ivory); color: var(--ink); }
 .theme-ivory-2 { background: var(--ivory-2); color: var(--ink); }
-.theme-ink { background: var(--ink); color: var(--ivory); --focus: var(--accent); }
+.theme-ink {
+  background: var(--ink);
+  color: var(--ivory);
+  --focus: var(--ivory);
+  --solid: var(--ivory);
+  --solid-text: var(--ink);
+}
 .theme-ink h1, .theme-ink h2, .theme-ink h3, .theme-ink h4 { color: var(--ivory); }
 
 .muted { color: var(--muted-on-light); }
@@ -202,8 +212,8 @@ button { cursor: pointer; }
   color: var(--muted-on-light);
 }
 .theme-ink .eyebrow { color: var(--muted-on-dark); }
-.eyebrow svg { color: var(--accent-strong); flex: none; }
-.theme-ink .eyebrow svg { color: var(--accent); }
+.eyebrow svg { color: var(--ink); flex: none; }
+.theme-ink .eyebrow svg { color: var(--brand); }
 
 .section-head {
   display: flex;
@@ -214,7 +224,7 @@ button { cursor: pointer; }
 }
 .section-head h2 { margin-top: 22px; }
 
-/* Repère de section de l'accueil : un numéro et un court trait d'accent,
+/* Repère de section de l'accueil : un numéro et un court filet jaune,
    au-dessus d'un titre de deux ou trois mots. */
 .section-index {
   display: inline-flex;
@@ -227,8 +237,8 @@ button { cursor: pointer; }
 .section-index::after {
   content: '';
   width: 36px;
-  height: 2px;
-  background: var(--accent);
+  height: 3px;
+  background: var(--brand);
 }
 .theme-ink .section-index { color: var(--muted-on-dark); }
 
@@ -259,8 +269,10 @@ button { cursor: pointer; }
 .btn svg { flex: none; transition: transform 200ms var(--ease); }
 .btn:hover svg { transform: translate(2px, -2px); }
 
-.btn--accent { background: var(--accent); color: var(--ink); }
-.btn--accent:hover { background: var(--ivory); border-color: var(--ink); }
+/* Bouton principal : aplat noir sur fond clair, blanc sur fond sombre ;
+   au survol, il s'évide. */
+.btn--primary { background: var(--solid); border-color: var(--solid); color: var(--solid-text); }
+.btn--primary:hover { background: transparent; color: var(--solid); }
 
 .btn--ink { background: var(--ink); color: var(--ivory); }
 .btn--ink:hover { background: var(--ink-2); }
@@ -324,19 +336,6 @@ button { cursor: pointer; }
   will-change: auto;
 }
 
-/* Cartes du processus : légère rotation au départ, alignement à l'arrivée */
-.js [data-reveal-rotate] {
-  opacity: 0;
-  transform: translateY(var(--reveal-ty, 24px)) rotate(var(--reveal-rot, 0deg));
-}
-.js [data-reveal-rotate].is-revealed {
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity 820ms var(--ease-out) var(--reveal-delay, 0ms),
-    transform 820ms var(--ease-out) var(--reveal-delay, 0ms);
-}
-
 /* Images découvertes de bas en haut (Réalisations, pages projet).
    L'élément observé garde sa taille ; c'est son enfant direct qui est
    découpé (un élément entièrement découpé n'est jamais « visible » pour
@@ -362,8 +361,7 @@ button { cursor: pointer; }
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  .js [data-reveal],
-  .js [data-reveal-rotate] { opacity: 1 !important; transform: none !important; }
+  .js [data-reveal] { opacity: 1 !important; transform: none !important; }
   .js [data-reveal-clip] > * { clip-path: none !important; }
   .js [data-reveal-clip] img { transform: none !important; }
 }

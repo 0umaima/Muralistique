@@ -164,7 +164,7 @@ const ok = (label, cond, extra = '') => {
   const order = await page.$$eval('main > section[id], main > section', (n) =>
     n.map((s) => s.id || s.className.split(' ')[0])
   );
-  const want = ['transformations', 'processus', 'services', 'secteurs', 'positioning', 'contact'];
+  const want = ['transformations', 'services', 'secteurs', 'contact', 'retours'];
   const got = order.filter((id) => want.includes(id));
   ok('ordre des sections', got.join() === want.join(), got.join(' > '));
 
@@ -198,12 +198,12 @@ const ok = (label, cond, extra = '') => {
 {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   page.on('pageerror', (e) => fails.push('JS error: ' + e.message));
-  await page.goto(BASE + '/#processus', { waitUntil: 'networkidle' });
+  await page.goto(BASE + '/#services', { waitUntil: 'networkidle' });
   await page.waitForTimeout(1200);
-  const top = await page.$eval('#processus', (n) => n.getBoundingClientRect().top);
+  const top = await page.$eval('#services', (n) => n.getBoundingClientRect().top);
   const hh = await page.$eval('[data-header]', (n) => n.getBoundingClientRect().height);
   ok(
-    'ancre #processus juste sous l’en-tête',
+    'ancre #services juste sous l’en-tête',
     top >= hh - 2 && top < hh + 40,
     `top=${Math.round(top)} header=${Math.round(hh)}`
   );
@@ -246,7 +246,7 @@ const ok = (label, cond, extra = '') => {
   await page.goto(BASE + '/', { waitUntil: 'networkidle' });
   await page.waitForTimeout(800);
   console.log('\n— prefers-reduced-motion: reduce');
-  const hidden = await page.$$eval('[data-reveal], [data-reveal-rotate]', (n) =>
+  const hidden = await page.$$eval('[data-reveal]', (n) =>
     n.filter((e) => parseFloat(getComputedStyle(e).opacity) < 0.99).length
   );
   ok('aucun contenu masqué', hidden === 0, `${hidden} éléments à opacité < 1`);
@@ -287,7 +287,7 @@ const ok = (label, cond, extra = '') => {
   ok('1re tuile pleine largeur sans JavaScript', full > grid * 0.9, `${full}/${grid}`);
 
   await page.goto(BASE + '/', { waitUntil: 'load' });
-  const dim = await page.$$eval('[data-reveal], [data-reveal-rotate]', (n) =>
+  const dim = await page.$$eval('[data-reveal]', (n) =>
     n.filter((e) => parseFloat(getComputedStyle(e).opacity) < 0.99).length
   );
   ok('aucune section masquée sur l’accueil', dim === 0, `${dim} éléments à opacité < 1`);

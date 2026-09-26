@@ -1,0 +1,578 @@
+---
+/**
+ * « Vos retours » : les commentaires Instagram des clients, chacun sur sa
+ * propre carte, épinglés de travers sur un grand « MERCI » évidé.
+ *
+ * À l'apparition, chaque carte jaillit et se pose de biais, trois points
+ * « en train d'écrire » laissent place au commentaire, les mots forts se
+ * soulignent de jaune et le cœur « aimé par l'atelier » éclate. Des cœurs
+ * montent doucement en fond. Sans JavaScript ou en mouvement réduit, tout
+ * est affiché d'emblée, sans animation.
+ *
+ * Les textes se modifient dans src/data/content.ts (`feedback`).
+ */
+import BrandIcon from '../BrandIcon.astro';
+import Icon from '../Icon.astro';
+import { feedback } from '../../data/content';
+import { site } from '../../data/site.mjs';
+
+/** Découpe un commentaire en morceaux, les passages `highlight` à part. */
+function segments(text: string, marks: string[] = []) {
+  const out: { text: string; mark: boolean }[] = [];
+  let rest = text;
+  while (rest) {
+    let at = -1;
+    let hit = '';
+    for (const m of marks) {
+      const i = rest.indexOf(m);
+      if (i >= 0 && (at < 0 || i < at)) {
+        at = i;
+        hit = m;
+      }
+    }
+    if (at < 0) {
+      out.push({ text: rest, mark: false });
+      break;
+    }
+    if (at > 0) out.push({ text: rest.slice(0, at), mark: false });
+    out.push({ text: hit, mark: true });
+    rest = rest.slice(at + hit.length);
+  }
+  return out;
+}
+
+/** Initiale de l'avatar : la première lettre du pseudo. */
+const initial = (handle: string) => (handle.match(/\p{L}/u)?.[0] ?? '?').toUpperCase();
+
+/** « @pseudo » en tête de réponse, mis en gras comme sur Instagram. */
+const splitMention = (text: string) => {
+  const m = text.match(/^(@\S+)\s*(.*)$/s);
+  return m ? { mention: m[1], rest: m[2] } : { mention: '', rest: text };
+};
+
+/** Badge « vérifié » : une rosette à seize pointes. */
+const rosette = Array.from({ length: 32 }, (_, i) => {
+  const r = i % 2 ? 10.4 : 12;
+  const a = (i / 32) * Math.PI * 2;
+  return `${(12 + Math.cos(a) * r).toFixed(2)} ${(12 + Math.sin(a) * r).toFixed(2)}`;
+}).join('L');
+
+/** Inclinaison de chaque carte (la teinte, en damier, est gérée en CSS). */
+const tilts = [-2.4, 1.8, -1.3, 2.2, -1.9, 1.4];
+
+/** Cœurs qui montent en fond : position, taille, durée, décalage. */
+const hearts = [
+  { x: 4, s: 18, t: 13, d: -2, fill: false },
+  { x: 14, s: 12, t: 10, d: -7, fill: true },
+  { x: 27, s: 22, t: 16, d: -11, fill: false },
+  { x: 41, s: 14, t: 12, d: -4, fill: false },
+  { x: 55, s: 26, t: 18, d: -14, fill: false },
+  { x: 67, s: 12, t: 11, d: -9, fill: true },
+  { x: 78, s: 20, t: 15, d: -1, fill: false },
+  { x: 89, s: 16, t: 12, d: -6, fill: false },
+  { x: 96, s: 12, t: 14, d: -12, fill: true },
+];
+
+const instagramHandle = site.social.instagram?.match(/instagram\.com\/([^/?#]+)/)?.[1];
+const HEART = 'M12 21s-7.5-4.6-9.6-9.2C.9 8.4 2.8 4.5 6.5 4.5c2.1 0 3.6 1.2 4.5 2.6.9-1.4 2.4-2.6 4.5-2.6 3.7 0 5.6 3.9 4.1 7.3C19.5 16.4 12 21 12 21z';
+---
+
+<section class="fb theme-ivory" id="retours" data-section-theme="ivory">
+  <div class="fb__hearts" aria-hidden="true">
+    {
+      hearts.map((h) => (
+        <span class="fb__float" style={`--x:${h.x}%;--s:${h.s}px;--t:${h.t}s;--d:${h.d}s`}>
+          <svg class:list={['fb__float-heart', h.fill && 'is-filled']} viewBox="0 0 24 24">
+            <path d={HEART} />
+          </svg>
+        </span>
+      ))
+    }
+  </div>
+
+  <p class="fb__word" aria-hidden="true">Merci</p>
+
+  <div class="shell pad fb__inner">
+    <div class="section-head" data-reveal>
+      <div>
+        <p class="section-index">04</p>
+        <h2 class="section-title">Vos retours</h2>
+      </div>
+      <div class="fb__aside">
+        <p class="section-head__aside">Les mots que vous laissez sous nos fresques, sur Instagram. Merci à vous.</p>
+        {
+          instagramHandle && (
+            <a class="link-underline" href={site.social.instagram} target="_blank" rel="noopener noreferrer">
+              <BrandIcon name="instagram" size={15} />
+              Suivre @{instagramHandle}
+              <Icon name="arrow-up-right" size={13} stroke={2.2} />
+            </a>
+          )
+        }
+      </div>
+    </div>
+
+    <ul class="fb__wall">
+      {
+        feedback.map((item, i) => (
+          <li class="fb__item" data-reveal data-reveal-delay={i * 80}>
+            <div class="fb__pop">
+              <figure class="fb__card" style={`--rot:${tilts[i % tilts.length]}deg`}>
+                <span class="fb__avatar" aria-hidden="true">{initial(item.handle)}</span>
+                <span class="fb__source" aria-hidden="true">
+                  <BrandIcon name="instagram" size={16} />
+                </span>
+
+                <figcaption class="fb__who">
+                  <span class="visually-hidden">Commentaire Instagram de </span>
+                  <span class="fb__handle">{item.handle}</span>
+                  {item.verified && (
+                    <svg class="fb__verified" viewBox="0 0 24 24" role="img" aria-label="compte vérifié">
+                      <path d={`M${rosette}Z`} />
+                      <path class="fb__verified-check" d="M7.6 12.3l3 3 5.8-6.1" />
+                    </svg>
+                  )}
+                </figcaption>
+
+                <div class="fb__body">
+                  <span class="fb__typing" aria-hidden="true">
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                  <blockquote class="fb__text">
+                    {segments(item.text, item.highlight).map((part) =>
+                      part.mark ? <mark>{part.text}</mark> : part.text
+                    )}
+                  </blockquote>
+                </div>
+
+                <p class="fb__liked">
+                  <span class="fb__heart" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d={HEART} />
+                    </svg>
+                  </span>
+                  Aimé par l’atelier
+                </p>
+
+                {item.reply && (
+                  <div class="fb__reply">
+                    <span class="fb__reply-avatar" aria-hidden="true">
+                      {initial(item.reply.handle)}
+                    </span>
+                    <p>
+                      <span class="fb__reply-handle">
+                        {item.reply.handle}
+                        <span class="fb__reply-tag">Auteur</span>
+                      </span>
+                      <span class="fb__reply-text">
+                        {splitMention(item.reply.text).mention && (
+                          <strong>{splitMention(item.reply.text).mention} </strong>
+                        )}
+                        {splitMention(item.reply.text).rest}
+                      </span>
+                    </p>
+                  </div>
+                )}
+              </figure>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .fb {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: var(--section-y-lg) calc(var(--section-y-lg) - 1rem);
+  }
+  .fb__inner { position: relative; z-index: 1; }
+
+  .fb__aside {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  /* ——— Décor : « MERCI » géant, évidé, qui glisse au défilement ——— */
+  .fb__word {
+    position: absolute;
+    z-index: 0;
+    top: 58%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font: 900 clamp(9rem, 36vw, 34rem) / 0.8 var(--font-display);
+    letter-spacing: var(--ls-display);
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: transparent;
+    -webkit-text-stroke: 2px var(--rule);
+    pointer-events: none;
+    user-select: none;
+  }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .fb__word {
+        animation: fb-drift linear both;
+        animation-timeline: view();
+      }
+    }
+  }
+  @keyframes fb-drift {
+    from { transform: translate(-38%, -50%); }
+    to { transform: translate(-62%, -50%); }
+  }
+
+  /* ——— Décor : des cœurs montent doucement ———
+     Chaque colonne fait la hauteur de la section : la décaler de 100 % de
+     sa propre hauteur, c'est traverser toute la section. */
+  .fb__hearts {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .fb__float {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--x);
+    width: var(--s);
+    transform: translateY(100%);
+    animation: fb-rise var(--t) linear var(--d) infinite;
+  }
+  .fb__float-heart {
+    width: var(--s);
+    height: var(--s);
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.4;
+    opacity: 0.16;
+    animation: fb-sway 3.2s ease-in-out infinite alternate;
+  }
+  .fb__float-heart.is-filled { fill: var(--brand); stroke: none; opacity: 0.9; }
+  @keyframes fb-rise {
+    from { transform: translateY(100%); }
+    to { transform: translateY(-8%); }
+  }
+  @keyframes fb-sway {
+    from { transform: translateX(-10px) rotate(-8deg); }
+    to { transform: translateX(10px) rotate(8deg); }
+  }
+
+  /* ——— Le mur de commentaires : trois colonnes façon « masonry » ——— */
+  .fb__wall {
+    columns: 3;
+    column-gap: clamp(1.5rem, 3.3vw, 3.25rem);
+    margin-top: clamp(2.5rem, 5vw, 4.5rem);
+  }
+  .fb__item {
+    break-inside: avoid;
+    /* Place pour l'avatar qui déborde en haut, l'ombre et l'inclinaison. */
+    padding: 34px 12px clamp(1.75rem, 3.5vw, 3rem) 4px;
+  }
+
+  /* Teintes de carte : blanc par défaut, noir une carte sur deux en damier
+     (voir les règles « damier » plus bas, selon le nombre de colonnes). */
+  .fb__card {
+    --card-bg: var(--ivory);
+    --card-fg: var(--ink);
+    --card-shadow: var(--ink);
+    --card-muted: var(--muted-on-light);
+    --card-soft: var(--ivory-2);
+    --heart-stroke: var(--ink);
+    position: relative;
+    margin: 0;
+    padding: 38px clamp(20px, 2vw, 28px) 22px;
+    border: 1.5px solid var(--ink);
+    background: var(--card-bg);
+    color: var(--card-fg);
+    box-shadow: 8px 8px 0 var(--card-shadow);
+    transform: rotate(var(--rot));
+    transition:
+      transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 420ms var(--ease-out);
+  }
+  .fb__card:hover { transform: rotate(0deg) translateY(-6px); box-shadow: 12px 14px 0 var(--card-shadow); }
+
+  /* Damier sur trois colonnes de deux cartes : 1re, 4e, 5e… en noir. */
+  @media (min-width: 1101px) {
+    .fb__item:nth-child(4n + 1) .fb__card,
+    .fb__item:nth-child(4n) .fb__card {
+      --card-bg: var(--ink);
+      --card-fg: var(--ivory);
+      --card-shadow: #d2d2cf;
+      --card-muted: var(--muted-on-dark);
+      --card-soft: var(--ink-line);
+      --heart-stroke: var(--brand);
+    }
+  }
+  /* Deux colonnes de trois, ou une seule : une carte sur deux. */
+  @media (max-width: 1100px) {
+    .fb__item:nth-child(odd) .fb__card {
+      --card-bg: var(--ink);
+      --card-fg: var(--ivory);
+      --card-shadow: #d2d2cf;
+      --card-muted: var(--muted-on-dark);
+      --card-soft: var(--ink-line);
+      --heart-stroke: var(--brand);
+    }
+  }
+
+  /* Avatar « pastille » qui déborde du haut de la carte, cerclé comme une
+     story Instagram, en noir et blanc. */
+  .fb__avatar {
+    position: absolute;
+    top: -27px;
+    left: 20px;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    font: 800 1.5rem/1 var(--font-display);
+    background: var(--card-fg);
+    color: var(--card-bg);
+    box-shadow: 0 0 0 3px var(--card-bg), 0 0 0 4.5px var(--card-fg);
+  }
+
+  .fb__source {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    opacity: 0.45;
+  }
+
+  .fb__who {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font: 700 0.9375rem/1.2 var(--font-body);
+    letter-spacing: 0.01em;
+    overflow-wrap: anywhere;
+  }
+  .fb__verified { flex: none; width: 17px; height: 17px; fill: var(--card-fg); }
+  .fb__verified-check {
+    fill: none;
+    stroke: var(--card-bg);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .fb__body { position: relative; margin-top: 12px; }
+  .fb__text {
+    margin: 0;
+    font: 500 clamp(1.125rem, 1.45vw, 1.3125rem) / 1.45 var(--font-body);
+    overflow-wrap: break-word;
+  }
+  /* Les mots forts : un trait jaune sous le texte, jamais un aplat. */
+  .fb__text mark {
+    color: inherit;
+    font-weight: 700;
+    background: linear-gradient(var(--brand), var(--brand)) no-repeat 0 94% / 100% 0.26em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  /* « En train d'écrire… » : masqué sans JavaScript. */
+  .fb__typing { display: none; }
+
+  .fb__liked {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 18px;
+    font: 600 0.75rem/1 var(--font-body);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--card-muted);
+  }
+
+  .fb__heart { position: relative; display: block; flex: none; width: 20px; height: 20px; }
+  .fb__heart svg {
+    width: 100%;
+    height: 100%;
+    fill: var(--brand);
+    stroke: var(--heart-stroke);
+    stroke-width: 1.3;
+    overflow: visible;
+  }
+  /* Éclats du « j'aime » : six points jaunes autour du cœur. */
+  .fb__heart::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    margin: -2px 0 0 -2px;
+    border-radius: 50%;
+    box-shadow:
+      0 -16px 0 var(--brand), 14px -8px 0 var(--brand), 14px 8px 0 var(--brand),
+      0 16px 0 var(--brand), -14px 8px 0 var(--brand), -14px -8px 0 var(--brand);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .fb__card:hover .fb__heart svg { animation: fb-beat 900ms ease-in-out infinite; }
+  @keyframes fb-beat {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.25); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.15); }
+  }
+
+  /* Réponse de l'atelier, en retrait comme un fil de discussion. */
+  .fb__reply {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed currentColor;
+  }
+  .fb__reply-avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--brand);
+    font: 800 0.9375rem/1 var(--font-display);
+    box-shadow: 0 0 0 1px var(--card-fg);
+  }
+  .fb__reply p { font-size: var(--fs-body-sm); line-height: 1.45; }
+  .fb__reply-handle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+  }
+  .fb__reply-tag {
+    font: 600 0.6875rem/1 var(--font-body);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+  .fb__reply-text { display: block; margin-top: 3px; }
+
+  /* ——— Apparition ———
+     L'élément observé reste en place ; c'est `.fb__pop` qui jaillit, pour
+     que l'inclinaison et le survol de la carte gardent leurs propres
+     transitions, sans le délai de la cascade. */
+  :global(.js) .fb__item[data-reveal] { opacity: 1; transform: none; }
+  :global(.js) .fb__item[data-reveal] .fb__pop {
+    opacity: 0;
+    transform: translateY(70px) scale(0.82) rotate(-6deg);
+  }
+  :global(.js) .fb__item[data-reveal].is-revealed .fb__pop {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 300ms var(--ease-out) var(--reveal-delay, 0ms),
+      transform 750ms cubic-bezier(0.34, 1.56, 0.64, 1) var(--reveal-delay, 0ms);
+  }
+
+  /* Trois points « en train d'écrire », puis le commentaire. */
+  :global(.js) .fb__typing {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    display: flex;
+    gap: 5px;
+    padding: 11px 14px;
+    border-radius: 100px;
+    background: var(--card-soft);
+  }
+  .fb__typing i {
+    display: block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.55;
+  }
+  .fb__typing i:nth-child(2) { --dd: 120ms; }
+  .fb__typing i:nth-child(3) { --dd: 240ms; }
+  :global(.js) .fb__item.is-revealed .fb__typing {
+    opacity: 0;
+    transition: opacity 180ms var(--ease) calc(var(--reveal-delay, 0ms) + 680ms);
+  }
+  :global(.js) .fb__item.is-revealed .fb__typing i {
+    animation: fb-dot 300ms ease-in-out calc(var(--reveal-delay, 0ms) + 180ms + var(--dd, 0ms)) 4 alternate;
+  }
+  @keyframes fb-dot {
+    from { transform: translateY(0); opacity: 0.35; }
+    to { transform: translateY(-5px); opacity: 1; }
+  }
+
+  :global(.js) .fb__item[data-reveal] .fb__text { opacity: 0; transform: translateY(8px); }
+  :global(.js) .fb__item.is-revealed .fb__text {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 450ms var(--ease-out) calc(var(--reveal-delay, 0ms) + 750ms),
+      transform 450ms var(--ease-out) calc(var(--reveal-delay, 0ms) + 750ms);
+  }
+
+  :global(.js) .fb__item[data-reveal] .fb__text mark { background-size: 0% 0.26em; }
+  :global(.js) .fb__item.is-revealed .fb__text mark {
+    background-size: 100% 0.26em;
+    transition: background-size 700ms var(--ease-out) calc(var(--reveal-delay, 0ms) + 1080ms);
+  }
+
+  :global(.js) .fb__item[data-reveal] .fb__heart { transform: scale(0); }
+  :global(.js) .fb__item.is-revealed .fb__heart {
+    animation: fb-heart 650ms cubic-bezier(0.17, 0.89, 0.32, 1.49) calc(var(--reveal-delay, 0ms) + 1350ms) both;
+  }
+  :global(.js) .fb__item.is-revealed .fb__heart::before {
+    animation: fb-burst 650ms ease-out calc(var(--reveal-delay, 0ms) + 1500ms) both;
+  }
+  @keyframes fb-heart {
+    0% { transform: scale(0); }
+    55% { transform: scale(1.45); }
+    100% { transform: scale(1); }
+  }
+  @keyframes fb-burst {
+    0% { opacity: 1; transform: scale(0.3); }
+    100% { opacity: 0; transform: scale(1.5); }
+  }
+
+  :global(.js) .fb__item[data-reveal] .fb__reply { opacity: 0; }
+  :global(.js) .fb__item.is-revealed .fb__reply {
+    opacity: 1;
+    transition: opacity 500ms var(--ease-out) calc(var(--reveal-delay, 0ms) + 1650ms);
+  }
+
+  /* ——— Tablette et mobile ——— */
+  @media (max-width: 1100px) {
+    .fb__wall { columns: 2; }
+  }
+  @media (max-width: 680px) {
+    .fb__wall { columns: 1; max-width: 520px; }
+    .fb__card { transform: rotate(calc(var(--rot) * 0.5)); }
+    .fb__card:hover { transform: rotate(0deg) translateY(-4px); }
+    .fb__word { top: 50%; font-size: 48vw; }
+  }
+
+  /* Mouvement réduit : tout est là d'emblée, rien ne bouge. */
+  @media (prefers-reduced-motion: reduce) {
+    .fb__hearts { display: none; }
+    :global(.js) .fb__typing { display: none; }
+    :global(.js) .fb__item[data-reveal] .fb__pop,
+    :global(.js) .fb__item[data-reveal] .fb__text { opacity: 1; transform: none; }
+    :global(.js) .fb__item[data-reveal] .fb__text mark { background-size: 100% 0.26em; }
+    :global(.js) .fb__item[data-reveal] .fb__heart,
+    :global(.js) .fb__item.is-revealed .fb__heart { transform: none; animation: none; }
+    :global(.js) .fb__item.is-revealed .fb__heart::before { animation: none; }
+    :global(.js) .fb__item[data-reveal] .fb__reply { opacity: 1; }
+    .fb__card:hover .fb__heart svg { animation: none; }
+  }
+</style>

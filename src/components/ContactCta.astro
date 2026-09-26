@@ -37,13 +37,13 @@ const { eyebrow = 'Contact', title, secondary = 'whatsapp', id = 'contact', bg }
     </div>
 
     <div class="cta__cards">
-      <div class="cta__card cta__card--accent" data-reveal>
+      <div class="cta__card cta__card--light" data-reveal>
         <Icon name="message-square-text" size={26} stroke={1.7} />
         <div>
           <h3>Demander un devis</h3>
           <p>Décrivez votre mur, votre lieu et vos délais. Réponse sous 48 h, devis gratuit.</p>
         </div>
-        <a class="btn btn--accent cta__button" href="/devis">
+        <a class="btn btn--primary cta__button" href="/devis">
           Remplir le formulaire
           <Icon name="arrow-up-right" size={14} stroke={2.2} />
         </a>
@@ -126,10 +126,15 @@ const { eyebrow = 'Contact', title, secondary = 'whatsapp', id = 'contact', bg }
   .cta__card h3 { font-size: var(--fs-h3); }
   .cta__card p { margin-top: 12px; max-width: 340px; font-size: var(--fs-body-sm); }
 
-  .cta__card--accent { background: var(--ivory); color: var(--ink); }
-  .cta__card--accent h3 { color: var(--ink); }
-  .cta__card--accent > :global(svg) { color: var(--accent-strong); }
-  .cta__card--accent .btn--accent:hover { background: var(--ink); color: var(--ivory); }
+  .cta__card--light {
+    --solid: var(--ink);
+    --solid-text: var(--ivory);
+    --focus: var(--ink);
+    background: var(--ivory);
+    color: var(--ink);
+  }
+  .cta__card--light h3 { color: var(--ink); }
+  .cta__card--light > :global(svg) { color: var(--ink); }
   .cta__card--ink {
     background: var(--ink-2);
     border: 1px solid var(--ink-line-2);
@@ -147,7 +152,7 @@ const { eyebrow = 'Contact', title, secondary = 'whatsapp', id = 'contact', bg }
     color: var(--muted-on-dark);
     word-break: break-all;
   }
-  .cta__mail:hover { color: var(--accent); }
+  .cta__mail:hover { color: var(--ivory); }
 
   @media (max-width: 860px) {
     .cta__cards { grid-template-columns: 1fr; }

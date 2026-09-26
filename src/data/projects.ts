@@ -67,7 +67,7 @@ title: 'Robotique en mouvement',
   city: 'Casablanca',
 
   excerpt:
-    'Bureaux CB Robotics — création d’une fresque murale futuriste inspirée de la robotique, de l’automatisation et des technologies RPA.',
+    'Bureaux CB Robotics : création d’une fresque murale futuriste inspirée de la robotique, de l’automatisation et des technologies RPA.',
 
   body: [
     'Pour habiller ses bureaux, CB Robotics souhaitait une fresque forte et cohérente avec son univers : la robotique, l’automatisation et les technologies tournées vers le futur.',
@@ -184,7 +184,7 @@ title: 'Robotique en mouvement',
   city: 'Casablanca',
 
   excerpt:
-    'École pour enfants — création d’une fresque murale colorée inspirée de la nature et du monde animal.',
+    'École pour enfants : création d’une fresque murale colorée inspirée de la nature et du monde animal.',
 
   body: [
     'Pour transformer les espaces de jeux en un environnement vivant et stimulant, l’équipe pédagogique souhaitait une fresque joyeuse, accessible aux enfants et propice à l’imaginaire.',
@@ -228,7 +228,7 @@ title: 'Robotique en mouvement',
   city: 'Bordeaux',
 
   excerpt:
-    'Café de quartier — création d’une fresque murale chaleureuse et inspirante autour de l’univers du café.',
+    'Café de quartier : création d’une fresque murale chaleureuse et inspirante autour de l’univers du café.',
 
   body: [
     'Pour créer une atmosphère accueillante et mémorable, le Café Nord souhaitait habiller ses murs avec une fresque originale, pensée pour accompagner les moments de pause autour d’un bon café.',
@@ -272,7 +272,7 @@ title: 'Robotique en mouvement',
   city: '',
 
   excerpt:
-    'Cabine gynécologique — une fresque en ligne art pensée comme un espace de sérénité, de confiance et de bien-être.',
+    'Cabine gynécologique : une fresque en ligne art pensée comme un espace de sérénité, de confiance et de bien-être.',
 
   body: [
     'Pour cette cabine gynécologique, l’objectif était de créer un environnement doux, rassurant et élégant, afin d’accompagner les patientes dans un moment intime avec davantage de sérénité.',
@@ -311,14 +311,14 @@ title: 'Robotique en mouvement',
 {
   slug: 'hotel-kaan-misti',
 
-  title: 'Hôtel Kaan — Misti Rooftop',
+  title: 'Hôtel Kaan · Misti Rooftop',
 
   sector: 'hotellerie',
 
   city: 'Casablanca',
 
   excerpt:
-    'Rooftop Misti — une fresque abstraite en bleu mêlant formes, lignes dynamiques et lettrage inspiré du street art.',
+    'Rooftop Misti : une fresque abstraite en bleu mêlant formes, lignes dynamiques et lettrage inspiré du street art.',
 
   body: [
     'Pour le rooftop Misti de l’Hôtel Kaan, l’objectif était de créer une identité visuelle forte, contemporaine et immédiatement reconnaissable, à la hauteur de l’atmosphère urbaine du lieu.',
@@ -345,7 +345,7 @@ title: 'Robotique en mouvement',
     surface: '',
     duration: '',
     year: '',
-    client: 'Hôtel Kaan — Misti Rooftop',
+    client: 'Hôtel Kaan · Misti Rooftop',
   },
 },
 {
@@ -358,7 +358,7 @@ title: 'Robotique en mouvement',
   city: '',
 
   excerpt:
-    'Spa et espace beauté — une fresque élégante inspirée de la Renaissance, entre figures féminines, raffinement et bien-être.',
+    'Spa et espace beauté : une fresque élégante inspirée de la Renaissance, entre figures féminines, raffinement et bien-être.',
 
   body: [
     'Pour Tsarine Beauty House, l’objectif était de créer un univers visuel élégant, apaisant et raffiné, à l’image d’un lieu dédié à la beauté et au bien-être.',

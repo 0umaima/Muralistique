@@ -31,7 +31,7 @@ for (const width of widths) {
     // Forcer l'état final des apparitions : la capture ne doit pas attraper
     // une transition en cours.
     await page.evaluate(() => {
-      document.querySelectorAll('[data-reveal], [data-reveal-rotate]').forEach((el) => {
+      document.querySelectorAll('[data-reveal]').forEach((el) => {
         el.classList.add('is-revealed');
         el.style.transition = 'none';
       });

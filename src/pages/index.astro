@@ -4,9 +4,8 @@ import Hero from '../components/home/Hero.astro';
 import Stats from '../components/home/Stats.astro';
 import Sectors from '../components/home/Sectors.astro';
 import Transformations from '../components/home/Transformations.astro';
-import Process from '../components/home/Process.astro';
 import Services from '../components/home/Services.astro';
-import Positioning from '../components/home/Positioning.astro';
+import Feedback from '../components/home/Feedback.astro';
 import ContactCta from '../components/ContactCta.astro';
 import { site } from '../data/site.mjs';
 ---
@@ -20,11 +19,10 @@ import { site } from '../data/site.mjs';
   <Hero />
   <Stats />
   <Transformations />
-  <Process />
   <Services />
   <Sectors />
-  <Positioning />
   <ContactCta title="Parlons projet." bg="projects/harmonie-verte/cover.jpeg" />
+  <Feedback />
 </BaseLayout>
 
 <script>
