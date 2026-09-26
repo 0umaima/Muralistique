@@ -298,9 +298,12 @@ const ok = (label, cond, extra = '') => {
 
   await page.goto(BASE + '/devis', { waitUntil: 'load' });
   const action = await page.$eval('[data-quote-form]', (n) => n.getAttribute('action'));
-  const enctype = await page.$eval('[data-quote-form]', (n) => n.getAttribute('enctype'));
+  const enctype = await page.$eval('[data-quote-form]', (n) => n.enctype);
   ok('formulaire postable nativement vers Basin', action === 'https://usebasin.com/f/ba3ae17d310d', action);
-  ok('enctype multipart/form-data', enctype === 'multipart/form-data', enctype);
+  ok('encodage par défaut des formulaires', enctype === 'application/x-www-form-urlencoded', enctype);
+  ok('validation native active sans JavaScript', await page.$eval('[data-quote-form]', (n) => !n.noValidate));
+  const required = await page.$$eval('[data-quote-form] [required]', (n) => n.map((e) => e.name));
+  ok('seul le téléphone est exigé', required.join() === 'phone', required.join());
   await ctx.close();
 }
 

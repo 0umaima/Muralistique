@@ -22,7 +22,8 @@ const ok = (label, cond, extra = '') => {
 
 /** Ouvre /devis avec l'endpoint Basin simulé. `respond` reçoit la route. */
 async function open(respond) {
-  const page = await browser.newPage({ viewport: { width: 1280, height: 1000 } });
+  const context = await browser.newContext({ viewport: { width: 1280, height: 1000 } });
+  const page = await context.newPage();
   page.on('pageerror', (e) => fails.push('JS error: ' + e.message));
   const captured = [];
   await page.route(ENDPOINT, async (route) => {
@@ -36,70 +37,81 @@ async function open(respond) {
     await respond(route);
   });
   await page.goto(BASE + '/devis', { waitUntil: 'networkidle' });
-  return { page, captured };
+  const close = () => context.close();
+  return { page, captured, context, close };
 }
 
 const fill = async (page, over = {}) => {
   const data = {
-    '#qf-name': 'Camille Dupont',
-    '#qf-email': 'camille@exemple.fr',
-    '#qf-city': 'Marseille',
-    '#qf-message': 'Un mur de 12 m dans le hall, ambiance végétale, chantier en soirée.',
+    '#qf-name': 'Salma Bennani',
+    '#qf-phone': '06 12 34 56 78',
+    '#qf-email': 'salma@exemple.ma',
+    '#qf-city': 'Casablanca',
+    '#qf-message': 'Un mur de 4 m dans le hall, ambiance végétale, chantier en soirée.',
     ...over,
   };
   for (const [selector, value] of Object.entries(data)) {
     if (value === null) continue;
     await page.fill(selector, value);
   }
-  await page.check('[name="consent"]');
 };
 
 const statusText = (page) => page.$eval('[data-form-status]', (n) => (n.hidden ? '' : n.textContent.trim()));
+const fallbackLinks = (page) =>
+  page.$$eval('[data-form-status] .qf-status__fallback a', (n) => n.map((a) => a.getAttribute('href')));
 
-// ─── 1. Validation française côté client ─────────────────────────────────
+// ─── 1. Validation : seul le téléphone est obligatoire ───────────────────
 {
-  const { page, captured } = await open((route) => route.fulfill({ status: 200, body: '{}' }));
+  const { page, captured, close } = await open((route) => route.fulfill({ status: 200, body: '{}' }));
   console.log('\n— Validation (aucun envoi ne doit partir)');
+
+  ok('validation native désactivée par le script', await page.$eval('[data-quote-form]', (n) => n.noValidate));
+  ok('aucune zone d’envoi de photos', (await page.$$('input[type="file"]')).length === 0);
+  ok('aucune case à cocher obligatoire', (await page.$$('[data-quote-form] input[type="checkbox"]')).length === 0);
+
+  const placeholders = await page.$$eval('[data-quote-form] [placeholder]', (n) => n.map((e) => e.placeholder).join(' | '));
+  ok('exemples marocains', /\+212/.test(placeholders) && /Casablanca/.test(placeholders) && /\.ma\b/.test(placeholders), placeholders);
+  ok('plus d’exemples français', !/\+33|Marseille|\.fr\b/.test(placeholders), placeholders);
 
   await page.click('[data-submit]');
   await page.waitForTimeout(200);
   const errors = await page.$$eval('[data-error-for]', (n) =>
     n.map((e) => [e.dataset.errorFor, e.textContent.trim()]).filter(([, t]) => t)
   );
-  const named = Object.fromEntries(errors);
-  ok('nom obligatoire signalé', Boolean(named.name), named.name);
-  ok('e-mail obligatoire signalé', Boolean(named.email), named.email);
-  ok('ville obligatoire signalée', Boolean(named.city), named.city);
-  ok('projet obligatoire signalé', Boolean(named.message), named.message);
-  ok('consentement obligatoire signalé', Boolean(named.consent), named.consent);
-  ok('messages en français', Object.values(named).every((t) => /[éèêàûô]|Ce champ|Merci|Indiquez|Décrivez/.test(t)));
+  ok('seul le téléphone est signalé', errors.length === 1 && errors[0][0] === 'phone', JSON.stringify(errors));
+  ok('message en français', /téléphone/.test(errors[0]?.[1] || ''), errors[0]?.[1]);
   ok('aucune requête envoyée', captured.length === 0, `${captured.length} requête(s)`);
-  ok('focus placé sur le premier champ invalide', await page.evaluate(() => document.activeElement?.id === 'qf-name'));
-  ok('aria-invalid posé', (await page.$eval('#qf-name', (n) => n.getAttribute('aria-invalid'))) === 'true');
+  ok('focus placé sur le téléphone', await page.evaluate(() => document.activeElement?.id === 'qf-phone'));
+  ok('aria-invalid posé', (await page.$eval('#qf-phone', (n) => n.getAttribute('aria-invalid'))) === 'true');
 
-  await page.fill('#qf-email', 'pas-une-adresse');
-  await fill(page, { '#qf-email': null });
+  await page.fill('#qf-phone', '12 34');
+  await page.click('[data-submit]');
+  await page.waitForTimeout(200);
+  const phoneError = await page.$eval('[data-error-for="phone"]', (n) => n.textContent.trim());
+  ok('numéro trop court refusé', /incomplet/.test(phoneError), phoneError);
+
+  await page.fill('#qf-phone', '+212 6 12 34 56 78');
   await page.fill('#qf-email', 'pas-une-adresse');
   await page.click('[data-submit]');
   await page.waitForTimeout(200);
   const emailError = await page.$eval('[data-error-for="email"]', (n) => n.textContent.trim());
-  ok('format d’e-mail vérifié', /valide/.test(emailError), emailError);
+  ok('e-mail facultatif, mais vérifié s’il est rempli', /laissez le champ vide/.test(emailError), emailError);
   ok('toujours aucune requête', captured.length === 0);
   await page.screenshot({ path: `${OUT}/form-validation.png`, fullPage: false });
-  await page.close();
+  await close();
 }
 
-// ─── 2. Succès — confirmé seulement après acceptation par Basin ──────────
+// ─── 2. Succès — téléphone seul, confirmé après acceptation par Basin ────
 {
   let resolveHold;
   const hold = new Promise((r) => (resolveHold = r));
-  const { page, captured } = await open(async (route) => {
+  const { page, captured, close } = await open(async (route) => {
     await hold; // on garde la requête en vol pour observer l'état « envoi »
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true }) });
   });
-  console.log('\n— Envoi accepté');
+  console.log('\n— Envoi accepté (téléphone seul)');
 
-  await fill(page);
+  await page.fill('#qf-phone', '0612345678');
   await page.click('[data-submit]');
   await page.waitForTimeout(300);
 
@@ -116,32 +128,36 @@ const statusText = (page) => page.$eval('[data-form-status]', (n) => (n.hidden ?
   ok('succès annoncé après acceptation', (await statusText(page)).includes('bien arrivée'), await statusText(page));
   ok('une seule requête envoyée', captured.length === 1, `${captured.length} requête(s)`);
   ok('méthode POST', captured[0].method === 'POST', captured[0].method);
-  ok('corps multipart/form-data', captured[0].contentType.startsWith('multipart/form-data'), captured[0].contentType);
-  ok('limite multipart posée par le navigateur', captured[0].contentType.includes('boundary='));
+  ok(
+    'corps application/x-www-form-urlencoded',
+    captured[0].contentType.startsWith('application/x-www-form-urlencoded'),
+    captured[0].contentType
+  );
   ok('en-tête Accept: application/json', captured[0].accept.includes('application/json'), captured[0].accept);
-  ok('champs présents dans le corps', /name="name"/.test(captured[0].body) && /Camille Dupont/.test(captured[0].body));
-  ok('consentement transmis', /name="consent"/.test(captured[0].body));
-  ok('piège à robots transmis vide', /name="_gotcha"/.test(captured[0].body));
+  const sent = new URLSearchParams(captured[0].body);
+  ok('téléphone transmis', sent.get('phone') === '0612345678', sent.get('phone'));
+  ok('champs facultatifs transmis vides', sent.has('name') && sent.get('name') === '');
+  ok('piège à robots transmis vide', sent.has('_gotcha') && sent.get('_gotcha') === '');
   ok('bouton verrouillé après succès', await page.$eval('[data-submit]', (n) => n.disabled));
+  ok('brouillon effacé après succès', (await page.evaluate(() => sessionStorage.getItem('muralistique:devis'))) === null);
 
   await page.click('[data-submit]', { force: true }).catch(() => {});
   await page.waitForTimeout(300);
   ok('renvoi impossible après succès', captured.length === 1, `${captured.length} requête(s)`);
   await page.screenshot({ path: `${OUT}/form-success.png` });
-  await page.close();
+  await close();
 }
 
-// ─── 3. Erreurs serveur ──────────────────────────────────────────────────
+// ─── 3. Erreurs serveur : saisie conservée + secours WhatsApp / e-mail ───
 const errorCases = [
   { label: 'quota atteint (429)', status: 429, body: '{"error":"rate limited"}', expect: /limite du service|plus de nouvelles demandes/i },
   { label: 'limite de formule (402)', status: 402, body: '{}', expect: /limite du service|plus de nouvelles demandes/i },
-  { label: 'fichiers trop lourds (413)', status: 413, body: '{}', expect: /trop lourds/i },
   { label: 'erreur serveur (500)', status: 500, body: '{}', expect: /n’a pas abouti/i },
 ];
 
 console.log('\n— Réponses en erreur (les saisies doivent être conservées)');
 for (const testCase of errorCases) {
-  const { page, captured } = await open((route) =>
+  const { page, captured, close } = await open((route) =>
     route.fulfill({ status: testCase.status, contentType: 'application/json', body: testCase.body })
   );
   await fill(page);
@@ -149,18 +165,23 @@ for (const testCase of errorCases) {
   await page.waitForTimeout(500);
   const text = await statusText(page);
   ok(testCase.label, testCase.expect.test(text), text.slice(0, 90));
-  ok(`  ↳ saisies conservées`, (await page.$eval('#qf-name', (n) => n.value)) === 'Camille Dupont');
+  ok(`  ↳ saisies conservées`, (await page.$eval('#qf-name', (n) => n.value)) === 'Salma Bennani');
+  const links = await fallbackLinks(page);
+  const wa = links.find((href) => href.startsWith('https://wa.me/')) || '';
+  const mail = links.find((href) => href.startsWith('mailto:')) || '';
+  ok(`  ↳ secours WhatsApp pré-rempli`, /^https:\/\/wa\.me\/\d{8,}\?text=/.test(wa) && decodeURIComponent(wa).includes('06 12 34 56 78'), wa.slice(0, 60));
+  ok(`  ↳ secours e-mail pré-rempli`, mail.includes('@') && decodeURIComponent(mail).includes('Salma Bennani'), mail.slice(0, 60));
   ok(`  ↳ nouvel essai possible`, (await page.$eval('[data-submit]', (n) => n.disabled)) === false);
   await page.click('[data-submit]');
   await page.waitForTimeout(400);
   ok(`  ↳ un nouvel envoi part bien`, captured.length === 2, `${captured.length} requête(s)`);
   if (testCase.status === 429) await page.screenshot({ path: `${OUT}/form-error.png` });
-  await page.close();
+  await close();
 }
 
 // ─── 4. Erreurs de validation renvoyées par Basin (422) ──────────────────
 {
-  const { page } = await open((route) =>
+  const { page, close } = await open((route) =>
     route.fulfill({
       status: 422,
       contentType: 'application/json',
@@ -174,13 +195,17 @@ for (const testCase of errorCases) {
   const emailError = await page.$eval('[data-error-for="email"]', (n) => n.textContent.trim());
   ok('erreur reportée sur le champ concerné', emailError.includes('adresse valide'), emailError);
   ok('récapitulatif affiché', (await statusText(page)).includes('n’ont pas été acceptés'));
-  await page.close();
+  await close();
 }
 
 // ─── 5. Réponse 2xx mais succès explicitement faux ───────────────────────
 {
-  const { page } = await open((route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: false, error: 'Formulaire désactivé' }) })
+  const { page, close } = await open((route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: false, error: '<b>Formulaire désactivé</b>' }),
+    })
   );
   console.log('\n— Réponse 200 avec success: false');
   await fill(page);
@@ -189,133 +214,70 @@ for (const testCase of errorCases) {
   const text = await statusText(page);
   ok('pas de faux succès', !text.includes('bien arrivée'), text.slice(0, 80));
   ok('message d’erreur du service repris', text.includes('Formulaire désactivé'), text.slice(0, 80));
-  await page.close();
+  ok('message du service affiché comme texte, jamais comme HTML', (await page.$$('[data-form-status] b')).length === 0);
+  await close();
 }
 
 // ─── 6. Panne réseau ─────────────────────────────────────────────────────
 {
-  const { page } = await open((route) => route.abort('failed'));
+  const { page, close } = await open((route) => route.abort('failed'));
   console.log('\n— Réseau coupé');
   await fill(page);
   await page.click('[data-submit]');
   await page.waitForTimeout(600);
   const text = await statusText(page);
   ok('message réseau affiché', /connexion/i.test(text), text.slice(0, 80));
-  ok('saisies conservées', (await page.$eval('#qf-message', (n) => n.value)).startsWith('Un mur de 12 m'));
+  ok('secours proposé', (await fallbackLinks(page)).length === 2);
+  ok('saisies conservées', (await page.$eval('#qf-message', (n) => n.value)).startsWith('Un mur de 4 m'));
   ok('nouvel essai possible', (await page.$eval('[data-submit]', (n) => n.disabled)) === false);
-  await page.close();
+  await close();
 }
 
-// ─── 7. Limites de fichiers ──────────────────────────────────────────────
+// ─── 7. Hors connexion : rien ne part, le secours est proposé ────────────
 {
-  const { page, captured } = await open((route) =>
+  const { page, captured, context, close } = await open((route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '{"success":true}' })
   );
-  console.log('\n— Photos jointes');
-
-  const makeFile = (name, bytes, mime = 'image/jpeg') => ({
-    name,
-    mimeType: mime,
-    buffer: Buffer.alloc(bytes, 1),
-  });
-
-  const clearFiles = async () => {
-    await page.evaluate(() => {
-      let button;
-      while ((button = document.querySelector('.qf-files__remove'))) button.click();
-    });
-    await page.waitForTimeout(150);
-  };
-
-  // fichier trop lourd
-  await page.setInputFiles('#qf-photos', [makeFile('mur-lourd.jpg', 900 * 1024)]);
-  await page.waitForTimeout(250);
-  let error = await page.$eval('[data-error-for="photos"]', (n) => n.textContent.trim());
-  ok('fichier > 750 Ko refusé', /750 Ko|maximum/.test(error), error.slice(0, 80));
-  ok('  ↳ non ajouté à la liste', (await page.$$eval('.qf-files__item', (n) => n.length)) === 0);
-
-  // mauvais format
-  await page.setInputFiles('#qf-photos', [makeFile('plan.pdf', 10 * 1024, 'application/pdf')]);
-  await page.waitForTimeout(250);
-  error = await page.$eval('[data-error-for="photos"]', (n) => n.textContent.trim());
-  ok('format non accepté refusé', /bon format/.test(error), error.slice(0, 80));
-  ok('  ↳ non ajouté à la liste', (await page.$$eval('.qf-files__item', (n) => n.length)) === 0);
-
-  // deux fichiers valides
-  await clearFiles();
-  await page.setInputFiles('#qf-photos', [makeFile('mur-1.jpg', 300 * 1024), makeFile('mur-2.png', 300 * 1024, 'image/png')]);
-  await page.waitForTimeout(300);
-  let items = await page.$$eval('.qf-files__item', (n) => n.length);
-  ok('deux photos listées', items === 2, `${items}`);
-  ok('aucune erreur', (await page.$eval('[data-error-for="photos"]', (n) => n.textContent.trim())) === '');
-  const summary = await page.$eval('[data-file-list]', (n) => n.textContent);
-  ok('récapitulatif de poids affiché', /sur 1,5 Mo/.test(summary), summary.slice(-40));
-
-  // troisième fichier refusé (limite de 2)
-  await page.setInputFiles('#qf-photos', [makeFile('mur-3.jpg', 100 * 1024)]);
-  await page.waitForTimeout(300);
-  items = await page.$$eval('.qf-files__item', (n) => n.length);
-  ok('3e photo non ajoutée', items === 2, `${items}`);
-
-  // retrait
-  await page.click('.qf-files__item .qf-files__remove');
-  await page.waitForTimeout(250);
-  items = await page.$$eval('.qf-files__item', (n) => n.length);
-  ok('retrait d’une photo', items === 1, `${items}`);
-  await page.screenshot({ path: `${OUT}/form-files.png` });
-
-  // Total combiné : avec 2 photos à 750 Ko maximum (1 500 Ko), le plafond
-  // combiné de 1,5 Mo (1 536 Ko) n'est jamais franchi — c'est la limite par
-  // fichier qui borne l'envoi. On vérifie donc que le cas maximal passe et
-  // que le récapitulatif affiche bien le total.
-  await clearFiles();
-  await page.setInputFiles('#qf-photos', [makeFile('a.jpg', 748 * 1024), makeFile('b.jpg', 748 * 1024)]);
-  await page.waitForTimeout(300);
-  error = await page.$eval('[data-error-for="photos"]', (n) => n.textContent.trim());
-  items = await page.$$eval('.qf-files__item', (n) => n.length);
-  ok('cas maximal (2 × 748 Ko) accepté', error === '' && items === 2, `${items} photo(s) — ${error}`);
-  const totalText = await page.$eval('[data-file-list]', (n) => n.textContent);
-  ok('total affiché par rapport au plafond', /sur 1,5 Mo/.test(totalText), totalText.slice(-30));
-
-  // Envoi final avec une photo valide jointe.
-  await clearFiles();
-  await page.setInputFiles('#qf-photos', [makeFile('mur-final.jpg', 200 * 1024)]);
-  await page.waitForTimeout(250);
+  console.log('\n— Hors connexion');
   await fill(page);
+  await context.setOffline(true);
   await page.click('[data-submit]');
-  await page.waitForTimeout(800);
-  ok('envoi accepté avec une photo jointe', captured.length === 1, `${captured.length} requête(s)`);
-  ok('photo transmise dans le multipart', /name="photos\[\]"/.test(captured[0]?.body || ''));
-  ok('nom du fichier transmis', /mur-final\.jpg/.test(captured[0]?.body || ''));
-  await page.close();
+  await page.waitForTimeout(300);
+  const text = await statusText(page);
+  ok('message hors connexion', /hors connexion/i.test(text), text.slice(0, 80));
+  ok('aucune requête tentée', captured.length === 0, `${captured.length} requête(s)`);
+  ok('bouton toujours actif', (await page.$eval('[data-submit]', (n) => n.disabled)) === false);
+  await context.setOffline(false);
+  await close();
 }
 
-// ─── 8. Plafond combiné ──────────────────────────────────────────────────
-// Avec 2 photos à 750 Ko, le total (1 500 Ko) ne franchit jamais 1,5 Mo :
-// c'est la limite par fichier qui borne l'envoi. On sert donc la page réelle
-// avec un plafond combiné abaissé pour vérifier que la règle s'applique.
+// ─── 8. Service muet : on n'attend pas indéfiniment ──────────────────────
 {
-  const page = await browser.newPage({ viewport: { width: 1280, height: 1000 } });
-  page.on('pageerror', (e) => fails.push('JS error: ' + e.message));
-  await page.route(BASE + '/devis', async (route) => {
-    const response = await route.fetch();
-    const html = (await response.text()).replace(
-      /data-max-total-bytes="\d+"/,
-      `data-max-total-bytes="${900 * 1024}"`
-    );
-    await route.fulfill({ response, body: html });
-  });
-  await page.goto(BASE + '/devis', { waitUntil: 'networkidle' });
-  console.log('\n— Plafond combiné (page servie avec un plafond abaissé à 900 Ko)');
+  const { page, close } = await open(() => new Promise(() => {})); // jamais de réponse
+  console.log('\n— Service qui ne répond pas (≈ 20 s)');
+  await fill(page);
+  await page.click('[data-submit]');
+  await page.waitForTimeout(21000);
+  const text = await statusText(page);
+  ok('délai dépassé annoncé', /ne répond pas/.test(text), text.slice(0, 80));
+  ok('secours proposé', (await fallbackLinks(page)).length === 2);
+  ok('nouvel essai possible', (await page.$eval('[data-submit]', (n) => n.disabled)) === false);
+  await close();
+}
 
-  const file = (name, bytes) => ({ name, mimeType: 'image/jpeg', buffer: Buffer.alloc(bytes, 1) });
-  await page.setInputFiles('#qf-photos', [file('a.jpg', 600 * 1024), file('b.jpg', 600 * 1024)]);
-  await page.waitForTimeout(350);
-  const error = await page.$eval('[data-error-for="photos"]', (n) => n.textContent.trim());
-  const items = await page.$$eval('.qf-files__item', (n) => n.length);
-  ok('2e photo refusée sur le total combiné', /total autorisé/.test(error), error.slice(0, 90));
-  ok('  ↳ une seule photo conservée', items === 1, `${items}`);
-  await page.close();
+// ─── 9. Brouillon : la saisie survit à un rechargement de l'onglet ───────
+{
+  const { page, close } = await open((route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '{"success":true}' })
+  );
+  console.log('\n— Brouillon conservé au rechargement');
+  await fill(page);
+  await page.click('.qf__budgets label:nth-child(3)');
+  await page.reload({ waitUntil: 'networkidle' });
+  ok('téléphone restauré', (await page.$eval('#qf-phone', (n) => n.value)) === '06 12 34 56 78');
+  ok('projet restauré', (await page.$eval('#qf-message', (n) => n.value)).startsWith('Un mur de 4 m'));
+  ok('budget restauré', (await page.$eval('input[name="budget"]:checked', (n) => n.value).catch(() => '')) === '5 000 à 10 000 Dh');
+  await close();
 }
 
 console.log(fails.length ? `\n✗ ${fails.length} échec(s) : ${fails.join(' | ')}` : '\n✓ tous les tests du formulaire passent');

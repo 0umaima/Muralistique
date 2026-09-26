@@ -92,7 +92,7 @@ Résumé :
 | Dossier | Contenu |
 | --- | --- |
 | `brand/` | `og.jpg` (1200 × 630, partage réseaux sociaux). Le logo, lui, est du texte (`src/components/Logo.astro`) |
-| `home/` | Fond fixe du hero (éclaboussure de peinture blanche sur mur neutre) + les trois visuels du collage (gauche, GIF central, droite) |
+| `home/` | Fond fixe du hero (pinceaux d'atelier) + les trois visuels du collage (gauche, GIF central, droite) |
 | `services/` | Fresque, toile, performance |
 | `studio/` | Photo du hero (les images d'atelier restent disponibles pour la mosaïque, voir `studio.gallery` dans `src/data/content.ts`) |
 | `projects/<slug>/` | `cover.jpg`, `avant.jpg`, `apres.jpg`, `1.jpg`, `2.jpg` |
@@ -127,40 +127,57 @@ node scripts/generate-placeholders.mjs
 
 ### Fonctionnement
 
-- Envoi en `POST` **`multipart/form-data`** — indispensable pour les pièces
-  jointes. Le `Content-Type` n'est jamais fixé à la main : c'est le navigateur
-  qui écrit la limite (« boundary ») multipart.
+- Envoi en `POST`, encodage par défaut des formulaires
+  (`application/x-www-form-urlencoded`) — il n'y a plus de pièce jointe.
 - En-tête `Accept: application/json` pour obtenir une réponse JSON.
 - **Le succès n'est annoncé qu'après acceptation par Basin.** Une réponse
   d'erreur, une réponse `success: false` ou une coupure réseau affichent un
   message d'échec, jamais une confirmation.
 - **Sans JavaScript**, le formulaire reste un `<form action="…" method="post">`
-  classique : le navigateur l'envoie lui-même et Basin affiche sa page de
-  confirmation.
-- Champs obligatoires : **nom, e-mail, ville, description, consentement**.
-  Validation en français, focus placé sur le premier champ en défaut,
-  `aria-invalid` et messages liés par `aria-describedby`.
+  classique : le navigateur exige le téléphone (`required`), l'envoie lui-même
+  et Basin affiche sa page de confirmation.
+- **Seul le téléphone est obligatoire** (8 à 15 chiffres, séparateurs libres :
+  `06 12 34 56 78`, `+212 6 12 34 56 78`, un numéro étranger…). L'e-mail est
+  facultatif mais vérifié s'il est rempli. Validation en français, focus placé
+  sur le champ en défaut, `aria-invalid` et messages liés par
+  `aria-describedby`.
+- Une phrase d'information remplace la case de consentement (qui aurait été un
+  second champ obligatoire).
 - **Aucun double envoi** : le bouton est verrouillé pendant la requête et après
   un succès.
-- **Les saisies sont conservées** en cas d'échec — rien à ressaisir.
-- Champ piège anti-spam `_gotcha`, invisible pour les visiteurs.
+- Champ piège anti-spam `_gotcha`, invisible pour les visiteurs, et ignoré
+  par les gestionnaires de mots de passe (attributs `data-lpignore`,
+  `data-1p-ignore`, `data-bwignore`) : Basin **supprime sans prévenir** toute
+  demande où il est rempli.
 
-### Pièces jointes
+### Ce qui empêcherait une demande d'arriver — et la parade
 
-Limites appliquées **dans le navigateur**, configurables dans
-`src/data/site.mjs` → `form.uploads` :
+| Situation | Ce que fait le site |
+| --- | --- |
+| Réseau coupé, requête bloquée | Message clair, saisie conservée, bouton de nouvel essai |
+| Visiteur hors connexion | Rien ne part, message immédiat, saisie conservée |
+| Basin ne répond pas (réseau mobile instable) | Abandon au bout de 20 s au lieu d'un « Envoi en cours… » infini |
+| Refus de Basin (quota `429`/`402`/`403`, erreur `5xx`, `success: false`) | Message traduit, saisie conservée |
+| Tous les échecs ci-dessus | Boutons **« Envoyer par WhatsApp »** et **« Envoyer par e-mail »**, message pré-rempli avec toutes les réponses |
+| Page rechargée par le téléphone pendant la saisie (passage dans une autre appli) | Brouillon gardé le temps de l'onglet (`sessionStorage`), effacé après un envoi réussi |
+| Case obligatoire oubliée, formulaire abandonné | Un seul champ exigé : le téléphone |
+| Honeypot rempli par un gestionnaire de mots de passe | Attributs d'exclusion sur le champ piège |
 
-- 2 photos maximum ;
-- 750 Ko par photo ;
-- 1,5 Mo au total ;
-- JPEG, PNG ou WebP uniquement.
+**À vérifier côté Basin** (le site ne peut pas le voir) :
 
-Un fichier hors limites est **refusé à l'ajout** avec la raison précise, et
-chaque photo acceptée peut être retirée d'un clic.
-
-> ⚠️ Ces limites servent à éviter les envois trop lourds. **Elles ne remplacent
-> pas et ne garantissent pas** le plafond de stockage du compte Basin, qui
-> reste défini côté Basin. Vérifiez-le dans votre tableau de bord.
+1. **Dossier Spam de Basin** : une vraie demande jugée suspecte y atterrit
+   (conservée 30 jours) au lieu de la boîte de réception. À consulter
+   régulièrement.
+2. **Notifications e-mail** : adresse de destination confirmée dans Basin ;
+   vérifier le dossier Spam de Gmail et ajouter l'expéditeur de Basin aux
+   contacts.
+3. **Domaines autorisés** : s'ils sont restreints, y inscrire le domaine
+   définitif **et** celui des aperçus (`*.workers.dev`), sinon les envois
+   depuis ces adresses sont refusés.
+4. **Captcha** (reCAPTCHA, hCaptcha, Turnstile) : doit rester **désactivé**
+   pour ce formulaire — il n'en affiche aucun, chaque envoi serait refusé.
+5. **Quota mensuel** de la formule : au-delà, Basin refuse les demandes (le
+   site bascule alors sur WhatsApp / e-mail, voir ci-dessus).
 
 ### Quota et coupure du formulaire
 
@@ -169,8 +186,8 @@ X demandes ce mois-ci » sans accès à l'état réel de Basin serait faux. À l
 place :
 
 - les réponses d'erreur documentées sont traduites en messages clairs —
-  `429` / `402` / `403` → « limite du service atteinte », `413` → fichiers trop
-  lourds, `422` → erreurs de champ reportées sur les champs concernés ;
+  `429` / `402` / `403` → « limite du service atteinte », `422` → erreurs de
+  champ reportées sur les champs concernés ;
 - un **interrupteur manuel** permet de fermer le formulaire :
 
   ```js
@@ -187,19 +204,19 @@ Dans tous les cas d'échec, l'alternative **WhatsApp / e-mail** reste proposée.
 La documentation officielle de Basin (`usebasin.com` et `docs.usebasin.com`)
 est **bloquée par le proxy réseau de l'environnement de développement** : elle
 n'a pas pu être consultée pendant l'intégration. Le code suit le comportement
-publié et documenté de Basin (endpoint `usebasin.com/f/<id>`, `multipart/form-data`,
-`Accept: application/json`) et reste **volontairement défensif** : il n'annonce
-un succès que sur une réponse 2xx sans `success: false`, et gère plusieurs
-formes de corps d'erreur.
+publié et documenté de Basin (endpoint `usebasin.com/f/<id>`, corps de
+formulaire classique, `Accept: application/json`) et reste **volontairement
+défensif** : il n'annonce un succès que sur une réponse 2xx sans
+`success: false`, et gère plusieurs formes de corps d'erreur.
 
 **Aucun envoi réel n'a été effectué vers Basin.** Les tests utilisent des
 réponses simulées. Avant la mise en ligne, faites **un envoi de test manuel**
 et vérifiez :
 
-1. que la demande arrive bien dans le tableau de bord Basin ;
-2. que la photo jointe est bien reçue ;
+1. que la demande arrive bien dans le tableau de bord Basin **et** par e-mail ;
+2. qu'une demande avec **le téléphone seul** arrive aussi ;
 3. les libellés des champs (`name`, `phone`, `email`, `city`, `space_type`,
-   `budget`, `start_date`, `message`, `photos[]`, `consent`) ;
+   `budget`, `start_date`, `message`) ;
 4. le comportement réel en cas de quota atteint, et ajustez au besoin les codes
    d'erreur dans `src/scripts/quote-form.ts` (fonction `describeFailure`).
 
@@ -257,7 +274,8 @@ scripts/             Outils de développement (placeholders, captures, tests)
   (`--brand: #FBBE67`) n'apparaît que par **touches minuscules** : le logo, le
   filet des repères de section, les étincelles des sur-titres sur fond sombre,
   les petits carrés de secteur, les cœurs et les soulignés des retours
-  clients. Jamais en fond de carte ou de bouton. Les sections alternent blanc,
+  clients — et, plus largement, le titre et les traits de pinceau du hero de
+  l'accueil. Jamais en fond de carte ou de bouton. Les sections alternent blanc,
   noir et photos assombries.
 - Typographies : **Big Shoulders Display** (titres, navigation, boutons — en
   capitales étroites, comme le logo) + **Manrope** (textes courants). La police
@@ -293,8 +311,8 @@ fermeture par Échap, focus rendu au bouton, défilement de page bloqué.
 
 - Apparitions au défilement : fondu + 24 px vers le haut, 700 ms, léger
   décalage en cascade, **une seule fois par chargement**.
-- Hero de l'accueil : trois grands visuels (angles francs) sur une
-  éclaboussure de peinture ; ils se découvrent **presque d'un coup** (50 ms
+- Hero de l'accueil : trois grands visuels (angles francs) sur un fond de
+  pinceaux d'atelier ; ils se découvrent **presque d'un coup** (50 ms
   d'écart, sans aplat de couleur) pendant que le titre monte : tout est en
   place en ~0,6 s.
 - Carrousel des secteurs (`src/scripts/carousel.ts`) : rail défilant natif,
@@ -408,8 +426,9 @@ Puis, **avec `npm run preview` lancé dans un autre terminal** :
 npm run test:interactions   # filtres et grille, visionneuse, carrousel, accordéon,
                             # comparateur, navigation mobile, mouvement réduit,
                             # sans JavaScript
-npm run test:form           # formulaire : validation, états d'envoi, limites de
-                            # fichiers, erreurs serveur — réponses SIMULÉES
+npm run test:form           # formulaire : validation, états d'envoi, erreurs
+                            # serveur, hors ligne, délai, secours WhatsApp,
+                            # brouillon — réponses SIMULÉES
 npm run test:a11y           # 360/768/1024/1440 px, clavier, sémantique, métadonnées
 ```
 

@@ -200,6 +200,18 @@ const works = studio.works.flatMap(({ slug, image }) => {
     to { transform: none; }
   }
 
+  /* Écran plus large que la photo (ordinateur, tablette ou téléphone à
+     l'horizontale) : la photo déborde en hauteur et perdait le haut — la tête —
+     sous l'en-tête. On la cale donc sous l'en-tête, alignée par le haut.
+     En portrait, le cadrage d'origine reste inchangé. */
+  @media (orientation: landscape) {
+    .shero :global(.shero__bg .fixed-bg__layer) {
+      top: var(--header-h);
+      height: calc(100lvh - var(--header-h));
+    }
+    .shero :global(.shero__bg img) { object-position: 62% 0%; }
+  }
+
   /* Voile en dégradé : le nom reste lisible quelle que soit la photo posée. */
   .shero__shade {
     position: absolute;

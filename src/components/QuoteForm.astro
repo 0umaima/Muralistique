@@ -1,11 +1,11 @@
 ---
 import Icon from '../components/Icon.astro';
-import { site } from '../data/site.mjs';
+import { site, whatsappUrl } from '../data/site.mjs';
 import { quoteOptions } from '../data/content';
 
-const { endpoint, uploads, formEnabled, disabledMessage } = site.form;
-const kb = (bytes: number) => Math.round(bytes / 1024);
-const mb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1).replace('.', ',');
+const { endpoint, formEnabled, disabledMessage } = site.form;
+// Contacts directs proposés si l'envoi échoue (message pré-rempli avec les réponses).
+const whatsappDigits = whatsappUrl() ? site.contact.whatsappNumber.replace(/[^\d]/g, '') : '';
 ---
 
 {
@@ -24,76 +24,85 @@ const mb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1).replace('.', ',
       data-quote-form
       action={endpoint}
       method="post"
-      enctype="multipart/form-data"
       accept-charset="UTF-8"
-      novalidate
-      data-max-files={uploads.maxFiles}
-      data-max-file-bytes={uploads.maxFileBytes}
-      data-max-total-bytes={uploads.maxTotalBytes}
-      data-accept={uploads.accept.join(',')}
-      data-accept-label={uploads.acceptLabel}
+      data-whatsapp={whatsappDigits}
+      data-email={site.contact.email}
     >
-      {/* Piège à robots : invisible pour une personne, rempli par les scripts de spam. */}
+      {/* Piège à robots : invisible pour une personne, rempli par les scripts de spam.
+          Basin supprime sans prévenir toute demande où il est rempli : les
+          attributs data-*-ignore empêchent les gestionnaires de mots de passe
+          (LastPass, 1Password, Bitwarden, Dashlane) de le remplir à la place
+          d'un vrai visiteur. */}
       <p class="qf-honeypot" aria-hidden="true">
         <label for="qf-gotcha">Ne remplissez pas ce champ</label>
-        <input id="qf-gotcha" type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
+        <input
+          id="qf-gotcha"
+          type="text"
+          name="_gotcha"
+          tabindex="-1"
+          autocomplete="off"
+          data-lpignore="true"
+          data-1p-ignore
+          data-bwignore
+          data-form-type="other"
+        />
       </p>
 
       <div class="qf__row">
         <p class="field">
-          <label class="field__label" for="qf-name">Nom <abbr title="obligatoire">*</abbr></label>
+          <label class="field__label" for="qf-name">Nom</label>
           <input
             class="field__input"
             id="qf-name"
             name="name"
             type="text"
-            placeholder="Prénom Nom"
+            placeholder="Salma Bennani"
             autocomplete="name"
-            required
             aria-describedby="qf-name-error"
           />
           <span class="field__error" id="qf-name-error" data-error-for="name"></span>
         </p>
 
         <p class="field">
-          <label class="field__label" for="qf-phone">Téléphone</label>
+          <label class="field__label" for="qf-phone">Téléphone <abbr title="obligatoire">*</abbr></label>
           <input
             class="field__input"
             id="qf-phone"
             name="phone"
             type="tel"
-            placeholder="+33 6 00 00 00 00"
+            inputmode="tel"
+            placeholder="+212 6 12 34 56 78"
             autocomplete="tel"
+            required
+            minlength="8"
             aria-describedby="qf-phone-error"
           />
           <span class="field__error" id="qf-phone-error" data-error-for="phone"></span>
         </p>
 
         <p class="field">
-          <label class="field__label" for="qf-email">E-mail <abbr title="obligatoire">*</abbr></label>
+          <label class="field__label" for="qf-email">E-mail</label>
           <input
             class="field__input"
             id="qf-email"
             name="email"
             type="email"
-            placeholder="vous@exemple.fr"
+            placeholder="salma@exemple.ma"
             autocomplete="email"
-            required
             aria-describedby="qf-email-error"
           />
           <span class="field__error" id="qf-email-error" data-error-for="email"></span>
         </p>
 
         <p class="field">
-          <label class="field__label" for="qf-city">Ville <abbr title="obligatoire">*</abbr></label>
+          <label class="field__label" for="qf-city">Ville</label>
           <input
             class="field__input"
             id="qf-city"
             name="city"
             type="text"
-            placeholder="Marseille"
+            placeholder="Casablanca"
             autocomplete="address-level2"
-            required
             aria-describedby="qf-city-error"
           />
           <span class="field__error" id="qf-city-error" data-error-for="city"></span>
@@ -130,60 +139,21 @@ const mb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1).replace('.', ',
       </p>
 
       <p class="field">
-        <label class="field__label" for="qf-message">Votre projet <abbr title="obligatoire">*</abbr></label>
+        <label class="field__label" for="qf-message">Votre projet</label>
         <textarea
           class="field__input field__input--area"
           id="qf-message"
           name="message"
           rows={5}
-          placeholder="Surface approximative, ambiance souhaitée, contraintes de chantier, échéance…"
-          required
+          placeholder="Ex. : un mur de 4 × 3 m dans un café à Rabat, ambiance végétale, travaux possibles le soir, ouverture prévue avant l’été…"
           aria-describedby="qf-message-error"
         />
         <span class="field__error" id="qf-message-error" data-error-for="message"></span>
       </p>
 
-      {/* ——— Photos ——— */}
-      <div class="qf-files">
-        <div class="qf-files__drop">
-          <span class="qf-files__icon" aria-hidden="true">
-            <Icon name="image-plus" size={18} stroke={1.8} />
-          </span>
-          <div class="qf-files__text">
-            <label class="qf-files__label" for="qf-photos">Ajouter des photos du mur (facultatif)</label>
-            <p class="qf-files__hint" id="qf-photos-hint">
-              {uploads.acceptLabel} · {uploads.maxFiles} fichiers maximum · {kb(uploads.maxFileBytes)} Ko par fichier
-              · {mb(uploads.maxTotalBytes)} Mo au total.
-            </p>
-          </div>
-          <input
-            class="qf-files__input"
-            id="qf-photos"
-            name="photos[]"
-            type="file"
-            multiple
-            accept={uploads.accept.join(',')}
-            aria-describedby="qf-photos-hint qf-photos-error"
-          />
-        </div>
-
-        <ul class="qf-files__list" data-file-list hidden></ul>
-        <p class="field__error" id="qf-photos-error" data-error-for="photos"></p>
-        <p class="qf-files__note muted">
-          Ces limites s’appliquent dans votre navigateur pour éviter les envois trop lourds. Elles ne remplacent pas
-          les limites de stockage du service de réception des formulaires.
-        </p>
-      </div>
-
-      <p class="qf-consent field">
-        <label class="check">
-          <input type="checkbox" name="consent" value="oui" required aria-describedby="qf-consent-error" />
-          <span>
-            J’accepte que mes données soient utilisées uniquement dans le cadre du traitement de ma demande de devis.
-            <abbr title="obligatoire">*</abbr>
-          </span>
-        </label>
-        <span class="field__error" id="qf-consent-error" data-error-for="consent"></span>
+      <p class="qf-consent muted">
+        En envoyant ce formulaire, vous acceptez que vos coordonnées soient utilisées uniquement pour répondre à
+        votre demande de devis.
       </p>
 
       <div class="qf__actions">
@@ -192,11 +162,11 @@ const mb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1).replace('.', ',
           <Icon name="arrow-up-right" size={14} stroke={2.2} class="qf__submit-arrow" />
           <Icon name="loader-circle" size={16} stroke={2.2} class="qf__spinner" />
         </button>
-        <p class="qf__required muted"><abbr title="obligatoire">*</abbr> Champs obligatoires</p>
+        <p class="qf__required muted"><abbr title="obligatoire">*</abbr> Seul le téléphone est obligatoire</p>
       </div>
 
       <!-- Récapitulatif d'erreurs global : annoncé aux lecteurs d'écran. -->
-      <div class="qf-status" data-form-status role="status" aria-live="polite" hidden></div>
+      <div class="qf-status" data-form-status role="status" aria-live="polite" tabindex="-1" hidden></div>
     </form>
   )
 }
@@ -297,80 +267,8 @@ const mb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1).replace('.', ',
 
   .qf__date { max-width: 260px; }
 
-  /* ——— Photos ——— */
-  .qf-files { display: flex; flex-direction: column; gap: 12px; }
-  .qf-files__drop {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 20px;
-    border: 1px dashed var(--ink);
-    border-radius: 14px;
-    background: var(--ivory-2);
-    flex-wrap: wrap;
-  }
-  .qf-files__icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 46px;
-    height: 46px;
-    border-radius: 12px;
-    border: 1px solid var(--ink);
-    flex: none;
-  }
-  .qf-files__text { flex: 1; min-width: 200px; }
-  .qf-files__label { font-size: var(--fs-body-sm); font-weight: 600; cursor: pointer; }
-  .qf-files__hint { margin-top: 4px; font-size: var(--fs-xs); color: var(--muted-on-light); }
-  .qf-files__input { flex: none; max-width: 100%; font-size: var(--fs-xs); }
-  .qf-files__note { font-size: var(--fs-xs); line-height: 1.5; }
-
-  .qf-files__list { display: flex; flex-direction: column; gap: 8px; }
-  .qf-files__list[hidden] { display: none; }
-  /* Ces éléments sont créés par le script : sélecteurs globaux obligatoires. */
-  .qf-files__list :global(.qf-files__item) {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px 10px 16px;
-    border: 1px solid var(--ink);
-    border-radius: 12px;
-    background: var(--ivory);
-    font-size: var(--fs-xs);
-  }
-  .qf-files__list :global(.qf-files__name) {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .qf-files__list :global(.qf-files__size) { color: var(--muted-on-light); flex: none; }
-  .qf-files__list :global(.qf-files__remove) {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 12px;
-    border: 1px solid var(--ink);
-    border-radius: 100px;
-    background: transparent;
-    font: 600 var(--fs-xs) / 1 var(--font-body);
-    flex: none;
-  }
-  .qf-files__list :global(.qf-files__remove:hover) { background: var(--ink); color: var(--ivory); }
-
   /* ——— Consentement & envoi ——— */
-  .check {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    cursor: pointer;
-    font-size: var(--fs-small);
-    color: var(--muted-on-light);
-    line-height: 1.5;
-  }
-  .check input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--ink); flex: none; }
-  .check abbr { color: var(--ink); text-decoration: none; border: 0; }
+  .qf-consent { font-size: var(--fs-small); line-height: 1.5; }
 
   .qf__actions { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
   .qf__submit { padding: 19px 34px; font-size: var(--fs-body-sm); }
@@ -399,6 +297,26 @@ const mb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1).replace('.', ',
   .qf-status[data-tone='success'] { border: 1px solid var(--ink); background: var(--ink); color: var(--ivory); }
   .qf-status a { text-decoration: underline; text-underline-offset: 3px; }
   .qf-status :global(svg) { flex: none; margin-top: 2px; }
+  .qf-status:focus { outline: none; }
+  /* Contacts directs proposés après un échec (créés par le script). */
+  .qf-status :global(.qf-status__fallback) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .qf-status :global(.qf-status__fallback a) {
+    display: inline-flex;
+    align-items: center;
+    padding: 11px 18px;
+    border: 1px solid currentColor;
+    border-radius: 100px;
+    font: 700 0.875rem/1 var(--font-display);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+  .qf-status :global(.qf-status__fallback a:first-child) { background: #6d2415; border-color: #6d2415; color: var(--ivory); }
 
   .qf-closed {
     display: flex;
