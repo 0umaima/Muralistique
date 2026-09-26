@@ -29,7 +29,7 @@ const {
 
 const canonical = new URL(Astro.url.pathname.replace(/\/+$/, '') || '/', Astro.site ?? site.url).href;
 const ogUrl = new URL(asset(ogImage).src, Astro.site ?? site.url).href;
-const fullTitle = title === site.name ? `${site.name} — Fresques murales sur mesure` : `${title} — ${site.name}`;
+const fullTitle = title === site.name ? `${site.name} | Fresques murales sur mesure` : `${title} | ${site.name}`;
 ---
 
 <!doctype html>

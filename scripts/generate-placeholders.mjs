@@ -137,8 +137,6 @@ const JOBS = [
   ['services/fresque.jpg', 1236, 680, 'Fresque', { tone: 'dark' }],
   ['services/toile.jpg', 1236, 680, 'Toile', { tone: 'dark' }],
   ['services/performance.jpg', 1236, 680, 'Performance', { tone: 'dark' }],
-  // — Témoignage ————————————————————————————————————————
-  ['people/temoignage.jpg', 520, 520, 'Portrait client'],
   // — Studio ————————————————————————————————————————————
   ['studio/hero.jpg', 2132, 1760, 'Amine en train de peindre', { tone: 'dark' }],
   ['studio/founder.jpg', 1440, 1640, 'Amine en train de dessiner'],

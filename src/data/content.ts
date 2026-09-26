@@ -1,11 +1,11 @@
 /**
  * ============================================================================
- *  TEXTES DU SITE — chiffres clés, processus, services, témoignage, studio.
+ *  TEXTES DU SITE : chiffres clés, services, retours clients, studio.
  * ============================================================================
  *  Tous les textes proviennent de la maquette. Modifiez-les librement ici :
  *  ils sont utilisés tels quels par les composants.
- *  ⚠ Les chiffres du bloc « statistiques » et le témoignage sont des exemples
- *    de maquette — À VÉRIFIER / REMPLACER par vos données réelles.
+ *  ⚠ Les chiffres du bloc « statistiques » sont des exemples de maquette :
+ *    À VÉRIFIER / REMPLACER par vos données réelles.
  * ============================================================================
  */
 
@@ -18,57 +18,6 @@ export const stats = [
   { value: '15 j', label: 'Du croquis à la livraison', shortLabel: 'Croquis → livraison' },
 ];
 
-/** Les cinq étapes de la section #processus (accueil). */
-export const processSteps = [
-  {
-    number: '01',
-    title: 'Visite & brief',
-    text: 'Relevé du mur, contraintes du lieu, attentes du public.',
-    /** Ambiance de la carte : 'ivory' | 'ink' | 'accent' (vermillon). */
-    tone: 'ivory' as const,
-    icon: 'map' as const,
-    /** Rotation de départ de l'animation d'entrée. */
-    rotate: -5,
-    translate: 34,
-  },
-  {
-    number: '02',
-    title: 'Esquisse',
-    text: 'Croquis au trait, mise à l’échelle et palette proposée.',
-    tone: 'ink' as const,
-    icon: 'pen-tool' as const,
-    rotate: 2.5,
-    translate: 18,
-  },
-  {
-    number: '03',
-    title: 'Validation',
-    text: 'Simulation sur photo du lieu, ajustements, devis signé.',
-    tone: 'ivory' as const,
-    icon: 'check' as const,
-    rotate: 5,
-    translate: 42,
-  },
-  {
-    number: '04',
-    title: 'Peinture',
-    text: 'Exécution sur site, en horaires compatibles avec l’activité.',
-    tone: 'ink' as const,
-    icon: 'paintbrush' as const,
-    rotate: -3,
-    translate: 22,
-  },
-  {
-    number: '05',
-    title: 'Livraison',
-    text: 'Vernis de protection, reportage photo et vidéo du résultat.',
-    tone: 'accent' as const,
-    icon: 'house' as const,
-    rotate: 4,
-    translate: 38,
-  },
-];
-
 /** Les trois services de l'accordéon (accueil). */
 export const services = [
   {
@@ -78,7 +27,7 @@ export const services = [
     heading: 'Peinture murale sur mesure, réalisée directement sur vos murs.',
     text: 'Du croquis à la finition, sur site. Surface lessivable et protégée, chantier calé sur vos horaires d’ouverture.',
     shortText: 'Peinture murale sur mesure, du croquis à la finition, réalisée sur site.',
-    image: { src: 'services/fresque.png', alt: 'Fresque murale en cours de réalisation — photo à remplacer' },
+    image: { src: 'services/fresque.png', alt: 'Fresque murale en cours de réalisation (photo à remplacer)' },
   },
   {
     number: '02',
@@ -87,7 +36,7 @@ export const services = [
     heading: 'Œuvres peintes en atelier, pensées pour un mur précis.',
     text: 'Format, palette et sujet définis avec vous, puis livrées prêtes à accrocher. La solution pour les murs qu’on ne peut pas peindre.',
     shortText: 'Œuvres peintes en atelier, livrées prêtes à accrocher.',
-    image: { src: 'services/toile.png', alt: 'Toile peinte en atelier — photo à remplacer' },
+    image: { src: 'services/toile.png', alt: 'Toile peinte en atelier (photo à remplacer)' },
   },
   {
     number: '03',
@@ -96,30 +45,61 @@ export const services = [
     heading: 'Peinture en direct, devant votre public.',
     text: 'Pour une ouverture, une inauguration ou un événement : l’œuvre se construit sous les yeux des invités et reste sur place.',
     shortText: 'Peinture en direct devant votre public, l’œuvre reste sur place.',
-    image: { src: 'services/performance.png', alt: 'Séance de live painting devant un public — photo à remplacer' },
+    image: { src: 'services/performance.png', alt: 'Séance de live painting devant un public (photo à remplacer)' },
   },
 ];
 
 /**
- * Témoignage de l'accueil.
- * ⚠ EXEMPLE DE MAQUETTE — À VALIDER auprès de la personne citée, ou à
- *   remplacer par un témoignage réel. Mettez `enabled: false` pour masquer
- *   entièrement le bloc tant que vous n'avez pas de témoignage validé.
+ * Retours clients (accueil, section « Vos retours »).
+ * Recopiés mot pour mot depuis les commentaires Instagram laissés sous les
+ * publications de @muralistique : on n'y corrige rien.
+ *  - `highlight` : passages soulignés d'un trait jaune (recopiés à
+ *    l'identique du texte, apostrophes typographiques comprises) ;
+ *  - `verified` : badge « compte vérifié » d'Instagram ;
+ *  - `reply` : réponse de l'atelier, affichée sous le commentaire.
  */
-export const testimonial = {
-  enabled: true,
-  quote: 'Les patients parlent du mur avant de parler de l’attente. La salle a changé de nature.',
-  author: 'Camille Roux',
-  role: 'Directrice, Clinique Vision Sud — témoignage à valider',
-  portrait: { src: 'people/temoignage.jpg', alt: 'Portrait de la personne citée — photo à remplacer' },
-};
+export interface Feedback {
+  handle: string;
+  text: string;
+  highlight?: string[];
+  verified?: boolean;
+  reply?: { handle: string; text: string };
+}
 
-/** Phrase de positionnement (accueil). Le fragment `highlight` est surligné. */
-export const positioning = {
-  before: 'Muralistique transforme les espaces professionnels et privés grâce à des ',
-  highlight: 'fresques murales uniques',
-  after: ', imaginées pour chaque lieu.',
-};
+export const feedback: Feedback[] = [
+  {
+    handle: 'salwawakrim',
+    text: 'Merci Amine pour ce chef-d’œuvre ! Ton talent a transformé mon mur en une vraie œuvre d’art. J’adore le résultat 🦅✨',
+    highlight: ['chef-d’œuvre', 'une vraie œuvre d’art'],
+  },
+  {
+    handle: 'guacate.casablanca',
+    verified: true,
+    text: 'Merci pour la super fresque !!! ❤️',
+    highlight: ['super fresque'],
+  },
+  {
+    handle: 'dr_sassi',
+    text: 'Créativité frere tbarklah elek je recommande vivement ⭐⭐⭐⭐⭐',
+    highlight: ['je recommande vivement'],
+    reply: { handle: 'muralistique', text: '@dr_sassi Mercii beaucoup docteur 🙏🙏🙏' },
+  },
+  {
+    handle: 'bouzerda.souad',
+    text: 'Merci 😍 tu es un grand artiste',
+    highlight: ['un grand artiste'],
+  },
+  {
+    handle: 'dr.oukheirimane',
+    text: 'Vraiment un grand bravo pour ton travail, ton dévouement et ton talent 🙌 et très bonne continuation 🌸',
+    highlight: ['un grand bravo'],
+  },
+  {
+    handle: 'touriameskini',
+    text: 'très beau travail, est ce que je peux avoir une idée sur les prix',
+    highlight: ['très beau travail'],
+  },
+];
 
 /**
  * Page Studio — volontairement peu de texte : des images et des titres.
@@ -129,7 +109,7 @@ export const studio = {
   founderName: 'Amine Houmam',
   founderRole: 'Fondateur & artiste muraliste',
   /** Phrase d'introduction, révélée mot à mot au défilement. */
-  intro: 'Un atelier, une ligne continue, quelques couleurs — et des murs pensés pour l’identité de chaque lieu.',
+  intro: 'Un atelier, une ligne continue, quelques couleurs, et des murs pensés pour l’identité de chaque lieu.',
 
   /** Défilé horizontal « Quelques murs signés ». `slug` renvoie à src/data/projects.ts ;
    *  `image` permet de choisir une autre photo que la couverture du projet. */
@@ -140,9 +120,6 @@ export const studio = {
     { slug: 'ecole-les-tilleuls' },
     { slug: 'cabine-gynecologique' },
   ],
-
-  /** Les étapes, réduites à des titres qui défilent. */
-  steps: ['Écouter le lieu', 'Dessiner', 'Tester les couleurs', 'Peindre sur place', 'Protéger'],
 
   quote: 'Un mur ne devrait jamais être neutre. Il porte l’identité du lieu, ou il ne porte rien.',
   quoteAuthor: 'Amine Houmam',
@@ -165,8 +142,8 @@ export const quoteOptions = {
   /** ⚠ Fourchettes reprises de la maquette (en dirhams) . */
   budgets: [
     'Moins de 2 000 Dh',
-    '2 000 Dh – 5 000 Dh',
-    '5 000 Dh – 10 000 Dh',
+    '2 000 à 5 000 Dh',
+    '5 000 à 10 000 Dh',
     'Plus de 10 000 Dh',
     'Pas sûr / à discuter',
   ],

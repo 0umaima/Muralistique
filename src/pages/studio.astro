@@ -3,7 +3,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
 import Media from '../components/Media.astro';
 import FixedBg from '../components/FixedBg.astro';
-import MarqueeBand from '../components/MarqueeBand.astro';
 import ContactCta from '../components/ContactCta.astro';
 import { studio } from '../data/content';
 import { projectBySlug } from '../data/projects';
@@ -33,7 +32,7 @@ const works = studio.works.flatMap(({ slug, image }) => {
   headerTheme="ink"
   activeNav="/studio"
 >
-  <!-- ——— Hero : la photo reste fixe, la page glisse dessus ——— -->
+  <!-- Hero : la photo reste fixe, la page glisse dessus -->
   <section class="shero theme-ink" data-section-theme="ink">
     <FixedBg src="studio/hero.jpg" position="62% 30%" priority class="shero__bg" />
     <div class="shero__shade" aria-hidden="true"></div>
@@ -67,7 +66,7 @@ const works = studio.works.flatMap(({ slug, image }) => {
     <div class="shero__wipe" aria-hidden="true"></div>
   </section>
 
-  <!-- ——— Intro : une seule phrase, révélée mot à mot ——— -->
+  <!-- Intro : une seule phrase, révélée mot à mot -->
   <section class="sintro theme-ivory" data-section-theme="ivory">
     <div class="shell pad sintro__inner">
       <p class="sintro__kicker" data-reveal><span class="sintro__square"></span>Hey, juste une intro</p>
@@ -89,7 +88,7 @@ const works = studio.works.flatMap(({ slug, image }) => {
     </div>
   </section>
 
-  <!-- ——— Quelques murs : défilé horizontal épinglé ——— -->
+  <!-- Quelques murs : défilé horizontal épinglé -->
   <section class="sworks theme-ink" id="murs" data-section-theme="ink" data-hscroll>
     <div class="sworks__sticky" data-hscroll-sticky>
       <div class="sworks__head shell pad">
@@ -134,14 +133,7 @@ const works = studio.works.flatMap(({ slug, image }) => {
     </div>
   </section>
 
-  <!-- ——— Les étapes, en titres seulement ——— -->
-  <div class="visually-hidden">
-    <h2>Les étapes</h2>
-    <ol>{studio.steps.map((step) => <li>{step}</li>)}</ol>
-  </div>
-  <MarqueeBand words={studio.steps} bg="projects/hotel-kaan-misti/cover.png" />
-
-  <!-- ——— Citation sur photo fixe ——— -->
+  <!-- Citation sur photo fixe -->
   <section class="squote theme-ink" data-section-theme="ink">
     <FixedBg src="projects/cabine-gynecologique/1.jpeg" scrim={0.72} />
     <figure class="squote__inner shell pad">
@@ -151,7 +143,7 @@ const works = studio.works.flatMap(({ slug, image }) => {
     </figure>
   </section>
 
-  <!-- ——— Le geste, en détail : mosaïque d'images et de titres ——— -->
+  <!-- Le geste, en détail : mosaïque d'images et de titres -->
   <section class="sgallery theme-ivory" id="presse" data-section-theme="ivory">
     <div class="shell pad">
       <h2 class="sgallery__title" data-reveal>Le geste,<br /><span>en détail</span></h2>
@@ -235,7 +227,7 @@ const works = studio.works.flatMap(({ slug, image }) => {
     color: var(--ivory);
   }
   .shero__word { display: block; overflow: hidden; padding-bottom: 0.04em; }
-  .shero__word:last-child { color: var(--accent); }
+  .shero__word:last-child { color: transparent; -webkit-text-stroke: 2px var(--ivory); }
   .shero__letter { display: inline-block; }
   :global(.js) .shero__letter {
     animation: s-letter 900ms var(--ease-out) both;
@@ -256,7 +248,7 @@ const works = studio.works.flatMap(({ slug, image }) => {
     text-transform: uppercase;
     color: var(--ivory);
   }
-  .shero__scroll :global(svg) { color: var(--accent); }
+  .shero__scroll :global(svg) { color: var(--brand); }
   :global(.js) .shero__scroll :global(svg) { animation: s-bob 1800ms var(--ease) 2000ms infinite; }
   @keyframes s-bob {
     0%, 100% { transform: none; }
@@ -293,7 +285,7 @@ const works = studio.works.flatMap(({ slug, image }) => {
     text-transform: uppercase;
     color: var(--muted-on-light);
   }
-  .sintro__square { display: block; width: 16px; height: 16px; background: var(--accent); }
+  .sintro__square { display: block; width: 12px; height: 12px; background: var(--brand); }
   .sintro__statement {
     margin-top: 32px;
     font-family: var(--font-display);
@@ -334,7 +326,7 @@ const works = studio.works.flatMap(({ slug, image }) => {
     flex-wrap: wrap;
   }
   .sworks__title { font-size: var(--fs-h2-lg); }
-  .sworks__title span { color: var(--accent); }
+  .sworks__title span { color: transparent; -webkit-text-stroke: 1.5px var(--ivory); }
   .sworks__all { color: var(--ivory); }
 
   /* Repli (petit écran, mouvement réduit, sans JS) : rail horizontal natif. */
@@ -422,7 +414,8 @@ const works = studio.works.flatMap(({ slug, image }) => {
     text-transform: uppercase;
     transition: background-color 240ms var(--ease);
   }
-  .sworks__more:hover { background: var(--accent); }
+  .sworks__more { border: 1px solid var(--ivory); }
+  .sworks__more:hover { background: var(--ink); color: var(--ivory); }
   .sworks__more :global(svg) { align-self: flex-end; transition: transform 240ms var(--ease); }
   .sworks__more:hover :global(svg) { transform: translate(4px, -4px); }
 
@@ -444,7 +437,7 @@ const works = studio.works.flatMap(({ slug, image }) => {
     display: block;
     height: 0.5em;
     font: 900 clamp(7rem, 16vw, 14rem) / 1 var(--font-display);
-    color: var(--accent);
+    color: var(--ivory);
   }
   .squote__text {
     margin: 0 auto;
@@ -504,7 +497,7 @@ const works = studio.works.flatMap(({ slug, image }) => {
   .sgallery__index {
     font: 800 0.9375rem/1 var(--font-display);
     letter-spacing: 0.12em;
-    color: var(--accent-strong);
+    color: var(--muted-on-light);
   }
 
   /* Apparition propre à la mosaïque : l'image se découvre de bas en haut. */

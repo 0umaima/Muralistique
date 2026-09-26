@@ -33,7 +33,7 @@ const MESSAGES = {
   server:
     'L’envoi n’a pas abouti. Vos réponses sont conservées : réessayez dans quelques minutes, ou écrivez-nous directement.',
   quota:
-    'Le formulaire n’accepte plus de nouvelles demandes pour le moment (limite du service de réception atteinte). Écrivez-nous directement par e-mail ou sur WhatsApp — nous répondons sous 48 h.',
+    'Le formulaire n’accepte plus de nouvelles demandes pour le moment (limite du service de réception atteinte). Écrivez-nous directement par e-mail ou sur WhatsApp : nous répondons sous 48 h.',
   tooLarge:
     'Les fichiers joints sont trop lourds pour le service de réception. Retirez une photo ou envoyez-la nous ensuite par e-mail ou WhatsApp.',
   spam: 'Votre demande a été refusée par le filtre anti-spam. Écrivez-nous directement, nous la traiterons manuellement.',

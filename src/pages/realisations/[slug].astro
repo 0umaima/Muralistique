@@ -44,13 +44,13 @@ const galleryWide = gallery.length % 2 === 1;
 
 <BaseLayout
   title={project.title}
-  description={`${project.title} — ${project.excerpt} Fresque murale réalisée par Muralistique${project.city ? ` à ${project.city}` : ''}.`}
+  description={`${project.title}. ${project.excerpt} Fresque murale réalisée par Muralistique${project.city ? ` à ${project.city}` : ''}.`}
   headerTheme="ink"
   activeNav="/realisations"
   ogImage={project.cover.src}
 >
   <article class="project">
-    <!-- ——— Couverture plein écran, titre posé dessus ——— -->
+    <!-- Couverture plein écran, titre posé dessus -->
     <header class="phead theme-ink" data-section-theme="ink">
       <div class="phead__media" data-parallax="-0.12">
         <Media
@@ -84,7 +84,7 @@ const galleryWide = gallery.length % 2 === 1;
       </div>
     </header>
 
-    <!-- ——— L'essentiel : une phrase, le texte, les faits ——— -->
+    <!-- L'essentiel : une phrase, le texte, les faits -->
     <section class="pinfo theme-ink" data-section-theme="ink">
       <div class="shell pad pinfo__grid">
         <p class="pinfo__lead" data-reveal>{project.excerpt}</p>
@@ -107,7 +107,7 @@ const galleryWide = gallery.length % 2 === 1;
             )
           }
 
-          <a class="btn btn--accent btn--md pinfo__cta" href="/devis">
+          <a class="btn btn--primary btn--md pinfo__cta" href="/devis">
             Un projet similaire ?
             <Icon name="arrow-up-right" size={13} stroke={2.2} />
           </a>
@@ -178,7 +178,7 @@ const galleryWide = gallery.length % 2 === 1;
       )
     }
 
-    <!-- ——— Projet suivant : une grande image à traverser ——— -->
+    <!-- Projet suivant : une grande image à traverser -->
     <nav class="pnext theme-ink" aria-label="Projet suivant" data-section-theme="ink">
       <a class="pnext__link" href={`/realisations/${next.slug}`}>
         <div class="pnext__media">
@@ -279,7 +279,7 @@ const galleryWide = gallery.length % 2 === 1;
     width: 8px;
     height: 8px;
     margin-right: 10px;
-    background: var(--accent);
+    background: var(--brand);
     vertical-align: 1px;
   }
   .phead__title {
@@ -485,8 +485,8 @@ const galleryWide = gallery.length % 2 === 1;
     flex: none;
     width: clamp(56px, 6vw, 84px);
     height: clamp(56px, 6vw, 84px);
-    background: var(--accent);
-    color: var(--accent-ink);
+    background: var(--ivory);
+    color: var(--ink);
     transition: transform 400ms var(--ease-out);
   }
   .pnext__link:hover .pnext__arrow { transform: translateX(8px); }

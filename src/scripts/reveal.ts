@@ -70,7 +70,7 @@ function drawPaths(wrapper: HTMLElement) {
 
 export function initReveal() {
   const reveals = Array.from(
-    document.querySelectorAll<HTMLElement>('[data-reveal], [data-reveal-rotate], [data-reveal-clip]')
+    document.querySelectorAll<HTMLElement>('[data-reveal], [data-reveal-clip]')
   );
   const counters = Array.from(document.querySelectorAll<HTMLElement>('[data-count]'));
   const draws = Array.from(document.querySelectorAll<HTMLElement>('[data-draw]'));

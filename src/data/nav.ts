@@ -1,8 +1,7 @@
-/** Navigation principale. « Processus » pointe vers la section #processus de l'accueil. */
+/** Navigation principale. */
 export const mainNav = [
   { label: 'Réalisations', href: '/realisations' },
   { label: 'Secteurs', href: '/#secteurs' },
-  { label: 'Processus', href: '/#processus' },
   { label: 'Studio', href: '/studio' },
   { label: 'Contact', href: '/#contact' },
 ];
@@ -21,8 +20,7 @@ export const footerNav = [
     title: 'Studio',
     links: [
       { label: 'À propos', href: '/studio' },
-      { label: 'Processus', href: '/#processus' },
-      { label: 'Réalisations', href: '/realisations' },
+          { label: 'Réalisations', href: '/realisations' },
       { label: 'Presse', href: '/studio#presse' },
     ],
   },

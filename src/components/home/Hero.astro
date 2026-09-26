@@ -6,17 +6,18 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
 
 /**
  * Hero de l'accueil : un collage de trois grands visuels à angles francs,
- * le titre posé par-dessus leur bas, sur un fond photo fixe.
+ * le titre posé par-dessus leur bas, sur un fond fixe (une éclaboussure de
+ * peinture blanche sur un mur neutre, home/hero-bg.jpg).
  *
- * À l'ouverture, les visuels se découvrent en cascade rapide (gauche,
- * centre, droite), directement sur le fond, puis le titre monte.
+ * À l'ouverture, les visuels jaillissent presque d'un coup (gauche, centre,
+ * droite, 50 ms d'écart), puis le titre monte : tout est en place en ~0,6 s.
  * Pour changer une image : remplacez le fichier dans src/assets/images/home/
  * en gardant son nom.
  */
 ---
 
 <section class="hero theme-ink" data-section-theme="ink">
-  <FixedBg src="home/hero-bg.jpg" scrim={0.62} eager />
+  <FixedBg src="home/hero-bg.jpg" scrim={0.42} eager />
 
   <div class="hero__inner shell pad">
     <div class="hero__stage">
@@ -25,7 +26,7 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
           src="home/hero-left.jpeg"
           alt="Fresque « Build Something » peinte dans un espace de travail"
           widths={[320, 480, 640, 900]}
-          sizes="(max-width: 700px) 42vw, 26vw"
+          sizes="(max-width: 700px) 46vw, 30vw"
           eager
           position="center 40%"
           class="hero__media"
@@ -50,7 +51,7 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
           src="home/hero-right.jpeg"
           alt="Visage peint au trait noir sur des aplats jaune, rouge et bleu"
           widths={[320, 480, 640, 900]}
-          sizes="(max-width: 700px) 42vw, 36vw"
+          sizes="(max-width: 700px) 48vw, 38vw"
           eager
           position="center 35%"
           class="hero__media"
@@ -71,7 +72,7 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
     </div>
 
     <div class="hero__actions">
-      <a class="btn btn--accent" href="/devis">
+      <a class="btn btn--primary" href="/devis">
         Demander un devis
         <Icon name="arrow-up-right" size={14} stroke={2.2} />
       </a>
@@ -92,10 +93,13 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
     background: var(--ink);
   }
 
+  /* Le collage n'est pas bridé par la largeur du gabarit : sur grand écran,
+     il prend toute la place que la hauteur de la fenêtre lui laisse. */
   .hero__inner {
     display: flex;
     flex-direction: column;
     align-items: center;
+    max-width: 1760px;
   }
 
   /* ——— Scène du collage ———
@@ -105,7 +109,7 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
     position: relative;
     /* Largeur plafonnée par la hauteur d'écran : le collage et son titre
        tiennent dans la première vue, même sur un portable peu haut. */
-    width: min(100%, 1320px, (100svh - var(--header-h) - 4.5rem) * 1320 / 740);
+    width: min(100%, (100svh - var(--header-h) - 4rem) * 1320 / 740);
     aspect-ratio: 1320 / 740;
   }
 
@@ -121,9 +125,9 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
     background: transparent;
     box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.65);
   }
-  .hero__shot--left { --x: 2%; --y: 7%; --w: 25%; --ar: 3 / 4; z-index: 1; }
-  .hero__shot--center { --x: 28.5%; --y: 0%; --w: 35%; --ar: 4 / 5; z-index: 2; }
-  .hero__shot--right { --x: 60.5%; --y: 15%; --w: 36%; --ar: 1 / 1; z-index: 3; }
+  .hero__shot--left { --x: 0%; --y: 7%; --w: 30%; --ar: 3 / 4; z-index: 1; }
+  .hero__shot--center { --x: 26%; --y: 0%; --w: 42%; --ar: 4 / 5; z-index: 2; }
+  .hero__shot--right { --x: 62%; --y: 13%; --w: 38%; --ar: 1 / 1; z-index: 3; }
 
   .hero__shot :global(.hero__media),
   .hero__gif {
@@ -134,7 +138,7 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
   }
   .hero__gif { object-position: center 45%; }
 
-  /* Traits d'accent, à la manière d'un coup de pinceau autour du collage */
+  /* Deux traits blancs, à la manière d'un coup de pinceau autour du collage */
   .hero__stroke {
     position: absolute;
     z-index: 4;
@@ -142,12 +146,12 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
     pointer-events: none;
   }
   .hero__stroke path {
-    stroke: var(--accent);
-    stroke-width: 7;
+    stroke: var(--ivory);
+    stroke-width: 6;
     stroke-linecap: round;
   }
-  .hero__stroke--a { left: -3%; top: 34%; width: 13%; }
-  .hero__stroke--b { right: -2%; bottom: 4%; width: 20%; }
+  .hero__stroke--a { left: -4%; top: 30%; width: 12%; }
+  .hero__stroke--b { right: -3%; bottom: 2%; width: 20%; }
 
   .hero__title {
     position: absolute;
@@ -164,7 +168,13 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
     pointer-events: none;
   }
   .hero__line { display: block; }
-  .hero__line--2 { color: var(--accent); }
+  /* Deuxième ligne en négatif : lettres noires cerclées de blanc, lisibles
+     sur le fond sombre comme sur une photo claire. */
+  .hero__line--2 {
+    color: var(--ink);
+    -webkit-text-stroke: clamp(1.5px, 0.2vw, 3px) var(--ivory);
+    text-shadow: none;
+  }
 
   .hero__actions {
     display: flex;
@@ -178,9 +188,9 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
   @media (max-width: 900px) {
     .hero { min-height: 0; }
     .hero__stage { width: 100%; aspect-ratio: 4 / 3; }
-    .hero__shot--left { --x: 0%; --y: 10%; --w: 30%; }
-    .hero__shot--center { --x: 27%; --y: 0%; --w: 42%; }
-    .hero__shot--right { --x: 63%; --y: 16%; --w: 37%; }
+    .hero__shot--left { --x: 0%; --y: 8%; --w: 36%; }
+    .hero__shot--center { --x: 27%; --y: 0%; --w: 48%; }
+    .hero__shot--right { --x: 60%; --y: 16%; --w: 40%; }
     .hero__stroke--a { left: -4%; top: 44%; width: 16%; }
     .hero__stroke--b { width: 26%; }
   }
@@ -188,9 +198,9 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
   /* Mobile : collage plus vertical, titre sur toute la largeur */
   @media (max-width: 600px) {
     .hero__stage { aspect-ratio: 4 / 5; }
-    .hero__shot--left { --x: 0%; --y: 8%; --w: 40%; --ar: 3 / 4; }
-    .hero__shot--center { --x: 26%; --y: 0%; --w: 50%; --ar: 3 / 4; }
-    .hero__shot--right { --x: 58%; --y: 20%; --w: 42%; --ar: 3 / 4; }
+    .hero__shot--left { --x: 0%; --y: 10%; --w: 46%; --ar: 3 / 4; }
+    .hero__shot--center { --x: 24%; --y: 0%; --w: 56%; --ar: 3 / 4; }
+    .hero__shot--right { --x: 52%; --y: 24%; --w: 48%; --ar: 3 / 4; }
     .hero__title { font-size: clamp(2.5rem, 12.4vw, 4.25rem); }
     .hero__stroke--a { display: none; }
     .hero__stroke--b { width: 34%; right: -4%; bottom: 30%; }
@@ -198,26 +208,26 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
     .hero__actions :global(.btn) { width: 100%; }
   }
 
-  /* ——— Entrée : cascade rapide ———
+  /* ——— Entrée : très rapide ———
      Chaque cadre se découvre de bas en haut pendant que son image se
-     resserre ; les trois cadres se chevauchent dans le temps (120 ms
-     d'écart) et le titre monte avant la fin. Tout est en place en ~1,2 s.
+     resserre ; 50 ms d'écart seulement entre les trois cadres, et le titre
+     monte pendant qu'ils s'ouvrent. Tout est en place en ~0,6 s.
      Uniquement quand JavaScript est actif : sans lui, tout est déjà là. */
   .hero__shot--left { --d: 0ms; }
-  .hero__shot--center { --d: 120ms; }
-  .hero__shot--right { --d: 240ms; }
+  .hero__shot--center { --d: 50ms; }
+  .hero__shot--right { --d: 100ms; }
 
-  :global(.js) .hero__shot { animation: shot-open 750ms cubic-bezier(0.7, 0, 0.2, 1) var(--d) both; }
+  :global(.js) .hero__shot { animation: shot-open 380ms cubic-bezier(0.6, 0, 0.2, 1) var(--d) both; }
   :global(.js) .hero__shot :global(.hero__media),
-  :global(.js) .hero__gif { animation: shot-zoom 1000ms var(--ease-out) var(--d) both; }
+  :global(.js) .hero__gif { animation: shot-zoom 520ms var(--ease-out) var(--d) both; }
 
-  :global(.js) .hero__stroke path { animation: stroke-draw 700ms var(--ease-out) 650ms both; }
-  :global(.js) .hero__line--1 { animation: h-line 650ms var(--ease-out) 380ms both; }
-  :global(.js) .hero__line--2 { animation: h-line 650ms var(--ease-out) 460ms both; }
-  :global(.js) .hero__actions { animation: h-line 600ms var(--ease-out) 600ms both; }
+  :global(.js) .hero__stroke path { animation: stroke-draw 380ms var(--ease-out) 260ms both; }
+  :global(.js) .hero__line--1 { animation: h-line 380ms var(--ease-out) 140ms both; }
+  :global(.js) .hero__line--2 { animation: h-line 380ms var(--ease-out) 190ms both; }
+  :global(.js) .hero__actions { animation: h-line 360ms var(--ease-out) 240ms both; }
 
   @keyframes shot-open {
-    from { clip-path: inset(100% 0 0 0); transform: translateY(48px); }
+    from { clip-path: inset(100% 0 0 0); transform: translateY(36px); }
     to { clip-path: inset(0 0 0 0); transform: none; }
   }
   @keyframes shot-zoom {
@@ -229,7 +239,7 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
     to { stroke-dasharray: 1; stroke-dashoffset: 0; }
   }
   @keyframes h-line {
-    from { opacity: 0; transform: translateY(32px); }
+    from { opacity: 0; transform: translateY(24px); }
     to { opacity: 1; transform: none; }
   }
 

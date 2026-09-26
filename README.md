@@ -23,7 +23,7 @@ mise en ligne) sont détaillées au §7.
 ## 1. Ce qu'il faut remplacer avant la mise en ligne
 
 Tout ce qui suit est un **espace réservé**. Rien n'a été inventé : les
-coordonnées, chiffres et témoignages viennent de la maquette et doivent être
+coordonnées et chiffres viennent de la maquette et doivent être
 confirmés ou remplacés.
 
 | À faire | Où | Effet si oublié |
@@ -35,7 +35,7 @@ confirmés ou remplacés.
 | **Domaine définitif** | `src/data/site.mjs` → `url` | Sitemap, `robots.txt` et URL canoniques pointent vers le mauvais domaine |
 | **Mentions légales** | `src/data/site.mjs` → `legal` | La page `/mentions-legales` affiche « à compléter » et reste `noindex` tant qu'il manque une information |
 | **Chiffres clés** (120+, 6, 100 %, 15 j) | `src/data/content.ts` → `stats` | Chiffres de la maquette, non vérifiés |
-| **Témoignage client** | `src/data/content.ts` → `testimonial` | Passez `enabled: false` pour masquer le bloc tant que le témoignage n'est pas validé |
+| **Retours clients** | `src/data/content.ts` → `feedback` | Commentaires Instagram recopiés mot pour mot : ajoutez, retirez ou réordonnez les entrées |
 | **Fourchettes de budget** | `src/data/content.ts` → `quoteOptions.budgets` | Montants en dirhams repris de la maquette, à adapter |
 | **Vos projets** | `src/data/projects.ts` | Les 7 projets sont ceux de la maquette, textes marqués « TEXTE À REMPLACER » |
 | **Toutes les images** | `src/assets/images/` | Voir §3 |
@@ -52,7 +52,7 @@ src/data/
   site.mjs      Coordonnées, WhatsApp, réseaux, domaine, réglages du formulaire, mentions légales
   projects.ts   Les projets (page Réalisations + pages projet + avant/après de l'accueil)
   sectors.ts    Les secteurs (carrousel de l'accueil + filtres des Réalisations)
-  content.ts    Chiffres clés, processus, services, témoignage, page Studio, options du formulaire
+  content.ts    Chiffres clés, services, retours clients, page Studio, options du formulaire
   nav.ts        Liens du menu et du pied de page
 ```
 
@@ -92,9 +92,8 @@ Résumé :
 | Dossier | Contenu |
 | --- | --- |
 | `brand/` | `og.jpg` (1200 × 630, partage réseaux sociaux). Le logo, lui, est du texte (`src/components/Logo.astro`) |
-| `home/` | Fond fixe du hero + les trois visuels du collage (gauche, GIF central, droite) |
+| `home/` | Fond fixe du hero (éclaboussure de peinture blanche sur mur neutre) + les trois visuels du collage (gauche, GIF central, droite) |
 | `services/` | Fresque, toile, performance |
-| `people/` | Portrait du témoignage |
 | `studio/` | Photo du hero (les images d'atelier restent disponibles pour la mosaïque, voir `studio.gallery` dans `src/data/content.ts`) |
 | `projects/<slug>/` | `cover.jpg`, `avant.jpg`, `apres.jpg`, `1.jpg`, `2.jpg` |
 
@@ -251,12 +250,15 @@ scripts/             Outils de développement (placeholders, captures, tests)
 
 ### Design
 
-- Identité reprise du logo : **noir / blanc**, le **jaune du « M »**
-  (`--brand: #FBBE67`) réservé au logo, et un **vermillon de peintre**
-  (`--accent: #FF4A1C`) comme unique accent, utilisé avec parcimonie (boutons
-  principaux, repères de section, survols). `--accent-strong` (#C42D0C) sert
-  aux petits éléments d'accent sur fond blanc. Aucun fond crème ou jaune :
-  les sections alternent blanc, noir et photos assombries.
+- Identité reprise du logo : **noir / blanc** avant tout. Les boutons, cartes
+  et survols restent en noir et blanc : le bouton principal (`.btn--primary`)
+  est un aplat noir sur fond clair et blanc sur fond sombre (variables
+  `--solid` / `--solid-text`, basculées par `.theme-ink`). Le **jaune du « M »**
+  (`--brand: #FBBE67`) n'apparaît que par **touches minuscules** : le logo, le
+  filet des repères de section, les étincelles des sur-titres sur fond sombre,
+  les petits carrés de secteur, les cœurs et les soulignés des retours
+  clients. Jamais en fond de carte ou de bouton. Les sections alternent blanc,
+  noir et photos assombries.
 - Typographies : **Big Shoulders Display** (titres, navigation, boutons — en
   capitales étroites, comme le logo) + **Manrope** (textes courants). La police
   du logo, *Editorial Comment JNL*, est commerciale : Big Shoulders Display est
@@ -274,7 +276,7 @@ scripts/             Outils de développement (placeholders, captures, tests)
   mettre à jour : `node scripts/fetch-fonts.mjs`.
 - Icônes **Lucide** recopiées en SVG dans `src/components/Icon.astro` (aucune
   dépendance). Marques officielles des réseaux sociaux dans `BrandIcon.astro`.
-  Aucun emoji.
+  Aucun emoji, sauf dans les commentaires clients, recopiés tels quels.
 
 ### En-tête
 
@@ -291,9 +293,10 @@ fermeture par Échap, focus rendu au bouton, défilement de page bloqué.
 
 - Apparitions au défilement : fondu + 24 px vers le haut, 700 ms, léger
   décalage en cascade, **une seule fois par chargement**.
-- Hero de l'accueil : les trois visuels (angles francs) se découvrent **en
-  cascade rapide** (120 ms d'écart, sans aplat de couleur), puis le titre
-  monte par-dessus — tout est en place en ~1,2 s.
+- Hero de l'accueil : trois grands visuels (angles francs) sur une
+  éclaboussure de peinture ; ils se découvrent **presque d'un coup** (50 ms
+  d'écart, sans aplat de couleur) pendant que le titre monte : tout est en
+  place en ~0,6 s.
 - Carrousel des secteurs (`src/scripts/carousel.ts`) : rail défilant natif,
   flèches, glisser à la souris, compteur et barre de progression ; parallaxe
   de l'image dans chaque carte et légère inclinaison selon la vitesse.
@@ -307,11 +310,15 @@ fermeture par Échap, focus rendu au bouton, défilement de page bloqué.
   fonctionne aussi sur iOS, contrairement à `background-attachment: fixed`.
 - Chiffres clés : comptage jusqu'à la valeur exacte à la première apparition,
   suffixes conservés (`+`, `%`, ` j`).
-- Cartes du processus : légère rotation au départ, alignement à l'arrivée.
+- Retours clients (`src/components/home/Feedback.astro`, sous le contact) :
+  chaque commentaire Instagram jaillit sur sa carte inclinée, trois points
+  « en train d'écrire » laissent place au texte, les mots forts se soulignent
+  de jaune et le cœur « aimé par l'atelier » éclate ; des cœurs montent en
+  fond derrière un grand « MERCI » évidé qui glisse au défilement.
 - Studio (`src/scripts/scroll-fx.ts`) : volet sombre et nom lettre par lettre
   à l'ouverture, phrase d'intro révélée mot à mot au défilement, défilé
   horizontal épinglé des murs (grands écrans ; rail au doigt sur mobile),
-  étapes en bandeau défilant, mosaïque découverte au clip avec léger parallaxe.
+  mosaïque découverte au clip avec léger parallaxe.
 - Accordéon en `grid-template-rows`. Survol des cartes projet.
 
 Tout est en CSS + `IntersectionObserver`. `prefers-reduced-motion: reduce`

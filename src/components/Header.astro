@@ -16,7 +16,7 @@ const isActive = (href: string) => active === href || (active && href !== '/' &&
 
 <header class="header" data-header data-theme={theme}>
   <div class="header__inner pad">
-    <a class="header__brand" href="/" aria-label={`${site.name} — accueil`}>
+    <a class="header__brand" href="/" aria-label={`${site.name}, accueil`}>
       <Logo class="header__logo" />
     </a>
 
@@ -38,7 +38,7 @@ const isActive = (href: string) => active === href || (active && href !== '/' &&
       </ul>
       {
         active !== '/devis' && (
-          <a class="btn btn--accent btn--sm header__cta" href="/devis">
+          <a class="btn btn--primary btn--sm header__cta" href="/devis">
             Demander un devis
             <Icon name="arrow-up-right" size={13} stroke={2.2} />
           </a>
@@ -74,7 +74,7 @@ const isActive = (href: string) => active === href || (active && href !== '/' &&
       </ul>
       {
         active !== '/devis' && (
-          <a class="btn btn--accent btn--block header__panel-cta" href="/devis">
+          <a class="btn btn--primary btn--block header__panel-cta" href="/devis">
             Demander un devis
             <Icon name="arrow-up-right" size={14} stroke={2.2} />
           </a>
@@ -93,7 +93,9 @@ const isActive = (href: string) => active === href || (active && href !== '/' &&
     position: sticky;
     top: 0;
     z-index: 100;
-    --focus: var(--accent);
+    --focus: var(--ivory);
+    --solid: var(--ivory);
+    --solid-text: var(--ink);
     background: var(--ink);
     color: var(--ivory);
     border-bottom: 1px solid var(--ink-line);
@@ -104,6 +106,8 @@ const isActive = (href: string) => active === href || (active && href !== '/' &&
   }
   .header[data-theme='ivory'] {
     --focus: var(--ink);
+    --solid: var(--ink);
+    --solid-text: var(--ivory);
     background: var(--ivory);
     color: var(--ink);
     border-bottom-color: var(--ink);
@@ -146,8 +150,8 @@ const isActive = (href: string) => active === href || (active && href !== '/' &&
     border-bottom: 2px solid transparent;
     transition: border-color 200ms var(--ease);
   }
-  .header__link:hover { border-bottom-color: var(--accent); }
-  .header__link.is-current { border-bottom-color: var(--accent); font-weight: 800; }
+  .header__link:hover { border-bottom-color: currentColor; }
+  .header__link.is-current { border-bottom-color: currentColor; font-weight: 800; }
 
   .header__cta { flex: none; }
 
@@ -183,7 +187,9 @@ const isActive = (href: string) => active === href || (active && href !== '/' &&
 
   /* — Panneau mobile ————————————————————————————————— */
   .header__panel {
-    --focus: var(--accent);
+    --focus: var(--ivory);
+    --solid: var(--ivory);
+    --solid-text: var(--ink);
     position: fixed;
     inset: var(--header-h) 0 0;
     z-index: 99;
@@ -216,8 +222,8 @@ const isActive = (href: string) => active === href || (active && href !== '/' &&
     letter-spacing: var(--ls-display);
     text-transform: uppercase;
   }
-  .header__panel-link[aria-current='page'] { color: var(--accent); }
-  .header__panel-link svg { color: var(--accent); }
+  .header__panel-link svg { color: var(--muted-on-dark); }
+  .header__panel-link[aria-current='page'] svg { color: var(--brand); }
   .header__panel-cta { margin-top: auto; }
   .header__panel-mail {
     display: inline-flex;

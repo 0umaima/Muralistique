@@ -37,7 +37,7 @@ export const site = {
     phoneHref: '+212681932646',
 
     /** Horaires affichés à côté du numéro. À REMPLACER si besoin. */
-    hours: '7j/7 · 9 h – 19 h',
+    hours: '7j/7 · 9 h à 19 h',
 
     /**
      * WhatsApp — À REMPLACER par le vrai numéro, au format international
