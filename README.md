@@ -470,6 +470,20 @@ Chaque `git push` reconstruit et publie le site.
 À partir de là, chaque push sur la branche principale déclenche une mise en
 ligne, et chaque pull request obtient sa propre URL de prévisualisation.
 
+### Variante — projet créé comme *Worker* (configuration actuelle)
+
+Le bouton par défaut de Cloudflare crée un **Worker** plutôt qu'un projet
+Pages (réglage *Deploy command* : `npx wrangler deploy`). Cela fonctionne tout
+aussi bien grâce au fichier **`wrangler.jsonc`** à la racine du dépôt : il
+publie le dossier `dist/` tel quel, avec la page 404 et `_headers`. Sans ce
+fichier, `wrangler deploy` installerait l'adaptateur Astro pour Cloudflare à
+chaque build.
+
+- Le champ `name` de `wrangler.jsonc` doit être **identique au nom du Worker**
+  dans le tableau de bord (`muralistique`), sinon le build échoue.
+- Le domaine se branche dans l'onglet **Domains** du Worker (selon la version
+  du tableau de bord : **Settings → Domains & Routes → Add → Custom domain**).
+
 ### Méthode alternative — envoi direct du dossier
 
 Sans dépôt Git, ou pour un essai rapide :

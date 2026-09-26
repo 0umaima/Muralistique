@@ -12,9 +12,11 @@
 /favicon.png
   Cache-Control: public, max-age=604800
 
-# Pages HTML : revalidation à chaque visite, mise en cache côté CDN.
+# En-têtes de sécurité, sur toutes les réponses.
+# Pas de Cache-Control ici : cette règle s'applique AUSSI à /_astro/* et
+# /fonts/*, et Cloudflare y concatène les deux valeurs (cache long annulé).
+# Les pages HTML reçoivent déjà par défaut « public, max-age=0, must-revalidate ».
 /*
-  Cache-Control: public, max-age=0, must-revalidate
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
