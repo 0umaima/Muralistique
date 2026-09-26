@@ -76,20 +76,6 @@ export const site = {
     /** Message affiché quand formEnabled = false. */
     disabledMessage:
       'Le formulaire est momentanément fermé. Écrivez-nous directement par e-mail ou sur WhatsApp, nous répondons sous 48 h.',
-
-    /**
-     * Limites appliquées DANS LE NAVIGATEUR avant l'envoi.
-     * Elles évitent les envois trop lourds ; elles ne remplacent PAS et ne
-     * garantissent PAS les limites de stockage du compte Basin, qui restent
-     * définies côté Basin (voir README).
-     */
-    uploads: {
-      maxFiles: 2,
-      maxFileBytes: 750 * 1024, // 750 Ko par fichier
-      maxTotalBytes: 1536 * 1024, // 1,5 Mo au total
-      accept: ['image/jpeg', 'image/png', 'image/webp'],
-      acceptLabel: 'JPEG, PNG ou WebP',
-    },
   },
 
   /** À REMPLACER — mentions légales (voir src/pages/mentions-legales.astro). */

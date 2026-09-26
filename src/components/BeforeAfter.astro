@@ -69,23 +69,46 @@ const { before, after, id = 'ba', class: className = '', ratio = '2 / 1' } = Ast
   /* Neutralise le glisser-déposer natif des images pendant la comparaison. */
   .ba :global(img) { -webkit-user-drag: none; user-select: none; }
   .ba__layer :global(.media) { width: 100%; height: 100%; }
-  /* La couche « avant » est rognée à droite du curseur. */
-  .ba__layer--before { clip-path: inset(0 calc(100% - var(--ba-pos)) 0 0); }
 
+  /* La couche « avant » est rognée à droite du curseur, sans clip-path (qui
+     repeint l'image à chaque mouvement et saccade sur les téléphones modestes) :
+     la couche glisse vers la gauche et son image glisse d'autant vers la
+     droite. L'image reste immobile, seule la fenêtre bouge — deux `transform`
+     que la carte graphique applique sans rien repeindre. */
+  .ba__layer--before {
+    overflow: hidden;
+    transform: translate3d(calc(var(--ba-pos) - 100%), 0, 0);
+    will-change: transform;
+  }
+  .ba__layer--before :global(.media) {
+    transform: translate3d(calc(100% - var(--ba-pos)), 0, 0);
+    will-change: transform;
+  }
+
+  /* Poignée : un calque de la largeur du cadre dont le bord droit suit le
+     curseur (un pourcentage de `translate` se rapporte à l'élément lui-même). */
   .ba__handle {
+    position: absolute;
+    inset: 0;
+    transform: translate3d(calc(var(--ba-pos) - 100%), 0, 0);
+    will-change: transform;
+    pointer-events: none;
+  }
+  .ba__handle::before {
+    content: '';
     position: absolute;
     top: 0;
     bottom: 0;
-    left: var(--ba-pos);
+    right: 0;
     width: 1px;
     background: var(--ivory);
-    pointer-events: none;
+    transform: translateX(50%);
   }
   .ba__knob {
     position: absolute;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    right: 0;
+    transform: translate(50%, -50%);
     display: flex;
     align-items: center;
     justify-content: center;

@@ -6,8 +6,8 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
 
 /**
  * Hero de l'accueil : un collage de trois grands visuels à angles francs,
- * le titre posé par-dessus leur bas, sur un fond fixe (une éclaboussure de
- * peinture blanche sur un mur neutre, home/hero-bg.jpg).
+ * le titre jaune posé par-dessus leur bas, sur un fond fixe (des pinceaux
+ * d'atelier, home/hero-bg.jpg).
  *
  * À l'ouverture, les visuels jaillissent presque d'un coup (gauche, centre,
  * droite, 50 ms d'écart), puis le titre monte : tout est en place en ~0,6 s.
@@ -138,7 +138,7 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
   }
   .hero__gif { object-position: center 45%; }
 
-  /* Deux traits blancs, à la manière d'un coup de pinceau autour du collage */
+  /* Deux traits jaunes, à la manière d'un coup de pinceau autour du collage */
   .hero__stroke {
     position: absolute;
     z-index: 4;
@@ -146,7 +146,7 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
     pointer-events: none;
   }
   .hero__stroke path {
-    stroke: var(--ivory);
+    stroke: var(--brand);
     stroke-width: 6;
     stroke-linecap: round;
   }
@@ -163,16 +163,16 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
     font-weight: 900;
     line-height: 0.86;
     text-align: center;
-    color: var(--ivory);
+    color: var(--brand);
     text-shadow: 0 4px 40px rgba(0, 0, 0, 0.45);
     pointer-events: none;
   }
   .hero__line { display: block; }
-  /* Deuxième ligne en négatif : lettres noires cerclées de blanc, lisibles
+  /* Deuxième ligne en négatif : lettres noires cerclées de jaune, lisibles
      sur le fond sombre comme sur une photo claire. */
   .hero__line--2 {
     color: var(--ink);
-    -webkit-text-stroke: clamp(1.5px, 0.2vw, 3px) var(--ivory);
+    -webkit-text-stroke: clamp(1.5px, 0.2vw, 3px) var(--brand);
     text-shadow: none;
   }
 
