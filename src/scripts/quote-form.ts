@@ -336,9 +336,12 @@ export function initQuoteForm() {
 
     // Encodage par défaut des formulaires : le plus simple et le mieux
     // accepté, sans requête préalable CORS.
+    // Les champs laissés vides ne sont pas envoyés : un `email` vide peut
+    // faire classer la demande en spam par le filtre « e-mail valide » de
+    // Basin, alors qu'il est facultatif ici.
     const body = new URLSearchParams();
     new FormData(form).forEach((entry, key) => {
-      if (typeof entry === 'string') body.append(key, entry);
+      if (typeof entry === 'string' && entry.trim()) body.append(key, entry.trim());
     });
 
     const controller = typeof AbortController === 'function' ? new AbortController() : null;

@@ -136,8 +136,8 @@ const fallbackLinks = (page) =>
   ok('en-tête Accept: application/json', captured[0].accept.includes('application/json'), captured[0].accept);
   const sent = new URLSearchParams(captured[0].body);
   ok('téléphone transmis', sent.get('phone') === '0612345678', sent.get('phone'));
-  ok('champs facultatifs transmis vides', sent.has('name') && sent.get('name') === '');
-  ok('piège à robots transmis vide', sent.has('_gotcha') && sent.get('_gotcha') === '');
+  ok('champs vides non transmis (pas d’e-mail vide pour le filtre de Basin)', !sent.has('email') && !sent.has('name') && !sent.has('message'), captured[0].body);
+  ok('piège à robots vide non transmis', !sent.has('_gotcha'));
   ok('bouton verrouillé après succès', await page.$eval('[data-submit]', (n) => n.disabled));
   ok('brouillon effacé après succès', (await page.evaluate(() => sessionStorage.getItem('muralistique:devis'))) === null);
 
@@ -166,6 +166,8 @@ for (const testCase of errorCases) {
   const text = await statusText(page);
   ok(testCase.label, testCase.expect.test(text), text.slice(0, 90));
   ok(`  ↳ saisies conservées`, (await page.$eval('#qf-name', (n) => n.value)) === 'Salma Bennani');
+  const sentFull = new URLSearchParams(captured[0].body);
+  ok(`  ↳ champs remplis transmis`, sentFull.get('email') === 'salma@exemple.ma' && sentFull.get('city') === 'Casablanca');
   const links = await fallbackLinks(page);
   const wa = links.find((href) => href.startsWith('https://wa.me/')) || '';
   const mail = links.find((href) => href.startsWith('mailto:')) || '';
@@ -176,6 +178,20 @@ for (const testCase of errorCases) {
   await page.waitForTimeout(400);
   ok(`  ↳ un nouvel envoi part bien`, captured.length === 2, `${captured.length} requête(s)`);
   if (testCase.status === 429) await page.screenshot({ path: `${OUT}/form-error.png` });
+  await close();
+}
+
+// ─── 3 bis. Piège à robots rempli : il part quand même (Basin le filtre) ─
+{
+  const { page, captured, close } = await open((route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '{"success":true}' })
+  );
+  console.log('\n— Piège à robots rempli');
+  await page.fill('#qf-phone', '0612345678');
+  await page.evaluate(() => (document.querySelector('#qf-gotcha').value = 'robot'));
+  await page.click('[data-submit]');
+  await page.waitForTimeout(400);
+  ok('piège rempli transmis tel quel', new URLSearchParams(captured[0]?.body || '').get('_gotcha') === 'robot');
   await close();
 }
 

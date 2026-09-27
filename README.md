@@ -165,9 +165,21 @@ node scripts/generate-placeholders.mjs
 
 **À vérifier côté Basin** (le site ne peut pas le voir) :
 
-1. **Dossier Spam de Basin** : une vraie demande jugée suspecte y atterrit
-   (conservée 30 jours) au lieu de la boîte de réception. À consulter
-   régulièrement.
+1. **Filtres anti-spam de Basin** (Form → Settings → Spam) : une demande
+   classée spam n'est **pas** envoyée par e-mail. Une demande courte (téléphone
+   seul) est facilement prise pour du spam. Pour tout recevoir :
+   - **Lead Agent Spam Threshold** (note de qualité par IA) : au minimum ou
+     désactivé ;
+   - **Duplicate filter** : désactivé (sinon un 2ᵉ envoi identique, un test
+     par exemple, part en spam) ;
+   - **Valid email filter** : désactivé (l'e-mail est facultatif ici) ;
+   - **Filtres pays / langue** : désactivés, ou Maroc et français autorisés ;
+   - garder le **honeypot** `_gotcha` : il n'arrête que les robots.
+
+   Chaque demande classée spam indique la raison (ouvrir la demande dans le
+   dossier Spam) : c'est le filtre à couper. Cliquer **Not spam** la remet
+   dans la boîte de réception. Le site n'envoie pas les champs laissés vides,
+   pour ne pas déclencher le filtre e-mail sur une demande sans e-mail.
 2. **Notifications e-mail** : adresse de destination confirmée dans Basin ;
    vérifier le dossier Spam de Gmail et ajouter l'expéditeur de Basin aux
    contacts.
