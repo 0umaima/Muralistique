@@ -8,14 +8,51 @@ import Services from '../components/home/Services.astro';
 import Feedback from '../components/home/Feedback.astro';
 import ContactCta from '../components/ContactCta.astro';
 import { site } from '../data/site.mjs';
+import { studio } from '../data/content';
+import { asset } from '../lib/images';
+
+// Données structurées (schema.org) : disent à Google que « Muralistique » est
+// une entreprise, avec son site, son logo, ses contacts et son Instagram.
+// C'est ce qui l'aide à afficher le bon nom, le logo et les liens pour une
+// recherche sur la marque.
+const home = new URL('/', site.url).href;
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${home}#website`,
+      url: home,
+      name: site.name,
+      inLanguage: site.lang,
+      publisher: { '@id': `${home}#organization` },
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${home}#organization`,
+      name: site.name,
+      url: home,
+      logo: new URL('/favicon.png', site.url).href,
+      image: new URL(asset('brand/og.jpg').src, site.url).href,
+      description: site.tagline,
+      email: site.contact.email || undefined,
+      telephone: site.contact.phoneHref || undefined,
+      founder: { '@type': 'Person', name: studio.founderName },
+      address: { '@type': 'PostalAddress', addressCountry: 'MA' },
+      areaServed: { '@type': 'Country', name: 'Maroc' },
+      sameAs: Object.values(site.social).filter(Boolean),
+    },
+  ],
+};
 ---
 
 <BaseLayout
   title={site.name}
-  description="Muralistique, atelier de fresques murales sur mesure : hôtels, cabinets, écoles, restaurants, bureaux et espaces privés. Devis gratuit sous 48 h."
+  description="Muralistique, atelier de fresques murales sur mesure au Maroc : hôtels, cabinets, écoles, restaurants, bureaux et espaces privés. Devis gratuit sous 48 h."
   headerTheme="ink"
   activeNav="/"
 >
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(structuredData)} />
   <Hero />
   <Stats />
   <Transformations />

@@ -512,6 +512,9 @@ chaque build.
 
 - Le champ `name` de `wrangler.jsonc` doit être **identique au nom du Worker**
   dans le tableau de bord (`muralistique`), sinon le build échoue.
+- `html_handling: "drop-trailing-slash"` : les pages sont servies sans barre
+  finale (`/devis`), comme les liens internes, les balises canonical et le
+  sitemap ; `/devis/` redirige vers `/devis`.
 - Le domaine se branche dans l'onglet **Domains** du Worker (selon la version
   du tableau de bord : **Settings → Domains & Routes → Add → Custom domain**).
 
@@ -549,6 +552,35 @@ le dossier à chaque modification.
 Pour rediriger `muralistique.fr` vers `www.muralistique.fr` (ou l'inverse),
 utilisez **Rules → Redirect Rules** dans le tableau de bord du domaine ; c'est
 inclus dans l'offre gratuite.
+
+### Apparaître dans Google
+
+Le site fournit déjà ce que Google lit : titre et description par page,
+balise canonical, `sitemap-index.xml`, `robots.txt`, image de partage et
+données structurées (schema.org `Organization` + `WebSite` sur l'accueil :
+nom, logo, téléphone, e-mail, Instagram). Il reste à le **présenter** à Google :
+
+1. **Une seule adresse officielle.** `site.url` (`src/data/site.mjs`) vaut
+   `https://www.muralistique.com` : dans Cloudflare, `www.muralistique.com`
+   doit être branché sur le Worker et `muralistique.com` rediriger vers lui
+   (**Rules → Redirect Rules**). Si vous préférez l'adresse sans `www`,
+   changez `site.url` et inversez la redirection.
+2. **Google Search Console** ([search.google.com/search-console](https://search.google.com/search-console)) :
+   ajoutez une propriété **Domaine** `muralistique.com` (la vérification DNS
+   se fait en un clic quand le domaine est chez Cloudflare), puis
+   **Sitemaps** → `https://www.muralistique.com/sitemap-index.xml`, puis
+   **Inspection de l'URL** → accueil, `/studio`, `/realisations` →
+   **Demander l'indexation**.
+3. **Fiche Google Business Profile** ([business.google.com](https://business.google.com)) :
+   « Muralistique », zone desservie (sans adresse publique si vous n'avez pas
+   de local), catégorie de type artiste / peintre muraliste, site, téléphone
+   et photos des fresques. C'est elle qui fait apparaître l'atelier sur
+   « fresque murale Casablanca » et dans Google Maps.
+4. **Liens vers le site** : bio Instagram, fiche Google, et si possible un
+   lien depuis les sites des clients (hôtel, café, école…).
+
+Comptez quelques jours à quelques semaines après l'étape 2 pour que la
+recherche « muralistique » renvoie le site.
 
 ### En-têtes HTTP
 
