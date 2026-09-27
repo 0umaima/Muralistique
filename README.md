@@ -49,7 +49,7 @@ dur dans les composants.
 
 ```
 src/data/
-  site.mjs      Coordonnées, WhatsApp, réseaux, domaine, réglages du formulaire, mentions légales
+  site.mjs      Coordonnées, villes d'intervention, WhatsApp, réseaux, domaine, réglages du formulaire, mentions légales
   projects.ts   Les projets (page Réalisations + pages projet + avant/après de l'accueil)
   sectors.ts    Les secteurs (carrousel de l'accueil + filtres des Réalisations)
   content.ts    Chiffres clés, services, retours clients, page Studio, options du formulaire
@@ -578,6 +578,14 @@ nom, logo, téléphone, e-mail, Instagram). Il reste à le **présenter** à Goo
    « fresque murale Casablanca » et dans Google Maps.
 4. **Liens vers le site** : bio Instagram, fiche Google, et si possible un
    lien depuis les sites des clients (hôtel, café, école…).
+
+**Villes d'intervention** : la liste `site.contact.serviceAreas`
+(`src/data/site.mjs`) s'affiche dans le pied de page de chaque page et part
+dans les données structurées de l'accueil ; le titre et les descriptions
+citent Casablanca, Rabat, Marrakech et Tanger. Évitez de créer une page
+quasi identique par ville : Google les considère comme des pages satellites
+et peut pénaliser tout le site. Une vraie page par ville (projets réalisés
+sur place, photos, témoignages) est en revanche utile.
 
 Comptez quelques jours à quelques semaines après l'étape 2 pour que la
 recherche « muralistique » renvoie le site.

@@ -39,7 +39,10 @@ const structuredData = {
       telephone: site.contact.phoneHref || undefined,
       founder: { '@type': 'Person', name: studio.founderName },
       address: { '@type': 'PostalAddress', addressCountry: 'MA' },
-      areaServed: { '@type': 'Country', name: 'Maroc' },
+      areaServed: [
+        ...site.contact.serviceAreas.map((name) => ({ '@type': 'City', name })),
+        { '@type': 'Country', name: 'Maroc' },
+      ],
       sameAs: Object.values(site.social).filter(Boolean),
     },
   ],
@@ -48,7 +51,7 @@ const structuredData = {
 
 <BaseLayout
   title={site.name}
-  description="Muralistique, atelier de fresques murales sur mesure au Maroc : hôtels, cabinets, écoles, restaurants, bureaux et espaces privés. Devis gratuit sous 48 h."
+  description="Fresques murales sur mesure à Casablanca, Rabat, Marrakech, Tanger et partout au Maroc : hôtels, cabinets, écoles, restaurants, bureaux. Devis gratuit sous 48 h."
   headerTheme="ink"
   activeNav="/"
 >
