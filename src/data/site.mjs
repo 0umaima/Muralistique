@@ -51,8 +51,12 @@ export const site = {
     /** Message pré-rempli à l'ouverture de WhatsApp. */
     whatsappMessage: 'Bonjour Amine, je souhaite un devis pour une fresque murale.',
 
-    /** Ville / zone d'intervention affichée. À REMPLACER. */
-    city: '',
+    /**
+     * Villes d'intervention : affichées dans le pied de page de chaque page et
+     * transmises à Google (données structurées de l'accueil). Ajoutez ou
+     * retirez des villes ici.
+     */
+    serviceAreas: ['Casablanca', 'Rabat', 'Marrakech', 'Mohammedia', 'Témara', 'Tanger', 'Salé', 'Kénitra'],
   },
 
   social: {

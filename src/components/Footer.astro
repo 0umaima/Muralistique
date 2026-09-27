@@ -15,6 +15,7 @@ const socials = (
 ).filter(([, , url]) => Boolean(url));
 
 const year = new Date().getFullYear();
+const areas = site.contact.serviceAreas;
 ---
 
 <footer class="footer" data-section-theme="ink">
@@ -22,6 +23,13 @@ const year = new Date().getFullYear();
     <div class="footer__brand">
       <Logo class="footer__wordmark" />
       <p class="footer__tagline">{site.tagline}</p>
+      {
+        areas.length > 0 && (
+          <p class="footer__areas">
+            Interventions à {areas.join(', ')} et dans les grandes villes du Maroc.
+          </p>
+        )
+      }
       {
         socials.length > 0 && (
           <ul class="footer__socials">
@@ -116,6 +124,11 @@ const year = new Date().getFullYear();
   .footer__tagline {
     margin-top: 20px;
     max-width: 290px;
+  }
+  .footer__areas {
+    margin-top: 12px;
+    max-width: 320px;
+    line-height: 1.6;
   }
 
   .footer__socials {
