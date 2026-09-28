@@ -172,11 +172,9 @@ const hero = t.home.hero;
     pointer-events: none;
   }
   .hero__line { display: block; }
-  /* Deuxième ligne en négatif : lettres noires cerclées de jaune, lisibles
-     sur le fond sombre comme sur une photo claire. */
+  /* Deuxième ligne en noir plein, sans contour. */
   .hero__line--2 {
     color: var(--ink);
-    -webkit-text-stroke: clamp(1.5px, 0.2vw, 3px) var(--brand);
     text-shadow: none;
   }
 
