@@ -27,15 +27,15 @@ export const site = {
 
   contact: {
     /** À REMPLACER — adresse e-mail réelle de l'atelier. */
-    email: 'aminehoumam0@gmail.com',
+    email: 'muralistique@gmail.com',
 
     /**
      * À REMPLACER — numéro de téléphone affiché (format lisible).
      * Laissez la chaîne vide pour masquer complètement le bloc téléphone.
      */
-    phoneDisplay: '+212 6 81 93 2646 ',
+    phoneDisplay: '+212 6 30 46 46 86',
     /** À REMPLACER — même numéro au format composable (tel:). */
-    phoneHref: '+212681932646',
+    phoneHref: '+212630464686',
 
     /** Horaires affichés à côté du numéro. À REMPLACER si besoin. */
     hours: '7j/7 · 9 h à 19 h',
@@ -48,7 +48,7 @@ export const site = {
      * exemples ci-dessous, le site affiche un avertissement visible à la
      * place du bouton WhatsApp (voir src/components/WhatsAppLink.astro).
      */
-    whatsappNumber: '+212681932646',
+    whatsappNumber: '+212630464686',
     /** Message pré-rempli à l'ouverture de WhatsApp. */
     whatsappMessage: 'Bonjour Amine, je souhaite un devis pour une fresque murale.',
 
