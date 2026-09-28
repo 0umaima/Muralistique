@@ -6,7 +6,11 @@
 import { launchBrowser } from './browser.mjs';
 
 const BASE = process.env.BASE || 'http://localhost:4321';
-const PAGES = ['/', '/realisations', '/realisations/robotique-en-mouvement', '/studio', '/devis', '/mentions-legales', '/404'];
+const PAGES_FR = ['/', '/realisations', '/realisations/robotique-en-mouvement', '/studio', '/devis', '/mentions-legales', '/404'];
+const PAGES_EN = ['/en', '/en/projects', '/en/projects/robotique-en-mouvement', '/en/studio', '/en/quote', '/en/legal-notice', '/en/404'];
+const PAGES = [...PAGES_FR, ...PAGES_EN];
+/** Langue attendue dans <html lang>. */
+const langOf = (path) => (path === '/en' || path.startsWith('/en/') ? 'en' : 'fr');
 const WIDTHS = [360, 768, 1024, 1440];
 
 const browser = await launchBrowser();
@@ -122,12 +126,13 @@ for (const width of WIDTHS) {
         (a) => !a.textContent.trim() && !a.getAttribute('aria-label')
       ).length,
       canonical: document.querySelector('link[rel=canonical]')?.href || '',
+      alternates: [...document.querySelectorAll('link[rel=alternate][hreflang]')].map((l) => l.hreflang).join(),
       description: document.querySelector('meta[name=description]')?.content || '',
     }));
     ok(
       `${path} — un seul <h1>, lang, main, alt, noms accessibles`,
       report.h1 === 1 &&
-        report.lang === 'fr' &&
+        report.lang === langOf(path) &&
         report.main === 1 &&
         report.imagesWithoutAlt === 0 &&
         report.buttonsWithoutName === 0 &&
@@ -135,6 +140,7 @@ for (const width of WIDTHS) {
       JSON.stringify(report).slice(0, 150)
     );
     ok(`${path} — titre + description + canonique`, Boolean(report.title && report.description && report.canonical));
+    ok(`${path} — versions fr / en / x-default (hreflang)`, report.alternates === 'fr,en,x-default', report.alternates);
   }
   await page.close();
 }

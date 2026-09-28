@@ -1,6 +1,6 @@
 /**
  * En-tête : bascule de thème (ivoire / encre) selon la section qui passe
- * dessous, et navigation mobile accessible.
+ * dessous, navigation mobile accessible et sélecteur de langue.
  *
  * Les sections déclarent leur thème avec `data-section-theme="ink|ivory"`.
  * Rien n'est deviné : c'est toujours une valeur explicite, ce qui évite les
@@ -94,6 +94,9 @@ function initMobileNav(header: HTMLElement) {
   if (!toggle || !panel) return;
 
   const label = toggle.querySelector<HTMLElement>('.visually-hidden');
+  // Libellés dans la langue de la page, fournis par Header.astro.
+  const openLabel = toggle.dataset.labelOpen || 'Ouvrir le menu';
+  const closeLabel = toggle.dataset.labelClose || 'Fermer le menu';
   let lastFocused: HTMLElement | null = null;
 
   const focusables = () =>
@@ -105,7 +108,7 @@ function initMobileNav(header: HTMLElement) {
     lastFocused = document.activeElement as HTMLElement;
     panel.hidden = false;
     toggle.setAttribute('aria-expanded', 'true');
-    if (label) label.textContent = 'Fermer le menu';
+    if (label) label.textContent = closeLabel;
     document.body.style.overflow = 'hidden';
     focusables()[0]?.focus();
   };
@@ -113,7 +116,7 @@ function initMobileNav(header: HTMLElement) {
   const close = (restoreFocus = true) => {
     panel.hidden = true;
     toggle.setAttribute('aria-expanded', 'false');
-    if (label) label.textContent = 'Ouvrir le menu';
+    if (label) label.textContent = openLabel;
     document.body.style.overflow = '';
     if (restoreFocus) (lastFocused ?? toggle).focus();
   };
@@ -157,9 +160,42 @@ function initMobileNav(header: HTMLElement) {
   );
 }
 
+/**
+ * Sélecteur de langue : le lien vers l'autre langue garde le filtre et
+ * l'ancre de la page en cours (/realisations?secteur=sante →
+ * /en/projects?secteur=sante), lus au moment du clic puisque les filtres
+ * modifient l'adresse sans recharger. Au clic, le curseur glisse vers la
+ * nouvelle langue pendant que la page se charge.
+ */
+function initLangSwitch(header: HTMLElement) {
+  const nav = header.querySelector<HTMLElement>('[data-lang-switch]');
+  if (!nav) return;
+  nav.querySelectorAll<HTMLAnchorElement>('[data-lang-link]').forEach((link) => {
+    const base = link.getAttribute('href') || '/';
+    const sync = () => {
+      link.href = base + window.location.search + window.location.hash;
+    };
+    link.addEventListener('pointerenter', sync);
+    link.addEventListener('focus', sync);
+    link.addEventListener('click', (event) => {
+      sync();
+      // Ouverture dans un nouvel onglet : la page courante ne change pas.
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+      if (link.dataset.langOption) nav.dataset.active = link.dataset.langOption;
+    });
+  });
+  // Retour arrière depuis l'autre langue (page restaurée du cache) : le
+  // curseur revient sur la langue de cette page.
+  const initial = nav.dataset.active;
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted && initial) nav.dataset.active = initial;
+  });
+}
+
 export function initHeader() {
   const header = document.querySelector<HTMLElement>('[data-header]');
   if (!header) return;
   initThemeSync(header);
   initMobileNav(header);
+  initLangSwitch(header);
 }

@@ -12,6 +12,18 @@
  */
 import { revealNow } from './reveal';
 
+/** Textes du compteur, selon la langue de la page (<html lang>). */
+const TEXT = {
+  fr: {
+    count: (n: number) => `${n} projet${n > 1 ? 's' : ''}`,
+    shown: (shown: number, total: number) => `${shown} sur ${total} projets affichés`,
+  },
+  en: {
+    count: (n: number) => `${n} project${n === 1 ? '' : 's'}`,
+    shown: (shown: number, total: number) => `${shown} of ${total} projects shown`,
+  },
+};
+
 export function initProjectFilters() {
   const grid = document.querySelector<HTMLElement>('[data-project-grid]');
   if (!grid) return;
@@ -33,7 +45,8 @@ export function initProjectFilters() {
 
   const matching = () => cards.filter((card) => filter === 'tous' || card.dataset.sector === filter);
 
-  const plural = (n: number) => `${n} projet${n > 1 ? 's' : ''}`;
+  const text = document.documentElement.lang === 'en' ? TEXT.en : TEXT.fr;
+  const plural = text.count;
 
   // Tuiles remises à zéro sous la ligne de flottaison : elles s'ouvriront
   // quand elles entreront à l'écran, comme au premier chargement.
@@ -87,7 +100,7 @@ export function initProjectFilters() {
     if (moreEl) moreEl.hidden = remaining <= 0;
     if (remainingEl) {
       remainingEl.textContent =
-        remaining > 0 ? `${shown.length} sur ${matched.length} projets affichés` : '';
+        remaining > 0 ? text.shown(shown.length, matched.length) : '';
     }
   };
 

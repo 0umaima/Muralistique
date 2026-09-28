@@ -1,9 +1,13 @@
 ---
 import FixedBg from '../FixedBg.astro';
-import { stats } from '../../data/content';
+import { getStats } from '../../data/content';
+import { getLang, useTranslations } from '../../i18n';
+
+const lang = getLang(Astro.url);
+const stats = getStats(lang);
 ---
 
-<section class="stats theme-ink" data-section-theme="ink" aria-label="Chiffres clés">
+<section class="stats theme-ink" data-section-theme="ink" aria-label={useTranslations(lang).home.stats}>
   <FixedBg src="projects/cafe-nord/cover.jpeg" scrim={0.74} />
   <ul class="stats__grid shell">
     {

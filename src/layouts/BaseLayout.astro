@@ -4,13 +4,14 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { site } from '../data/site.mjs';
 import { asset } from '../lib/images';
+import { DEFAULT_LANG, LANGS, LOCALES, getLang, localizePath, useTranslations } from '../i18n';
 
 interface Props {
   title: string;
   description: string;
   /** Thème de la première section, pour que l'en-tête démarre à la bonne couleur. */
   headerTheme?: 'ink' | 'ivory';
-  /** Lien de navigation à marquer comme page courante. */
+  /** Lien de navigation à marquer comme page courante (adresse française : '/realisations'…). */
   activeNav?: string;
   /** Image de partage spécifique à la page (chemin dans src/assets/images/). */
   ogImage?: string;
@@ -27,13 +28,24 @@ const {
   noindex = false,
 } = Astro.props;
 
-const canonical = new URL(Astro.url.pathname.replace(/\/+$/, '') || '/', Astro.site ?? site.url).href;
-const ogUrl = new URL(asset(ogImage).src, Astro.site ?? site.url).href;
-const fullTitle = title === site.name ? `${site.name} | Fresques murales à Casablanca et au Maroc` : `${title} | ${site.name}`;
+const lang = getLang(Astro.url);
+const t = useTranslations(lang);
+const base = Astro.site ?? site.url;
+
+const canonical = new URL(Astro.url.pathname.replace(/\/+$/, '') || '/', base).href;
+const ogUrl = new URL(asset(ogImage).src, base).href;
+const fullTitle = title === site.name ? `${site.name} | ${t.meta.homeTitle}` : `${title} | ${site.name}`;
+
+// La même page dans chaque langue (balises hreflang) ; x-default = français.
+const alternates = LANGS.map((code) => ({
+  hreflang: LOCALES[code].hreflang,
+  href: new URL(localizePath(Astro.url.pathname, code), base).href,
+}));
+const defaultAlternate = new URL(localizePath(Astro.url.pathname, DEFAULT_LANG), base).href;
 ---
 
 <!doctype html>
-<html lang={site.lang}>
+<html lang={LOCALES[lang].lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -43,12 +55,15 @@ const fullTitle = title === site.name ? `${site.name} | Fresques murales à Casa
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
+    <link rel="alternate" hreflang="x-default" href={defaultAlternate} />
     {noindex && <meta name="robots" content="noindex, follow" />}
     <meta name="theme-color" content="#0B0B0B" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
-    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:locale" content={LOCALES[lang].og} />
+    {LANGS.filter((code) => code !== lang).map((code) => <meta property="og:locale:alternate" content={LOCALES[code].og} />)}
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -75,7 +90,7 @@ const fullTitle = title === site.name ? `${site.name} | Fresques murales à Casa
   </head>
 
   <body>
-    <a class="skip-link" href="#contenu">Aller au contenu</a>
+    <a class="skip-link" href="#contenu">{t.meta.skipLink}</a>
     <Header theme={headerTheme} active={activeNav} />
     <main id="contenu">
       <slot />

@@ -1,0 +1,88 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { getProjects } from '../data/projects';
+import { getLang, href, useTranslations } from '../i18n';
+
+/**
+ * Page 404, en français (/404) et en anglais (/en/404). Cloudflare sert la
+ * page 404 la plus proche de l'adresse demandée : une adresse /en/… inconnue
+ * reçoit donc la version anglaise.
+ */
+const lang = getLang(Astro.url);
+const ui = useTranslations(lang);
+const t = ui.notFound;
+const suggestions = getProjects(lang).slice(0, 3);
+---
+
+<BaseLayout
+  title={t.title}
+  description={t.description}
+  headerTheme="ink"
+  noindex
+>
+  <section class="nf theme-ink" data-section-theme="ink">
+    <div class="shell pad nf__inner">
+      <p class="eyebrow nf__eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />{t.eyebrow}</p>
+      <h1 class="nf__title">{t.heading}</h1>
+      <p class="nf__lead muted">{t.lead}</p>
+
+      <div class="nf__actions">
+        <a class="btn btn--primary" href={href('/', lang)}>
+          {t.home}
+          <Icon name="arrow-up-right" size={14} stroke={2.2} />
+        </a>
+        <a class="btn btn--ghost-light" href={href('/realisations', lang)}>{ui.seeProjects}</a>
+      </div>
+
+      <ul class="nf__links">
+        {
+          suggestions.map((project) => (
+            <li>
+              <a href={href(`/realisations/${project.slug}`, lang)}>
+                <span>{project.title}</span>
+                <Icon name="arrow-up-right" size={14} stroke={2.2} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf { display: flex; align-items: center; min-height: calc(100svh - var(--header-h)); }
+  .nf__inner { padding-block: clamp(3rem, 8vw, 7rem); width: 100%; }
+  .nf__eyebrow { color: var(--muted-on-dark); }
+  .nf__title {
+    margin-top: 24px;
+    font-size: var(--fs-h1);
+    line-height: 0.94;
+    letter-spacing: var(--ls-display);
+    color: var(--ivory);
+  }
+  .nf__lead { margin-top: 22px; max-width: 520px; font-size: var(--fs-body-lg); }
+  .nf__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
+
+  .nf__links {
+    display: flex;
+    flex-direction: column;
+    margin-top: clamp(2.5rem, 4.4vw, 4rem);
+    border-top: 1px solid var(--ink-line);
+    max-width: 620px;
+  }
+  .nf__links a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--ink-line);
+    font: 600 1.25rem/1.2 var(--font-display);
+    letter-spacing: var(--ls-display);
+    color: var(--ivory);
+  }
+  .nf__links a:hover { color: var(--muted-on-dark); }
+  .nf__links :global(svg) { color: var(--ivory); }
+</style>

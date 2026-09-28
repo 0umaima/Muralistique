@@ -1,7 +1,12 @@
 ---
 import Icon from '../Icon.astro';
 import Media from '../Media.astro';
-import { services } from '../../data/content';
+import { getServices } from '../../data/content';
+import { getLang, href, useTranslations } from '../../i18n';
+
+const lang = getLang(Astro.url);
+const t = useTranslations(lang);
+const services = getServices(lang);
 ---
 
 <section class="services theme-ink section" id="services" data-section-theme="ink">
@@ -9,9 +14,9 @@ import { services } from '../../data/content';
     <div class="section-head" data-reveal>
       <div>
         <p class="section-index">02</p>
-        <h2 class="section-title">Nos services</h2>
+        <h2 class="section-title">{t.home.services.title}</h2>
       </div>
-      <p class="section-head__aside">Sur le mur, sur toile ou en direct devant votre public.</p>
+      <p class="section-head__aside">{t.home.services.aside}</p>
     </div>
 
     <div class="services__list" data-accordion>
@@ -62,8 +67,8 @@ import { services } from '../../data/content';
                   <div>
                     <h4 class="services__panel-title">{service.heading}</h4>
                     <p class="services__panel-text muted">{service.text}</p>
-                    <a class="btn btn--primary btn--md services__panel-cta" href="/devis">
-                      Demander un devis
+                    <a class="btn btn--primary btn--md services__panel-cta" href={href('/devis', lang)}>
+                      {t.header.cta}
                       <Icon name="arrow-up-right" size={13} stroke={2.2} />
                     </a>
                   </div>

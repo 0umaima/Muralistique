@@ -1,0 +1,79 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/home/Hero.astro';
+import Stats from '../components/home/Stats.astro';
+import Sectors from '../components/home/Sectors.astro';
+import Transformations from '../components/home/Transformations.astro';
+import Services from '../components/home/Services.astro';
+import Feedback from '../components/home/Feedback.astro';
+import ContactCta from '../components/ContactCta.astro';
+import { siteFor } from '../data/site.mjs';
+import { studio } from '../data/content';
+import { asset } from '../lib/images';
+import { getLang, localizePath, useTranslations } from '../i18n';
+
+/** Accueil, commun à / (français) et /en (anglais). */
+const lang = getLang(Astro.url);
+const t = useTranslations(lang);
+const site = siteFor(lang);
+
+// Données structurées (schema.org) : disent à Google que « Muralistique » est
+// une entreprise, avec son site, son logo, ses contacts et son Instagram.
+// C'est ce qui l'aide à afficher le bon nom, le logo et les liens pour une
+// recherche sur la marque. L'entreprise garde le même identifiant dans les
+// deux langues ; chaque version du site est un `WebSite` dans sa langue.
+const root = new URL('/', site.url).href;
+const home = new URL(localizePath('/', lang), site.url).href;
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${home}#website`,
+      url: home,
+      name: site.name,
+      inLanguage: site.lang,
+      publisher: { '@id': `${root}#organization` },
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${root}#organization`,
+      name: site.name,
+      url: root,
+      logo: new URL('/favicon.png', site.url).href,
+      image: new URL(asset('brand/og.jpg').src, site.url).href,
+      description: site.tagline,
+      email: site.contact.email || undefined,
+      telephone: site.contact.phoneHref || undefined,
+      founder: { '@type': 'Person', name: studio.founderName },
+      address: { '@type': 'PostalAddress', addressCountry: 'MA' },
+      areaServed: [
+        ...site.contact.serviceAreas.map((name) => ({ '@type': 'City', name })),
+        { '@type': 'Country', name: t.meta.country },
+      ],
+      sameAs: Object.values(site.social).filter(Boolean),
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title={site.name}
+  description={t.home.description}
+  headerTheme="ink"
+  activeNav="/"
+>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(structuredData)} />
+  <Hero />
+  <Stats />
+  <Transformations />
+  <Services />
+  <Sectors />
+  <ContactCta title={t.letsTalk} bg="projects/harmonie-verte/cover.jpeg" />
+  <Feedback />
+</BaseLayout>
+
+<script>
+  import { initReveal } from '../scripts/reveal';
+  initReveal();
+</script>

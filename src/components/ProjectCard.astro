@@ -3,6 +3,7 @@ import Icon from './Icon.astro';
 import Media from './Media.astro';
 import { sectorBySlug } from '../data/sectors';
 import type { Project } from '../data/projects';
+import { getLang, href, useTranslations } from '../i18n';
 
 /**
  * Tuile de la grille Réalisations : l'image seule, en grand. Le titre, le
@@ -16,12 +17,14 @@ interface Props {
   priority?: boolean;
 }
 const { project, index = 0, priority = false } = Astro.props;
-const sector = sectorBySlug(project.sector);
+const lang = getLang(Astro.url);
+const t = useTranslations(lang);
+const sector = sectorBySlug(project.sector, lang);
 const meta = [sector?.label, project.city].filter(Boolean);
 ---
 
 <article class="tile" data-project data-sector={project.sector} data-index={index}>
-  <a class="tile__link" href={`/realisations/${project.slug}`} data-tile>
+  <a class="tile__link" href={href(`/realisations/${project.slug}`, lang)} data-tile>
     <div class="tile__frame" data-reveal-clip data-reveal-delay={(index % 2) * 120}>
       <div class="tile__clip">
         <Media
@@ -45,7 +48,7 @@ const meta = [sector?.label, project.city].filter(Boolean);
       <h2 class="tile__title">{project.title}</h2>
       <span class="tile__excerpt">{project.excerpt}</span>
       <span class="tile__cta">
-        Voir le projet
+        {t.viewProject}
         <Icon name="arrow-up-right" size={16} stroke={2.2} />
       </span>
     </span>

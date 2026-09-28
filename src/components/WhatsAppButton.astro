@@ -10,6 +10,7 @@
 import BrandIcon from './BrandIcon.astro';
 import Icon from './Icon.astro';
 import { whatsappUrl } from '../data/site.mjs';
+import { getLang, useTranslations } from '../i18n';
 
 interface Props {
   label?: string;
@@ -18,8 +19,10 @@ interface Props {
   variant?: 'primary' | 'outline-light';
   block?: boolean;
 }
-const { label = 'Ouvrir WhatsApp', class: className = '', variant = 'outline-light', block = false } = Astro.props;
-const url = whatsappUrl();
+const lang = getLang(Astro.url);
+const t = useTranslations(lang).whatsapp;
+const { label = t.open, class: className = '', variant = 'outline-light', block = false } = Astro.props;
+const url = whatsappUrl(lang);
 const variantClass = variant === 'primary' ? 'btn--primary' : 'btn--ghost-light';
 ---
 
@@ -38,8 +41,8 @@ const variantClass = variant === 'primary' ? 'btn--primary' : 'btn--ghost-light'
     <p class:list={['wa-missing', className]} role="note">
       <Icon name="alert-circle" size={18} />
       <span>
-        <strong>Numéro WhatsApp non configuré.</strong> Renseignez
-        <code>contact.whatsappNumber</code> dans <code>src/data/site.mjs</code> pour activer ce bouton.
+        <strong>{t.missingTitle}</strong> {t.missingFill}
+        <code>contact.whatsappNumber</code> {t.missingIn} <code>src/data/site.mjs</code> {t.missingEnd}
       </span>
     </p>
   )

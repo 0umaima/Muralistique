@@ -1,6 +1,7 @@
 /**
  * Tests d'interaction du site (filtres, accordéon, comparateur, navigation
- * mobile, mouvement réduit, fonctionnement sans JavaScript).
+ * mobile, mouvement réduit, fonctionnement sans JavaScript, version anglaise
+ * et sélecteur de langue).
  *
  *   npm run build && npm run preview   # dans un terminal
  *   node scripts/test-interactions.mjs # dans un autre
@@ -304,6 +305,88 @@ const ok = (label, cond, extra = '') => {
   ok('validation native active sans JavaScript', await page.$eval('[data-quote-form]', (n) => !n.noValidate));
   const required = await page.$$eval('[data-quote-form] [required]', (n) => n.map((e) => e.name));
   ok('seul le téléphone est exigé', required.join() === 'phone', required.join());
+  await ctx.close();
+}
+
+// ─── 6. Version anglaise et sélecteur de langue ─────────────────────────
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  page.on('pageerror', (e) => fails.push('JS error: ' + e.message));
+  console.log('\n— Version anglaise');
+
+  // La bascule garde le filtre en cours
+  await page.goto(BASE + '/realisations?secteur=bureaux', { waitUntil: 'networkidle' });
+  ok('sélecteur visible dans l’en-tête', await page.isVisible('[data-header] [data-lang-switch]'));
+  await Promise.all([page.waitForURL('**/en/projects?secteur=bureaux'), page.click('[data-lang-link]')]);
+  ok('FR → EN garde le filtre', page.url().endsWith('/en/projects?secteur=bureaux'), page.url());
+  ok('page anglaise : <html lang="en">', (await page.evaluate(() => document.documentElement.lang)) === 'en');
+  ok(
+    'filtre et compteur traduits',
+    (await page.$eval('.filter.is-active', (n) => n.firstChild.textContent.trim())) === 'Offices' &&
+      (await page.$eval('[data-project-count]', (n) => n.textContent.trim())) === '2 projects'
+  );
+  await page.click('[data-filter="tous"]');
+  ok('« All » : 7 projects', (await page.$eval('[data-project-count]', (n) => n.textContent.trim())) === '7 projects');
+  ok('curseur sur EN', (await page.$eval('[data-lang-switch]', (n) => n.dataset.active)) === 'en');
+
+  // Retour arrière : le curseur revient sur FR
+  await page.goBack({ waitUntil: 'networkidle' });
+  ok(
+    'retour arrière : page et curseur en français',
+    page.url().endsWith('/realisations?secteur=bureaux') &&
+      (await page.$eval('[data-lang-switch]', (n) => n.dataset.active)) === 'fr',
+    page.url()
+  );
+
+  // Au clavier, et retour EN → FR avec l'ancre
+  await page.goto(BASE + '/studio', { waitUntil: 'networkidle' });
+  await page.focus('[data-lang-link]');
+  await Promise.all([page.waitForURL('**/en/studio'), page.keyboard.press('Enter')]);
+  ok('bascule au clavier', page.url().endsWith('/en/studio'), page.url());
+  await page.goto(BASE + '/en#contact', { waitUntil: 'networkidle' });
+  await Promise.all([page.waitForURL((url) => url.pathname === '/'), page.click('[data-lang-link]')]);
+  ok('EN → FR garde l’ancre', page.url().endsWith('/#contact'), page.url());
+
+  // Aucun lien interne d'une page anglaise ne renvoie vers le site français
+  // (hors sélecteur de langue et images grand format de la galerie)
+  for (const path of ['/en', '/en/projects', '/en/projects/cafe-nord', '/en/studio', '/en/quote', '/en/legal-notice', '/en/404']) {
+    await page.goto(BASE + path, { waitUntil: 'load' });
+    const leaks = await page.$$eval('a[href^="/"]:not([data-lang-link]):not([href^="/_astro/"])', (n) =>
+      n.map((a) => a.getAttribute('href')).filter((href) => href !== '/en' && !href.startsWith('/en/') && !href.startsWith('/en#') && !href.startsWith('/en?'))
+    );
+    ok(`${path} — liens internes en anglais`, leaks.length === 0, leaks.slice(0, 3).join(', '));
+  }
+  ok('404 anglaise', (await page.$eval('h1', (n) => n.textContent.trim())) === 'This wall doesn’t exist.');
+
+  // Formulaire anglais : messages traduits, langue transmise à l'atelier
+  await page.goto(BASE + '/en/quote', { waitUntil: 'networkidle' });
+  await page.click('[data-submit]');
+  ok(
+    'erreur de validation en anglais',
+    (await page.$eval('[data-error-for="phone"]', (n) => n.textContent)).startsWith('Please enter your phone number')
+  );
+  let body = '';
+  await page.route('https://usebasin.com/**', (route) => {
+    body = route.request().postData() || '';
+    route.fulfill({ status: 200, contentType: 'application/json', body: '{"success":true}' });
+  });
+  await page.fill('#qf-phone', '+212 6 12 34 56 78');
+  await page.click('[data-submit]');
+  await page.waitForSelector('[data-form-status][data-tone="success"]');
+  ok('langue « English » envoyée avec la demande', new URLSearchParams(body).get('language') === 'English', body.slice(0, 80));
+  ok('confirmation en anglais', (await page.$eval('[data-form-status]', (n) => n.textContent)).includes('Thank you'));
+  await page.close();
+}
+
+// ─── 7. Sélecteur de langue sans JavaScript ─────────────────────────────
+{
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 800 }, javaScriptEnabled: false });
+  const page = await ctx.newPage();
+  await page.goto(BASE + '/devis', { waitUntil: 'load' });
+  console.log('\n— Sélecteur de langue sans JavaScript');
+  ok('visible en mobile sans JavaScript', await page.isVisible('[data-lang-switch]'));
+  await Promise.all([page.waitForURL('**/en/quote'), page.click('[data-lang-link]')]);
+  ok('lien simple vers la page anglaise', page.url().endsWith('/en/quote'), page.url());
   await ctx.close();
 }
 

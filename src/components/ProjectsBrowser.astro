@@ -1,8 +1,9 @@
 ---
 import Icon from './Icon.astro';
 import ProjectCard from './ProjectCard.astro';
-import { projects } from '../data/projects';
-import { sectors } from '../data/sectors';
+import { getProjects } from '../data/projects';
+import { getSectors } from '../data/sectors';
+import { getLang, useTranslations } from '../i18n';
 
 /**
  * Grille des réalisations : de grandes images de même format, bord à bord,
@@ -16,6 +17,11 @@ import { sectors } from '../data/sectors';
  * le bouton « voir plus » disparaissent.
  */
 const PAGE_SIZE = 8;
+
+const lang = getLang(Astro.url);
+const t = useTranslations(lang);
+const projects = getProjects(lang);
+const sectors = getSectors(lang);
 const counts = new Map<string, number>();
 projects.forEach((p) => counts.set(p.sector, (counts.get(p.sector) ?? 0) + 1));
 const usedSectors = sectors.filter((s) => counts.has(s.slug));
@@ -23,8 +29,8 @@ const usedSectors = sectors.filter((s) => counts.has(s.slug));
 
 <section class="browser theme-ink" id="projets" data-section-theme="ink">
   <div class="browser__bar shell pad">
-    <div class="browser__filters only-js" role="group" aria-label="Filtrer par secteur">
-      <button class="filter is-active" type="button" data-filter="tous" aria-pressed="true">Tous</button>
+    <div class="browser__filters only-js" role="group" aria-label={t.projects.filterLabel}>
+      <button class="filter is-active" type="button" data-filter="tous" aria-pressed="true">{t.projects.all}</button>
       {
         usedSectors.map((sector) => (
           <button class="filter" type="button" data-filter={sector.slug} aria-pressed="false">
@@ -35,7 +41,7 @@ const usedSectors = sectors.filter((s) => counts.has(s.slug));
       }
     </div>
     <p class="browser__count" data-project-count aria-live="polite">
-      {projects.length} projet{projects.length > 1 ? 's' : ''}
+      {t.projectCount(projects.length)}
     </p>
   </div>
 
@@ -47,14 +53,14 @@ const usedSectors = sectors.filter((s) => counts.has(s.slug));
     <p class="browser__empty" data-project-empty hidden>
       <Icon name="search-x" size={22} stroke={1.8} />
       <span>
-        Aucun projet dans ce secteur pour l’instant.
-        <button class="browser__reset" type="button" data-filter-reset>Voir tous les projets</button>
+        {t.projects.empty}
+        <button class="browser__reset" type="button" data-filter-reset>{t.projects.reset}</button>
       </span>
     </p>
 
     <div class="browser__more only-js" data-project-more hidden>
       <button class="btn btn--ghost-light" type="button" data-project-more-button>
-        Voir plus de projets
+        {t.projects.more}
         <Icon name="chevron-down" size={16} stroke={2.2} />
       </button>
       <p class="browser__more-count muted" data-project-remaining></p>
