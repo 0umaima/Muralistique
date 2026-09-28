@@ -158,12 +158,13 @@ const hero = t.home.hero;
     stroke-linecap: round;
   }
   .hero__stroke--a { left: -4%; top: 30%; width: 12%; }
-  .hero__stroke--b { right: -3%; bottom: 2%; width: 20%; }
+  /* Remonté contre l'image de droite : il ne croise pas le titre. */
+  .hero__stroke--b { right: -5%; bottom: 10%; width: 20%; }
 
-  /* Titre sous le collage, sur le fond sombre uni : blanc puis jaune, le
-     jaune portant l'idée clé (« à la main »). Il mord à peine sur le bas de
-     la scène, dans le vide laissé sous l'image centrale, sans toucher les
-     photos. */
+  /* Titre sous le collage, hors des photos : blanc puis jaune, le jaune
+     portant l'idée clé (« à la main »). Il mord à peine sur le bas de la
+     scène, dans le vide laissé sous l'image centrale, sans toucher les
+     photos ; une ombre douce le détache des pinceaux du fond. */
   .hero__title {
     position: relative;
     z-index: 5;
@@ -173,6 +174,7 @@ const hero = t.home.hero;
     line-height: 0.95;
     text-align: center;
     color: var(--brand);
+    text-shadow: 0 2px 28px rgba(0, 0, 0, 0.55);
   }
   .hero__line { display: block; }
   .hero__line--1 { color: var(--ivory); }
@@ -194,13 +196,14 @@ const hero = t.home.hero;
     .hero__shot--center { --x: 27%; --y: 0%; --w: 48%; }
     .hero__shot--right { --x: 60%; --y: 16%; --w: 40%; }
     .hero__stroke--a { left: -4%; top: 44%; width: 16%; }
-    .hero__stroke--b { width: 26%; }
+    .hero__stroke--b { width: 26%; bottom: 14%; }
   }
 
   /* Mobile : collage plus vertical, titre sur toute la largeur */
   @media (max-width: 600px) {
     .hero__inner { --title-size: clamp(2.5rem, 11.5vw, 4.25rem); }
-    .hero__stage { aspect-ratio: 8 / 7; }
+    .hero__stage { aspect-ratio: 10 / 9; }
+    .hero__title { margin-top: 0; }
     .hero__shot--left { --x: 0%; --y: 10%; --w: 46%; --ar: 3 / 4; }
     .hero__shot--center { --x: 24%; --y: 0%; --w: 56%; --ar: 3 / 4; }
     .hero__shot--right { --x: 52%; --y: 24%; --w: 48%; --ar: 3 / 4; }
