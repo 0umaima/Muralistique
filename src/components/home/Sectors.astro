@@ -1,8 +1,9 @@
 ---
 import Icon from '../Icon.astro';
 import Media from '../Media.astro';
-import { sectors } from '../../data/sectors';
+import { getSectors } from '../../data/sectors';
 import { projectsInSector } from '../../data/projects';
+import { getLang, href, useTranslations } from '../../i18n';
 
 /**
  * Carrousel des secteurs, nourri uniquement par les vrais projets :
@@ -13,8 +14,11 @@ import { projectsInSector } from '../../data/projects';
  * Le rail se fait défiler au doigt, à la souris (glisser), au clavier, ou
  * avec les flèches. Sans JavaScript, c'est un simple rail défilant.
  */
-const withWork = sectors
-  .map((sector) => ({ sector, projects: projectsInSector(sector.slug) }))
+const lang = getLang(Astro.url);
+const t = useTranslations(lang);
+const s = t.home.sectors;
+const withWork = getSectors(lang)
+  .map((sector) => ({ sector, projects: projectsInSector(sector.slug, lang) }))
   .sort((a, b) => Number(b.projects.length > 0) - Number(a.projects.length > 0));
 const total = withWork.length;
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -25,16 +29,16 @@ const pad = (n: number) => String(n).padStart(2, '0');
     <div class="section-head" data-reveal>
       <div>
         <p class="section-index">03</p>
-        <h2 class="section-title">Nos secteurs</h2>
+        <h2 class="section-title">{s.title}</h2>
       </div>
       <div class="sectors__nav only-js">
         <p class="sectors__counter" aria-hidden="true">
           <span data-carousel-current>01</span><span class="sectors__counter-total">/ {pad(total)}</span>
         </p>
-        <button class="sectors__arrow" type="button" data-carousel-prev aria-controls="secteurs-rail" aria-label="Secteur précédent">
+        <button class="sectors__arrow" type="button" data-carousel-prev aria-controls="secteurs-rail" aria-label={s.prev}>
           <Icon name="arrow-left" size={20} stroke={2} />
         </button>
-        <button class="sectors__arrow" type="button" data-carousel-next aria-controls="secteurs-rail" aria-label="Secteur suivant">
+        <button class="sectors__arrow" type="button" data-carousel-next aria-controls="secteurs-rail" aria-label={s.next}>
           <Icon name="arrow-right" size={20} stroke={2} />
         </button>
       </div>
@@ -45,7 +49,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
     class="sectors__viewport"
     id="secteurs-rail"
     role="region"
-    aria-label="Secteurs : faire défiler horizontalement"
+    aria-label={s.rail}
     tabindex="0"
     data-carousel-viewport
   >
@@ -58,7 +62,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
             <li class="sectors__item" data-carousel-item data-reveal data-reveal-delay={Math.min(i, 4) * 80}>
               <a
                 class:list={['sectors__card', !cover && 'sectors__card--open']}
-                href={cover ? `/realisations?secteur=${sector.slug}` : '/devis'}
+                href={href(cover ? `/realisations?secteur=${sector.slug}` : '/devis', lang)}
                 draggable="false"
               >
                 <div class="sectors__image" data-carousel-parallax>
@@ -74,7 +78,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
                 <span class="sectors__top">
                   <span class="sectors__num">{pad(i + 1)}</span>
                   <span class="sectors__count">
-                    {count > 0 ? `${count} projet${count > 1 ? 's' : ''}` : 'Premier projet ?'}
+                    {count > 0 ? t.projectCount(count) : s.firstProject}
                   </span>
                 </span>
 
@@ -89,7 +93,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
                           ))}
                         </span>
                       ) : (
-                        <span class="sectors__blurb">{sector.blurb} Votre lieu peut être le premier.</span>
+                        <span class="sectors__blurb">{sector.blurb} {s.beFirst}</span>
                       )}
                     </span>
                   </span>

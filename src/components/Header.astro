@@ -1,34 +1,42 @@
 ---
 import Icon from './Icon.astro';
 import Logo from './Logo.astro';
-import { mainNav } from '../data/nav';
+import LangSwitch from './LangSwitch.astro';
+import { mainNavFor } from '../data/nav';
 import { site } from '../data/site.mjs';
+import { getLang, href, useTranslations } from '../i18n';
 
 interface Props {
   /** Thème de la section située sous l'en-tête au chargement. */
   theme?: 'ink' | 'ivory';
+  /** Page courante, par son adresse française ('/realisations', '/devis'…). */
   active?: string;
 }
 const { theme = 'ink', active } = Astro.props;
 
-const isActive = (href: string) => active === href || (active && href !== '/' && active.startsWith(href));
+const lang = getLang(Astro.url);
+const t = useTranslations(lang).header;
+const mainNav = mainNavFor(lang);
+const quoteHref = href('/devis', lang);
+
+const isActive = (key: string) => active === key || (active && key !== '/' && active.startsWith(key));
 ---
 
 <header class="header" data-header data-theme={theme}>
   <div class="header__inner pad">
-    <a class="header__brand" href="/" aria-label={`${site.name}, accueil`}>
+    <a class="header__brand" href={href('/', lang)} aria-label={`${site.name}, ${t.home}`}>
       <Logo class="header__logo" />
     </a>
 
-    <nav class="header__nav" aria-label="Navigation principale">
+    <nav class="header__nav" aria-label={t.mainNav}>
       <ul class="header__links">
         {
           mainNav.map((item) => (
             <li>
               <a
-                class:list={['header__link', isActive(item.href) && 'is-current']}
+                class:list={['header__link', isActive(item.key) && 'is-current']}
                 href={item.href}
-                aria-current={isActive(item.href) ? 'page' : undefined}
+                aria-current={isActive(item.key) ? 'page' : undefined}
               >
                 {item.label}
               </a>
@@ -38,13 +46,15 @@ const isActive = (href: string) => active === href || (active && href !== '/' &&
       </ul>
       {
         active !== '/devis' && (
-          <a class="btn btn--primary btn--sm header__cta" href="/devis">
-            Demander un devis
+          <a class="btn btn--primary btn--sm header__cta" href={quoteHref}>
+            {t.cta}
             <Icon name="arrow-up-right" size={13} stroke={2.2} />
           </a>
         )
       }
     </nav>
+
+    <LangSwitch class="header__lang" />
 
     <button
       class="header__burger"
@@ -52,19 +62,21 @@ const isActive = (href: string) => active === href || (active && href !== '/' &&
       data-nav-toggle
       aria-expanded="false"
       aria-controls="navigation-mobile"
+      data-label-open={t.openMenu}
+      data-label-close={t.closeMenu}
     >
-      <span class="visually-hidden">Ouvrir le menu</span>
+      <span class="visually-hidden">{t.openMenu}</span>
       <span class="header__burger-bars" aria-hidden="true"><span></span><span></span></span>
     </button>
   </div>
 
   <div class="header__panel" id="navigation-mobile" data-nav-panel hidden>
-    <nav class="header__panel-inner pad" aria-label="Navigation mobile">
+    <nav class="header__panel-inner pad" aria-label={t.mobileNav}>
       <ul class="header__panel-links">
         {
           mainNav.map((item) => (
             <li>
-              <a class="header__panel-link" href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+              <a class="header__panel-link" href={item.href} aria-current={isActive(item.key) ? 'page' : undefined}>
                 <span>{item.label}</span>
                 <Icon name="arrow-up-right" size={18} stroke={2} />
               </a>
@@ -74,8 +86,8 @@ const isActive = (href: string) => active === href || (active && href !== '/' &&
       </ul>
       {
         active !== '/devis' && (
-          <a class="btn btn--primary btn--block header__panel-cta" href="/devis">
-            Demander un devis
+          <a class="btn btn--primary btn--block header__panel-cta" href={quoteHref}>
+            {t.cta}
             <Icon name="arrow-up-right" size={14} stroke={2.2} />
           </a>
         )
@@ -128,6 +140,8 @@ const isActive = (href: string) => active === href || (active && href !== '/' &&
     display: flex;
     align-items: center;
     min-width: 0;
+    /* Pousse la navigation, la langue et le menu vers la droite. */
+    margin-right: auto;
   }
   .header__brand :global(.header__logo) { flex: none; font-size: 1.625rem; }
 
@@ -154,6 +168,9 @@ const isActive = (href: string) => active === href || (active && href !== '/' &&
   .header__link.is-current { border-bottom-color: currentColor; font-weight: 800; }
 
   .header__cta { flex: none; }
+
+  /* Sélecteur de langue : toujours dans la barre, ordinateur comme mobile. */
+  .header :global(.header__lang) { margin-left: 12px; }
 
   .header__burger {
     display: none;
@@ -244,6 +261,14 @@ const isActive = (href: string) => active === href || (active && href !== '/' &&
     .header__nav { display: none; }
     .header__burger { display: inline-flex; }
     .header__brand :global(.header__logo) { font-size: 1.25rem; }
+    .header :global(.header__lang) { margin-left: 0; }
+  }
+  /* Très petits téléphones (< 360 px) : logo et langue se resserrent pour
+     tenir sur une ligne avec le bouton du menu. */
+  @media (max-width: 359px) {
+    .header__inner { gap: 12px; }
+    .header__brand :global(.header__logo) { font-size: 1.0625rem; }
+    .header :global(.header__lang .lang__option) { min-width: 34px; padding-inline: 6px; }
   }
   @media (min-width: 901px) {
     .header__panel { display: none !important; }
@@ -253,6 +278,8 @@ const isActive = (href: string) => active === href || (active && href !== '/' &&
     .header__nav, .header__links { gap: 22px; }
     .header__links { font-size: 0.9375rem; letter-spacing: 0.1em; }
     .header__brand :global(.header__logo) { font-size: 1.375rem; }
+    .header :global(.header__lang) { margin-left: 0; }
+    .header :global(.header__lang .lang__globe) { display: none; }
   }
 </style>
 

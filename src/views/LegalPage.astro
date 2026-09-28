@@ -1,0 +1,134 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site.mjs';
+import { getLang, useTranslations } from '../i18n';
+
+/**
+ * MENTIONS LÉGALES — page volontairement incomplète.
+ *
+ * Aucune information juridique n'a été inventée : chaque valeur non renseignée
+ * dans src/data/site.mjs (objet `legal`) s'affiche comme « à compléter ».
+ * Renseignez-les avant la mise en ligne : ces mentions sont obligatoires.
+ *
+ * Page commune à /mentions-legales et /en/legal-notice.
+ */
+const t = useTranslations(getLang(Astro.url)).legal;
+const rows = [
+  { label: t.rows.companyName, value: site.legal.companyName },
+  { label: t.rows.legalForm, value: site.legal.legalForm },
+  { label: t.rows.address, value: site.legal.address },
+  { label: t.rows.siret, value: site.legal.siret },
+  { label: t.rows.vatNumber, value: site.legal.vatNumber },
+  { label: t.rows.publicationDirector, value: site.legal.publicationDirector },
+  { label: t.rows.hostingProvider, value: site.legal.hostingProvider },
+  { label: t.rows.contact, value: site.contact.email },
+];
+const missing = rows.filter((row) => !row.value).length;
+---
+
+<BaseLayout
+  title={t.title}
+  description={t.description}
+  headerTheme="ink"
+  noindex={missing > 0}
+>
+  <section class="legal theme-ink" data-section-theme="ink">
+    <div class="shell pad legal__head">
+      <p class="eyebrow legal__eyebrow"><Icon name="sparkle" size={13} stroke={1.6} />{t.eyebrow}</p>
+      <h1 class="legal__title">{t.title}</h1>
+    </div>
+  </section>
+
+  <section class="legal-body theme-ivory section" data-section-theme="ivory">
+    <div class="shell pad legal-body__inner">
+      {
+        missing > 0 && (
+          <p class="legal__todo">
+            <Icon name="alert-circle" size={20} stroke={1.8} />
+            <span>
+              <strong>{t.missing(missing)}</strong> {t.missingFill} <code>legal</code> {t.missingIn}
+              <code>src/data/site.mjs</code>{t.missingEnd}
+            </span>
+          </p>
+        )
+      }
+
+      <dl class="legal__list">
+        {
+          rows.map((row) => (
+            <div class="legal__row">
+              <dt>{row.label}</dt>
+              <dd class:list={[!row.value && 'is-missing']}>{row.value || t.toComplete}</dd>
+            </div>
+          ))
+        }
+      </dl>
+
+      <div class="legal__text">
+        <h2>{t.dataTitle}</h2>
+        <p>{t.dataText1}</p>
+        <p>
+          {t.dataText2}
+          <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.
+        </p>
+
+        <h2>{t.ipTitle}</h2>
+        <p>{t.ipText}</p>
+
+        <h2>{t.cookiesTitle}</h2>
+        <p>{t.cookiesText}</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal { padding-block: clamp(2.5rem, 5.5vw, 5rem); }
+  .legal__eyebrow { color: var(--muted-on-dark); }
+  .legal__title { margin-top: 22px; font-size: var(--fs-h1); letter-spacing: var(--ls-display); color: var(--ivory); }
+
+  .legal-body__inner { max-width: 780px; }
+
+  .legal__todo {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 40px;
+    padding: 20px 22px;
+    border: 1px dashed var(--ink);
+    border-radius: 14px;
+    background: var(--ivory-2);
+    font-size: var(--fs-body-sm);
+    line-height: 1.55;
+  }
+  .legal__todo :global(svg) { flex: none; margin-top: 2px; color: var(--ink); }
+  .legal__todo code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  .legal__list { margin: 0; border-top: 1px solid var(--ink); }
+  .legal__row {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .legal__row dt {
+    font: 600 var(--fs-eyebrow) / 1.5 var(--font-body);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted-on-light);
+  }
+  .legal__row dd { margin: 0; font-size: var(--fs-body-sm); }
+  .legal__row dd.is-missing { color: var(--muted-on-light); font-style: italic; }
+
+  .legal__text { margin-top: 56px; font-size: var(--fs-body); line-height: 1.7; color: var(--muted-on-light); }
+  .legal__text h2 { margin-top: 40px; margin-bottom: 14px; font-size: var(--fs-h3-sm); color: var(--ink); }
+  .legal__text h2:first-child { margin-top: 0; }
+  .legal__text p + p { margin-top: 16px; }
+  .legal__text a { text-decoration: underline; text-underline-offset: 3px; }
+
+  @media (max-width: 640px) {
+    .legal__row { grid-template-columns: 1fr; gap: 6px; }
+  }
+</style>

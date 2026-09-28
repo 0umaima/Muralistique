@@ -1,11 +1,17 @@
 ---
 import Icon from '../components/Icon.astro';
-import { site, whatsappUrl } from '../data/site.mjs';
-import { quoteOptions } from '../data/content';
+import { siteFor, whatsappUrl } from '../data/site.mjs';
+import { getQuoteOptions } from '../data/content';
+import { getLang, useTranslations } from '../i18n';
+
+const lang = getLang(Astro.url);
+const t = useTranslations(lang).form;
+const site = siteFor(lang);
+const quoteOptions = getQuoteOptions(lang);
 
 const { endpoint, formEnabled, disabledMessage } = site.form;
 // Contacts directs proposés si l'envoi échoue (message pré-rempli avec les réponses).
-const whatsappDigits = whatsappUrl() ? site.contact.whatsappNumber.replace(/[^\d]/g, '') : '';
+const whatsappDigits = whatsappUrl(lang) ? site.contact.whatsappNumber.replace(/[^\d]/g, '') : '';
 ---
 
 {
@@ -14,7 +20,7 @@ const whatsappDigits = whatsappUrl() ? site.contact.whatsappNumber.replace(/[^\d
     <div class="qf-closed" role="status">
       <Icon name="alert-circle" size={22} stroke={1.8} />
       <div>
-        <h2 class="qf-closed__title">Formulaire fermé</h2>
+        <h2 class="qf-closed__title">{t.closedTitle}</h2>
         <p>{disabledMessage}</p>
       </div>
     </div>
@@ -34,7 +40,7 @@ const whatsappDigits = whatsappUrl() ? site.contact.whatsappNumber.replace(/[^\d
           (LastPass, 1Password, Bitwarden, Dashlane) de le remplir à la place
           d'un vrai visiteur. */}
       <p class="qf-honeypot" aria-hidden="true">
-        <label for="qf-gotcha">Ne remplissez pas ce champ</label>
+        <label for="qf-gotcha">{t.honeypot}</label>
         <input
           id="qf-gotcha"
           type="text"
@@ -48,15 +54,19 @@ const whatsappDigits = whatsappUrl() ? site.contact.whatsappNumber.replace(/[^\d
         />
       </p>
 
+      {/* Langue de la page d'envoi (site anglais uniquement) : l'atelier sait
+          dans quelle langue répondre. */}
+      {t.languageField && <input type="hidden" name="language" value={t.languageField} />}
+
       <div class="qf__row">
         <p class="field">
-          <label class="field__label" for="qf-name">Nom</label>
+          <label class="field__label" for="qf-name">{t.name}</label>
           <input
             class="field__input"
             id="qf-name"
             name="name"
             type="text"
-            placeholder="Salma Bennani"
+            placeholder={t.namePlaceholder}
             autocomplete="name"
             aria-describedby="qf-name-error"
           />
@@ -64,7 +74,7 @@ const whatsappDigits = whatsappUrl() ? site.contact.whatsappNumber.replace(/[^\d
         </p>
 
         <p class="field">
-          <label class="field__label" for="qf-phone">Téléphone <abbr title="obligatoire">*</abbr></label>
+          <label class="field__label" for="qf-phone">{t.phone} <abbr title={t.required}>*</abbr></label>
           <input
             class="field__input"
             id="qf-phone"
@@ -81,13 +91,13 @@ const whatsappDigits = whatsappUrl() ? site.contact.whatsappNumber.replace(/[^\d
         </p>
 
         <p class="field">
-          <label class="field__label" for="qf-email">E-mail</label>
+          <label class="field__label" for="qf-email">{t.email}</label>
           <input
             class="field__input"
             id="qf-email"
             name="email"
             type="email"
-            placeholder="salma@exemple.ma"
+            placeholder={t.emailPlaceholder}
             autocomplete="email"
             aria-describedby="qf-email-error"
           />
@@ -95,13 +105,13 @@ const whatsappDigits = whatsappUrl() ? site.contact.whatsappNumber.replace(/[^\d
         </p>
 
         <p class="field">
-          <label class="field__label" for="qf-city">Ville</label>
+          <label class="field__label" for="qf-city">{t.city}</label>
           <input
             class="field__input"
             id="qf-city"
             name="city"
             type="text"
-            placeholder="Casablanca"
+            placeholder={t.cityPlaceholder}
             autocomplete="address-level2"
             aria-describedby="qf-city-error"
           />
@@ -110,7 +120,7 @@ const whatsappDigits = whatsappUrl() ? site.contact.whatsappNumber.replace(/[^\d
       </div>
 
       <fieldset class="qf__fieldset">
-        <legend class="field__label">Type d’espace</legend>
+        <legend class="field__label">{t.spaceType}</legend>
         <div class="qf__pills">
           {quoteOptions.spaceTypes.map((option, i) => (
             <label class="pill">
@@ -122,7 +132,7 @@ const whatsappDigits = whatsappUrl() ? site.contact.whatsappNumber.replace(/[^\d
       </fieldset>
 
       <fieldset class="qf__fieldset">
-        <legend class="field__label">Budget estimé</legend>
+        <legend class="field__label">{t.budget}</legend>
         <div class="qf__budgets">
           {quoteOptions.budgets.map((option, i) => (
             <label class:list={['choice', i === quoteOptions.budgets.length - 1 && 'choice--wide']}>
@@ -134,35 +144,32 @@ const whatsappDigits = whatsappUrl() ? site.contact.whatsappNumber.replace(/[^\d
       </fieldset>
 
       <p class="field qf__date">
-        <label class="field__label" for="qf-start">Date de début idéale</label>
+        <label class="field__label" for="qf-start">{t.startDate}</label>
         <input class="field__input" id="qf-start" name="start_date" type="date" />
       </p>
 
       <p class="field">
-        <label class="field__label" for="qf-message">Votre projet</label>
+        <label class="field__label" for="qf-message">{t.message}</label>
         <textarea
           class="field__input field__input--area"
           id="qf-message"
           name="message"
           rows={5}
-          placeholder="Ex. : un mur de 4 × 3 m dans un café à Rabat, ambiance végétale, travaux possibles le soir, ouverture prévue avant l’été…"
+          placeholder={t.messagePlaceholder}
           aria-describedby="qf-message-error"
         />
         <span class="field__error" id="qf-message-error" data-error-for="message"></span>
       </p>
 
-      <p class="qf-consent muted">
-        En envoyant ce formulaire, vous acceptez que vos coordonnées soient utilisées uniquement pour répondre à
-        votre demande de devis.
-      </p>
+      <p class="qf-consent muted">{t.consent}</p>
 
       <div class="qf__actions">
         <button class="btn btn--ink qf__submit" type="submit" data-submit>
-          <span data-submit-label>Envoyer la demande</span>
+          <span data-submit-label>{t.submit}</span>
           <Icon name="arrow-up-right" size={14} stroke={2.2} class="qf__submit-arrow" />
           <Icon name="loader-circle" size={16} stroke={2.2} class="qf__spinner" />
         </button>
-        <p class="qf__required muted"><abbr title="obligatoire">*</abbr> Seul le téléphone est obligatoire</p>
+        <p class="qf__required muted"><abbr title={t.required}>*</abbr> {t.requiredNote}</p>
       </div>
 
       <!-- Récapitulatif d'erreurs global : annoncé aux lecteurs d'écran. -->

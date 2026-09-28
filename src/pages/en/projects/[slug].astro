@@ -1,6 +1,6 @@
 ---
-import ProjectPage from '../../views/ProjectPage.astro';
-import { projects } from '../../data/projects';
+import ProjectPage from '../../../views/ProjectPage.astro';
+import { projects } from '../../../data/projects';
 
 export function getStaticPaths() {
   return projects.map((project) => ({ params: { slug: project.slug } }));

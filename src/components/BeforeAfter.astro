@@ -9,6 +9,7 @@
  */
 import Icon from './Icon.astro';
 import Media from './Media.astro';
+import { getLang, useTranslations } from '../i18n';
 
 interface Props {
   before: { src: string; alt: string };
@@ -20,6 +21,7 @@ interface Props {
   ratio?: string;
 }
 const { before, after, id = 'ba', class: className = '', ratio = '2 / 1' } = Astro.props;
+const t = useTranslations(getLang(Astro.url)).beforeAfter;
 ---
 
 <div class:list={['ba', className]} data-ba style={`--ba-pos:50%; aspect-ratio:${ratio}`}>
@@ -37,12 +39,12 @@ const { before, after, id = 'ba', class: className = '', ratio = '2 / 1' } = Ast
     </span>
   </div>
 
-  <span class="ba__tag ba__tag--before">Avant</span>
-  <span class="ba__tag ba__tag--after">Après</span>
+  <span class="ba__tag ba__tag--before">{t.before}</span>
+  <span class="ba__tag ba__tag--after">{t.after}</span>
 </div>
 
 <label class="ba__control" for={`${id}-range`}>
-  <span class="ba__control-label">Curseur avant / après</span>
+  <span class="ba__control-label">{t.control}</span>
   <input
     id={`${id}-range`}
     class="ba__range"
@@ -52,7 +54,7 @@ const { before, after, id = 'ba', class: className = '', ratio = '2 / 1' } = Ast
     value="50"
     step="1"
     data-ba-range
-    aria-label="Position du curseur entre l’image avant et l’image après"
+    aria-label={t.range}
   />
 </label>
 

@@ -2,8 +2,11 @@
 import Icon from '../Icon.astro';
 import BeforeAfter from '../BeforeAfter.astro';
 import { homeBeforeAfter } from '../../data/projects';
+import { getLang, href, useTranslations } from '../../i18n';
 
-const project = homeBeforeAfter();
+const lang = getLang(Astro.url);
+const t = useTranslations(lang);
+const project = homeBeforeAfter(lang);
 ---
 
 {
@@ -13,9 +16,9 @@ const project = homeBeforeAfter();
         <div class="section-head" data-reveal>
           <div>
             <p class="section-index">01</p>
-            <h2 class="section-title">Avant / Après</h2>
+            <h2 class="section-title">{t.home.transfo.title}</h2>
           </div>
-          <p class="section-head__aside">Glissez le curseur : le même mur, avant et après notre passage.</p>
+          <p class="section-head__aside">{t.home.transfo.aside}</p>
         </div>
 
         <div class="transfo__body" data-reveal>
@@ -32,12 +35,12 @@ const project = homeBeforeAfter();
               <span class="muted">{project.beforeAfter.meta ?? project.city}</span>
             </div>
             <div class="transfo__links">
-              <a class="link-underline" href={`/realisations/${project.slug}`}>
-                Voir le projet
+              <a class="link-underline" href={href(`/realisations/${project.slug}`, lang)}>
+                {t.viewProject}
                 <Icon name="arrow-up-right" size={13} stroke={2.2} />
               </a>
-              <a class="link-underline" href="/realisations">
-                Toutes les réalisations
+              <a class="link-underline" href={href('/realisations', lang)}>
+                {t.allProjects}
                 <Icon name="arrow-up-right" size={13} stroke={2.2} />
               </a>
             </div>

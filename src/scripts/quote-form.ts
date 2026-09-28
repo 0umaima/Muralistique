@@ -27,40 +27,98 @@
  *   téléphone recharge la page pendant que le visiteur passe sur une autre
  *   application (mesurer le mur, vérifier une date…), il retrouve sa saisie.
  *   Le brouillon est effacé dès que la demande est bien arrivée.
+ *
+ * Langue
+ * ──────
+ * Les messages suivent la langue de la page (`<html lang>`) : français sur
+ * /devis, anglais sur /en/quote. Les deux jeux de textes sont dans TEXT.
  */
 
 const REQUEST_TIMEOUT_MS = 20000;
 const DRAFT_KEY = 'muralistique:devis';
 /** Champs recopiés dans le brouillon et dans le message de secours. */
-const FIELDS: [name: string, label: string][] = [
-  ['name', 'Nom'],
-  ['phone', 'Téléphone'],
-  ['email', 'E-mail'],
-  ['city', 'Ville'],
-  ['space_type', 'Type d’espace'],
-  ['budget', 'Budget'],
-  ['start_date', 'Date de début'],
-  ['message', 'Projet'],
-];
+const FIELDS = ['name', 'phone', 'email', 'city', 'space_type', 'budget', 'start_date', 'message'] as const;
+type Field = (typeof FIELDS)[number];
 
-const MESSAGES = {
-  required: 'Indiquez votre numéro de téléphone pour que nous puissions vous rappeler.',
-  phone: 'Ce numéro semble incomplet. Exemple : 06 12 34 56 78 ou +212 6 12 34 56 78.',
-  email: 'Cette adresse e-mail semble incomplète (exemple : nom@exemple.ma). Corrigez-la ou laissez le champ vide.',
-  invalid: 'Un champ est à corriger avant l’envoi.',
-  offline:
-    'Vous semblez hors connexion : la demande n’est pas partie. Vos réponses sont conservées, réessayez une fois reconnecté.',
-  network:
-    'L’envoi n’a pas abouti : votre connexion semble interrompue. Vos réponses sont conservées, réessayez dans un instant.',
-  timeout:
-    'Le service de réception ne répond pas. Vos réponses sont conservées : réessayez dans un instant.',
-  server:
-    'L’envoi n’a pas abouti. Vos réponses sont conservées : réessayez dans quelques minutes.',
-  quota:
-    'Le formulaire n’accepte plus de nouvelles demandes pour le moment (limite du service de réception atteinte).',
-  fallback: 'Pour être sûr que votre demande nous parvienne, envoyez-la directement :',
-  success:
-    'Merci, votre demande est bien arrivée. Nous revenons vers vous sous 48 h avec un premier retour et un devis gratuit.',
+const FR = {
+  /** Libellés du message de secours (WhatsApp / e-mail). */
+  labels: {
+    name: 'Nom',
+    phone: 'Téléphone',
+    email: 'E-mail',
+    city: 'Ville',
+    space_type: 'Type d’espace',
+    budget: 'Budget',
+    start_date: 'Date de début',
+    message: 'Projet',
+  } as Record<Field, string>,
+  /** Entre libellé et valeur : espace avant les deux-points en français. */
+  colon: ' : ',
+  intro: 'Bonjour, voici ma demande de devis (le formulaire du site n’a pas pu l’envoyer).',
+  subject: 'Demande de devis — fresque murale',
+  viaWhatsapp: 'Envoyer par WhatsApp',
+  viaEmail: 'Envoyer par e-mail',
+  submit: 'Envoyer la demande',
+  sending: 'Envoi en cours…',
+  sent: 'Demande envoyée',
+  rejected: 'Certains champs n’ont pas été acceptés. Vérifiez les messages ci-dessus.',
+  messages: {
+    required: 'Indiquez votre numéro de téléphone pour que nous puissions vous rappeler.',
+    phone: 'Ce numéro semble incomplet. Exemple : 06 12 34 56 78 ou +212 6 12 34 56 78.',
+    email: 'Cette adresse e-mail semble incomplète (exemple : nom@exemple.ma). Corrigez-la ou laissez le champ vide.',
+    invalid: 'Un champ est à corriger avant l’envoi.',
+    offline:
+      'Vous semblez hors connexion : la demande n’est pas partie. Vos réponses sont conservées, réessayez une fois reconnecté.',
+    network:
+      'L’envoi n’a pas abouti : votre connexion semble interrompue. Vos réponses sont conservées, réessayez dans un instant.',
+    timeout:
+      'Le service de réception ne répond pas. Vos réponses sont conservées : réessayez dans un instant.',
+    server:
+      'L’envoi n’a pas abouti. Vos réponses sont conservées : réessayez dans quelques minutes.',
+    quota:
+      'Le formulaire n’accepte plus de nouvelles demandes pour le moment (limite du service de réception atteinte).',
+    fallback: 'Pour être sûr que votre demande nous parvienne, envoyez-la directement :',
+    success:
+      'Merci, votre demande est bien arrivée. Nous revenons vers vous sous 48 h avec un premier retour et un devis gratuit.',
+  },
+};
+
+const EN: typeof FR = {
+  labels: {
+    name: 'Name',
+    phone: 'Phone',
+    email: 'Email',
+    city: 'City',
+    space_type: 'Type of space',
+    budget: 'Budget',
+    start_date: 'Start date',
+    message: 'Project',
+  },
+  colon: ': ',
+  intro: 'Hello, here is my quote request (the website form could not send it).',
+  subject: 'Quote request — mural',
+  viaWhatsapp: 'Send via WhatsApp',
+  viaEmail: 'Send by email',
+  submit: 'Send request',
+  sending: 'Sending…',
+  sent: 'Request sent',
+  rejected: 'Some fields were not accepted. Please check the messages above.',
+  messages: {
+    required: 'Please enter your phone number so we can call you back.',
+    phone: 'This number looks incomplete. Example: 06 12 34 56 78 or +212 6 12 34 56 78.',
+    email: 'This email address looks incomplete (example: name@example.com). Correct it or leave the field empty.',
+    invalid: 'One field needs correcting before sending.',
+    offline:
+      'You appear to be offline: your request was not sent. Your answers are saved; try again once you are back online.',
+    network:
+      'Sending failed: your connection seems to have dropped. Your answers are saved; please try again in a moment.',
+    timeout: 'The receiving service is not responding. Your answers are saved: please try again in a moment.',
+    server: 'Sending failed. Your answers are saved: please try again in a few minutes.',
+    quota: 'The form is not accepting new requests right now (the receiving service’s limit has been reached).',
+    fallback: 'To make sure your request reaches us, send it directly:',
+    success:
+      'Thank you, your request has arrived. We will get back to you within 48 hours with initial feedback and a free quote.',
+  },
 };
 
 function icon(name: 'check' | 'alert'): SVGSVGElement {
@@ -103,7 +161,10 @@ export function initQuoteForm() {
   const form = document.querySelector<HTMLFormElement>('[data-quote-form]');
   if (!form) return;
 
-  // Le script prend la main sur la validation (messages en français, focus) ;
+  const TEXT = document.documentElement.lang === 'en' ? EN : FR;
+  const MESSAGES = TEXT.messages;
+
+  // Le script prend la main sur la validation (messages traduits, focus) ;
   // sans lui, la validation native du navigateur exige le téléphone.
   form.noValidate = true;
 
@@ -130,7 +191,7 @@ export function initQuoteForm() {
   const saveDraft = () => {
     if (done) return;
     const draft: Record<string, string> = {};
-    FIELDS.forEach(([name]) => (draft[name] = value(name)));
+    FIELDS.forEach((name) => (draft[name] = value(name)));
     try {
       storage()?.setItem(DRAFT_KEY, JSON.stringify(draft));
     } catch {
@@ -154,7 +215,7 @@ export function initQuoteForm() {
       draft = null;
     }
     if (!draft || typeof draft !== 'object') return;
-    FIELDS.forEach(([name]) => {
+    FIELDS.forEach((name) => {
       const saved = draft![name];
       if (typeof saved !== 'string' || !saved) return;
       const radio = Array.from(form.querySelectorAll<HTMLInputElement>(`input[type="radio"][name="${name}"]`));
@@ -191,10 +252,10 @@ export function initQuoteForm() {
 
   // ————————————————————————————————————————— message de secours
   const summary = () => {
-    const lines = FIELDS.map(([name, label]) => [label, value(name)] as const)
+    const lines = FIELDS.map((name) => [TEXT.labels[name], value(name)] as const)
       .filter(([, text]) => text)
-      .map(([label, text]) => `${label} : ${text}`);
-    return `Bonjour, voici ma demande de devis (le formulaire du site n’a pas pu l’envoyer).\n\n${lines.join('\n')}`;
+      .map(([label, text]) => `${label}${TEXT.colon}${text}`);
+    return `${TEXT.intro}\n\n${lines.join('\n')}`;
   };
 
   const fallbackLinks = (): HTMLElement | null => {
@@ -205,13 +266,13 @@ export function initQuoteForm() {
       link.href = `https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
-      link.textContent = 'Envoyer par WhatsApp';
+      link.textContent = TEXT.viaWhatsapp;
       links.push(link);
     }
     if (email) {
       const link = document.createElement('a');
-      link.href = `mailto:${email}?subject=${encodeURIComponent('Demande de devis — fresque murale')}&body=${encodeURIComponent(text)}`;
-      link.textContent = 'Envoyer par e-mail';
+      link.href = `mailto:${email}?subject=${encodeURIComponent(TEXT.subject)}&body=${encodeURIComponent(text)}`;
+      link.textContent = TEXT.viaEmail;
       links.push(link);
     }
     if (!links.length) return null;
@@ -270,7 +331,7 @@ export function initQuoteForm() {
     submit.disabled = isSending;
     submit.dataset.state = isSending ? 'sending' : '';
     submit.setAttribute('aria-busy', String(isSending));
-    if (submitLabel) submitLabel.textContent = isSending ? 'Envoi en cours…' : 'Envoyer la demande';
+    if (submitLabel) submitLabel.textContent = isSending ? TEXT.sending : TEXT.submit;
   };
 
   const failSend = (message: string) => {
@@ -297,7 +358,7 @@ export function initQuoteForm() {
           const text = Array.isArray(detail) ? detail.join(' ') : String(detail);
           if (errorSlot(field)) setFieldError(field, text);
         });
-        return 'Certains champs n’ont pas été acceptés. Vérifiez les messages ci-dessus.';
+        return TEXT.rejected;
       }
       return String(errors);
     }
@@ -382,7 +443,7 @@ export function initQuoteForm() {
       if (submit) {
         submit.disabled = true;
         submit.dataset.state = 'done';
-        if (submitLabel) submitLabel.textContent = 'Demande envoyée';
+        if (submitLabel) submitLabel.textContent = TEXT.sent;
       }
       status?.scrollIntoView({ block: 'center', behavior: 'smooth' });
       status?.focus({ preventScroll: true });

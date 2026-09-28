@@ -3,6 +3,7 @@ import Icon from '../Icon.astro';
 import Media from '../Media.astro';
 import FixedBg from '../FixedBg.astro';
 import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
+import { getLang, href, useTranslations } from '../../i18n';
 
 /**
  * Hero de l'accueil : un collage de trois grands visuels à angles francs,
@@ -14,6 +15,9 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
  * Pour changer une image : remplacez le fichier dans src/assets/images/home/
  * en gardant son nom.
  */
+const lang = getLang(Astro.url);
+const t = useTranslations(lang);
+const hero = t.home.hero;
 ---
 
 <section class="hero theme-ink" data-section-theme="ink">
@@ -24,7 +28,7 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
       <div class="hero__shot hero__shot--left">
         <Media
           src="home/hero-left.jpeg"
-          alt="Fresque « Build Something » peinte dans un espace de travail"
+          alt={hero.altLeft}
           widths={[320, 480, 640, 900]}
           sizes="(max-width: 700px) 46vw, 30vw"
           eager
@@ -37,7 +41,7 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
         <img
           class="hero__gif"
           src={heroCenterGif}
-          alt="Geste de peinture sur une fresque murale"
+          alt={hero.altCenter}
           width="720"
           height="1280"
           loading="eager"
@@ -49,7 +53,7 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
       <div class="hero__shot hero__shot--right">
         <Media
           src="home/hero-right.jpeg"
-          alt="Visage peint au trait noir sur des aplats jaune, rouge et bleu"
+          alt={hero.altRight}
           widths={[320, 480, 640, 900]}
           sizes="(max-width: 700px) 48vw, 38vw"
           eager
@@ -66,17 +70,17 @@ import heroCenterGif from '../../assets/images/home/hero-center.gif?url';
       </svg>
 
       <h1 class="hero__title">
-        <span class="hero__line hero__line--1">Fresques peintes</span>
-        <span class="hero__line hero__line--2">à la main</span>
+        <span class="hero__line hero__line--1">{hero.line1}</span>
+        <span class="hero__line hero__line--2">{hero.line2}</span>
       </h1>
     </div>
 
     <div class="hero__actions">
-      <a class="btn btn--primary" href="/devis">
-        Demander un devis
+      <a class="btn btn--primary" href={href('/devis', lang)}>
+        {t.header.cta}
         <Icon name="arrow-up-right" size={14} stroke={2.2} />
       </a>
-      <a class="btn btn--ghost-light" href="/realisations">Voir les réalisations</a>
+      <a class="btn btn--ghost-light" href={href('/realisations', lang)}>{t.seeProjects}</a>
     </div>
   </div>
 </section>

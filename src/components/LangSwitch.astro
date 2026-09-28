@@ -1,0 +1,132 @@
+---
+/**
+ * Sélecteur de langue de l'en-tête : une pastille « FR | EN » dont le curseur
+ * glisse sous la langue active. Chaque option est un vrai lien vers la même
+ * page dans l'autre langue (voir src/i18n/routes.mjs) : il fonctionne sans
+ * JavaScript. Avec JavaScript, le lien reprend en plus le filtre (?secteur=…)
+ * et l'ancre (#contact…) de la page en cours (voir src/scripts/header.ts).
+ *
+ * Il suit la couleur de l'en-tête : curseur blanc sur fond noir, noir sur
+ * fond blanc (variables --solid / --solid-text).
+ */
+import Icon from './Icon.astro';
+import { getLang, LANGS, LOCALES, localizePath, useTranslations } from '../i18n';
+
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+
+const lang = getLang(Astro.url);
+const t = useTranslations(lang);
+---
+
+<nav class:list={['lang', className]} aria-label={t.langSwitch.label} data-lang-switch data-active={lang}>
+  <Icon name="globe" size={17} stroke={1.8} class="lang__globe" />
+  <div class="lang__track">
+    <span class="lang__thumb" aria-hidden="true"></span>
+    <ul class="lang__list">
+      {
+        LANGS.map((code) => {
+          const locale = LOCALES[code];
+          return (
+            <li class="lang__item">
+              {code === lang ? (
+                <span class="lang__option" data-lang-option={code} lang={code} aria-current="true">
+                  <span class="lang__code" aria-hidden="true">{locale.short}</span>
+                  <span class="visually-hidden">{locale.name}</span>
+                </span>
+              ) : (
+                <a
+                  class="lang__option"
+                  href={localizePath(Astro.url.pathname, code)}
+                  hreflang={locale.hreflang}
+                  lang={code}
+                  title={t.langSwitch.title}
+                  data-lang-option={code}
+                  data-lang-link
+                >
+                  <span class="lang__code" aria-hidden="true">{locale.short}</span>
+                  <span class="visually-hidden">{locale.name}</span>
+                </a>
+              )}
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+</nav>
+
+<style>
+  .lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex: none;
+  }
+  .lang :global(.lang__globe) { flex: none; opacity: 0.85; }
+
+  /* La pastille : deux cases égales, un curseur plein qui glisse dessous. */
+  .lang__track {
+    position: relative;
+    padding: 3px;
+    border: 1px solid currentColor;
+    border-radius: 100px;
+  }
+  .lang__thumb {
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    left: 3px;
+    width: calc(50% - 3px);
+    border-radius: 100px;
+    background: var(--solid);
+    transition:
+      transform 360ms var(--ease-out),
+      background-color 400ms var(--ease);
+  }
+  .lang[data-active='en'] .lang__thumb { transform: translateX(100%); }
+
+  .lang__list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .lang__item { display: flex; }
+  .lang__item > * { flex: 1; }
+  .lang__option {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    min-width: 44px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 100px;
+    font: 700 0.9375rem/1 var(--font-display);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: inherit;
+    opacity: 0.6;
+    transition:
+      color 260ms var(--ease),
+      opacity 200ms var(--ease);
+  }
+  /* L'espacement s'ajoute aussi après la dernière lettre : on le reprend
+     pour que le code reste centré dans sa case. */
+  .lang__code { margin-right: -0.14em; }
+  a.lang__option:hover { opacity: 1; }
+  .lang__option:focus-visible { border-radius: 100px; outline-offset: 4px; }
+
+  /* Langue active : texte en réserve sur le curseur. */
+  .lang[data-active='fr'] [data-lang-option='fr'],
+  .lang[data-active='en'] [data-lang-option='en'] {
+    color: var(--solid-text);
+    opacity: 1;
+  }
+
+  @media (max-width: 900px) {
+    .lang :global(.lang__globe) { display: none; }
+    .lang__option { min-width: 38px; height: 30px; padding: 0 8px; font-size: 0.875rem; }
+  }
+</style>

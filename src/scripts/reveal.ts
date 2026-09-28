@@ -39,7 +39,8 @@ function runCounter(el: HTMLElement) {
 
   const duration = 1400;
   const start = performance.now();
-  const format = (n: number) => `${prefix}${Math.round(n).toLocaleString('fr-FR')}${suffix}`;
+  const locale = document.documentElement.lang === 'en' ? 'en-US' : 'fr-FR';
+  const format = (n: number) => `${prefix}${Math.round(n).toLocaleString(locale)}${suffix}`;
 
   const tick = (now: number) => {
     const t = Math.min(1, (now - start) / duration);

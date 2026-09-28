@@ -8,6 +8,7 @@
  *  ligne. Rien d'autre dans le code n'a besoin d'être touché.
  * ============================================================================
  */
+import { localize } from '../i18n/localize.mjs';
 
 export const site = {
   name: 'Muralistique',
@@ -92,14 +93,42 @@ export const site = {
     publicationDirector: '',
     hostingProvider: '',
   },
+
+  /**
+   * VERSION ANGLAISE (/en) — traduction des textes ci-dessus. Un champ
+   * absent de ce bloc garde sa valeur française sur les pages anglaises.
+   */
+  en: {
+    locale: 'en-US',
+    lang: 'en',
+    tagline: 'Custom hand-painted murals for businesses and private spaces.',
+    contact: {
+      hours: '7 days a week · 9 am to 7 pm',
+      whatsappMessage: 'Hello Amine, I would like a quote for a mural.',
+      /** Mêmes villes, dans le même ordre, avec leur nom anglais. */
+      serviceAreas: ['Casablanca', 'Rabat', 'Marrakech', 'Mohammedia', 'Temara', 'Tangier', 'Salé', 'Kenitra'],
+    },
+    form: {
+      disabledMessage:
+        'The form is temporarily closed. Email us or message us on WhatsApp directly: we reply within 48 hours.',
+    },
+  },
 };
 
-/** Lien WhatsApp prêt à l'emploi, ou `null` si le numéro n'est pas configuré. */
-export function whatsappUrl() {
+/** Réglages dans la langue demandée : textes du bloc `en` pour l'anglais. */
+export function siteFor(lang = 'fr') {
+  return localize(site, lang);
+}
+
+/**
+ * Lien WhatsApp prêt à l'emploi (message pré-rempli dans la langue de la
+ * page), ou `null` si le numéro n'est pas configuré.
+ */
+export function whatsappUrl(lang = 'fr') {
   const raw = (site.contact.whatsappNumber || '').replace(/[^\d]/g, '');
   // Un numéro international plausible fait au moins 8 chiffres.
   if (raw.length < 8) return null;
-  return `https://wa.me/${raw}?text=${encodeURIComponent(site.contact.whatsappMessage)}`;
+  return `https://wa.me/${raw}?text=${encodeURIComponent(siteFor(lang).contact.whatsappMessage)}`;
 }
 
 /** `true` si le numéro de téléphone affiché est encore l'espace réservé. */

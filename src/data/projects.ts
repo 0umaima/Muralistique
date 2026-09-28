@@ -10,8 +10,14 @@
  *  ⚠ Les textes ci-dessous proviennent de la maquette : ce sont des exemples.
  *    Remplacez-les par vos vrais projets. Les champs laissés vides ('') ne
  *    sont tout simplement pas affichés — n'inventez pas de chiffres.
+ *
+ *  VERSION ANGLAISE : le bloc `en` de chaque projet contient sa traduction
+ *  (titre, résumé, paragraphes, textes alternatifs, légendes). Les images de
+ *  la galerie se traduisent dans le même ordre que la galerie française. Un
+ *  champ absent du bloc `en` s'affiche en français sur le site anglais.
  * ============================================================================
  */
+import { localize, type Lang } from '../i18n';
 
 export interface ProjectImage {
   /** Chemin relatif dans src/assets/images/ */
@@ -56,6 +62,21 @@ export interface Project {
   facts: { surface: string; duration: string; year: string; client: string };
   /** Mis en avant dans le comparateur avant/après de l'accueil. */
   featuredOnHome?: boolean;
+  /** Traduction anglaise des textes ci-dessus (version /en du site). */
+  en?: ProjectTranslation;
+}
+
+type ImageText = { alt?: string; caption?: string };
+
+export interface ProjectTranslation {
+  title?: string;
+  city?: string;
+  excerpt?: string;
+  body?: string[];
+  cover?: ImageText;
+  beforeAfter?: { before?: ImageText; after?: ImageText; label?: string; meta?: string };
+  gallery?: ImageText[];
+  facts?: Partial<Project['facts']>;
 }
 
 export const projects: Project[] = [
@@ -115,6 +136,27 @@ title: 'Robotique en mouvement',
   },
 
   featuredOnHome: true,
+
+  en: {
+    title: 'Robotics in Motion',
+    excerpt:
+      'CB Robotics offices: a futuristic mural inspired by robotics, automation and RPA technology.',
+    body: [
+      'To dress its offices, CB Robotics wanted a bold mural in tune with its world: robotics, automation and forward-looking technology.',
+      'The composition stages a panoramic mechanical creature that unfolds across several walls like a machine in motion. Black lines, grey volumes and touches of tech blue create an immersive, dynamic mural closely tied to the CB Robotics identity.',
+    ],
+    cover: { alt: 'Futuristic robotics mural in the CB Robotics offices' },
+    beforeAfter: {
+      before: { alt: 'CB Robotics office wall before the mural was painted' },
+      after: { alt: 'Futuristic robotics mural painted in the CB Robotics offices' },
+      label: 'Robotics in Motion',
+      meta: 'CB Robotics offices',
+    },
+    gallery: [
+      { alt: 'Wall before the mural in the CB Robotics offices', caption: 'Before' },
+      { alt: 'Panoramic view of the CB Robotics mural', caption: 'Panoramic mural' },
+    ],
+  },
 },
 {
   slug: 'harmonie-verte',
@@ -173,6 +215,25 @@ title: 'Robotique en mouvement',
     client: 'KOON',
   },
 
+  en: {
+    title: 'Green Harmony',
+    excerpt: 'A mural in soft shades of green, designed to create a calm, natural and inspiring atmosphere.',
+    body: [
+      'To dress its interior, KOON wanted a botanical mural that would bring softness, balance and serenity to the space.',
+      'The composition combines shades of green, organic shapes and meditative silhouettes. Enveloping foliage creates a soothing atmosphere while strengthening the visual identity of the place.',
+    ],
+    cover: { alt: 'Botanical mural in soft shades of green in a KOON interior' },
+    beforeAfter: {
+      before: { alt: 'Interior space before the mural was painted' },
+      after: { alt: 'Green Harmony botanical mural painted in the KOON space' },
+      label: 'Green Harmony',
+      meta: 'Botanical mural · KOON',
+    },
+    gallery: [
+      { alt: 'Detail of the foliage and green tones of the mural', caption: 'Botanical detail' },
+      { alt: 'Overall view of the Green Harmony mural', caption: 'Overall view' },
+    ],
+  },
 },
  {
   slug: 'ecole-les-tilleuls',
@@ -216,6 +277,19 @@ title: 'Robotique en mouvement',
     duration: '',
     year: '',
     client: 'École Les Tilleuls',
+  },
+
+  en: {
+    excerpt: 'Children’s school: a colorful mural inspired by nature and the animal kingdom.',
+    body: [
+      'To turn its play areas into a lively, stimulating environment, the teaching team wanted a joyful mural that children could relate to and that would spark their imagination.',
+      'The composition features animals such as an elephant, a giraffe and a sloth amid lush vegetation. Shades of green, bright colors and rounded shapes create a playful, warm and reassuring world in the school’s courtyard and spaces.',
+    ],
+    cover: { alt: 'Colorful mural of animals and lush vegetation in a school' },
+    gallery: [
+      { alt: 'Detail of the mural with a sloth surrounded by foliage', caption: 'The sloth in the jungle' },
+      { alt: 'Mural of an elephant in a children’s play area', caption: 'Jungle animals' },
+    ],
   },
 },
 {
@@ -261,6 +335,19 @@ title: 'Robotique en mouvement',
     year: '',
     client: 'Café Nord',
   },
+
+  en: {
+    excerpt: 'Neighborhood café: a warm, inspiring mural built around the world of coffee.',
+    body: [
+      'To create a welcoming and memorable atmosphere, Café Nord wanted an original mural on its walls, designed to accompany those coffee breaks.',
+      'The mural blends flowers, foliage, cups and organic shapes in a palette of black, white and golden tones. An expressive composition that brings character, warmth and identity to the space.',
+    ],
+    cover: { alt: 'Coffee-themed mural in Café Nord, Bordeaux' },
+    gallery: [
+      { alt: 'Detail of the mural with floral patterns and a coffee cup', caption: 'Mural detail' },
+      { alt: 'Overall view of the mural in Café Nord', caption: 'Overall view' },
+    ],
+  },
 },
 {
   slug: 'cabine-gynecologique',
@@ -305,6 +392,20 @@ title: 'Robotique en mouvement',
     year: '',
     client: '',
   },
+
+  en: {
+    title: 'Gynecology Practice',
+    excerpt: 'Gynecology practice: a line-art mural designed as a space of serenity, trust and well-being.',
+    body: [
+      'For this gynecology practice, the goal was a soft, reassuring and elegant environment that helps patients approach an intimate moment with more serenity.',
+      'The mural combines female silhouettes, flowers and continuous lines in a clean, delicate style. An artistic composition that evokes femininity, care and well-being while blending harmoniously with the architecture of the practice.',
+    ],
+    cover: { alt: 'Line-art mural in a gynecology practice' },
+    gallery: [
+      { alt: 'Mural of a female silhouette and flowers', caption: 'Line art and femininity' },
+      { alt: 'Detail of a floral mural in the gynecology practice', caption: 'Floral detail' },
+    ],
+  },
 },
 
  
@@ -347,6 +448,16 @@ title: 'Robotique en mouvement',
     year: '',
     client: 'Hôtel Kaan · Misti Rooftop',
   },
+
+  en: {
+    excerpt: 'Misti Rooftop: an abstract mural in blue, mixing shapes, dynamic lines and street-art-inspired lettering.',
+    body: [
+      'For the Misti rooftop at Hôtel Kaan, the goal was a strong, contemporary and instantly recognizable visual identity, matching the urban atmosphere of the venue.',
+      'This explosion of shapes and letters captures the essence of street art through dynamic lines, abstract compositions and energetic lettering. Shades of blue contrast with the building’s light architecture and turn the rooftop into a lively, immersive art space.',
+    ],
+    cover: { alt: 'Abstract street-art mural on the Misti rooftop at Hôtel Kaan in Casablanca' },
+    gallery: [{ alt: 'Contemporary mural inside Hôtel Kaan', caption: 'Street art moves into Kaan' }],
+  },
 },
 {
   slug: 'tsarine-beauty-house',
@@ -387,9 +498,24 @@ title: 'Robotique en mouvement',
     year: '',
     client: 'Tsarine Beauty House',
   },
+
+  en: {
+    excerpt: 'Spa and beauty space: an elegant Renaissance-inspired mural of female figures, refinement and well-being.',
+    body: [
+      'For Tsarine Beauty House, the goal was an elegant, soothing and refined visual world, true to a place dedicated to beauty and well-being.',
+      'Inspired by Michelangelo’s iconic work, this mural celebrates the strength and beauty of the human body. Delicate figures, majestic lines and Renaissance-inspired details blend harmoniously into the spa’s atmosphere.',
+      'Other rooms take a more contemporary, graphic approach, with colorful compositions, geometric shapes and dynamic patterns that give Tsarine Beauty House a unique artistic identity.',
+    ],
+    cover: { alt: 'Renaissance-inspired mural at Tsarine Beauty House' },
+    gallery: [{ alt: 'Michelangelo-inspired mural in a beauty space', caption: 'Mural detail' }],
+  },
 },
 ];
 
-export const projectBySlug = (slug: string) => projects.find((p) => p.slug === slug);
-export const projectsInSector = (sectorSlug: string) => projects.filter((p) => p.sector === sectorSlug);
-export const homeBeforeAfter = () => projects.find((p) => p.featuredOnHome && p.beforeAfter);
+/** Projets dans la langue de la page (même ordre, mêmes slugs). */
+export const getProjects = (lang: Lang = 'fr'): Project[] => projects.map((project) => localize(project, lang));
+
+export const projectBySlug = (slug: string, lang: Lang = 'fr') => getProjects(lang).find((p) => p.slug === slug);
+export const projectsInSector = (sectorSlug: string, lang: Lang = 'fr') =>
+  getProjects(lang).filter((p) => p.sector === sectorSlug);
+export const homeBeforeAfter = (lang: Lang = 'fr') => getProjects(lang).find((p) => p.featuredOnHome && p.beforeAfter);

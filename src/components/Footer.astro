@@ -2,8 +2,15 @@
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
 import BrandIcon from './BrandIcon.astro';
-import { site, phoneIsPlaceholder } from '../data/site.mjs';
-import { footerNav } from '../data/nav';
+import { siteFor, phoneIsPlaceholder } from '../data/site.mjs';
+import { footerNavFor } from '../data/nav';
+import { getLang, href, useTranslations } from '../i18n';
+
+const lang = getLang(Astro.url);
+const t = useTranslations(lang).footer;
+const site = siteFor(lang);
+const footerNav = footerNavFor(lang);
+const legalHref = href('/mentions-legales', lang);
 
 const socials = (
   [
@@ -26,7 +33,7 @@ const areas = site.contact.serviceAreas;
       {
         areas.length > 0 && (
           <p class="footer__areas">
-            Interventions à {areas.join(', ')} et dans les grandes villes du Maroc.
+            {t.areas(areas.join(', '))}
           </p>
         )
       }
@@ -61,7 +68,7 @@ const areas = site.contact.serviceAreas;
     }
 
     <div class="footer__col">
-      <h2 class="footer__col-title">Contact</h2>
+      <h2 class="footer__col-title">{t.contact}</h2>
       <ul>
         <li><a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></li>
         {
@@ -69,7 +76,7 @@ const areas = site.contact.serviceAreas;
             <li>
               <a href={`tel:${site.contact.phoneHref}`}>
                 {site.contact.phoneDisplay}
-                {phoneIsPlaceholder() && <span class="footer__todo"> (à remplacer)</span>}
+                {phoneIsPlaceholder() && <span class="footer__todo">{t.toReplace}</span>}
               </a>
             </li>
           )
@@ -83,11 +90,11 @@ const areas = site.contact.serviceAreas;
             </li>
           ) : (
             <li>
-              <span class="footer__todo">Instagram : lien à renseigner</span>
+              <span class="footer__todo">{t.instagramMissing}</span>
             </li>
           )
         }
-        <li><a href="/mentions-legales">Mentions légales</a></li>
+        <li><a href={legalHref}>{t.legal}</a></li>
       </ul>
     </div>
   </div>
@@ -95,8 +102,8 @@ const areas = site.contact.serviceAreas;
   <div class="footer__giant shell pad" aria-hidden="true">{site.name}</div>
 
   <div class="footer__legal shell pad">
-    <span>© {year} {site.name}. Tous droits réservés.</span>
-    <a href="/mentions-legales">Mentions légales</a>
+    <span>© {year} {site.name}. {t.rights}</span>
+    <a href={legalHref}>{t.legal}</a>
   </div>
 </footer>
 

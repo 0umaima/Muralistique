@@ -5,6 +5,10 @@ Portfolio de l'atelier de fresques murales **Muralistique**, construit en
 JavaScript natif. Sortie **100 % statique** : aucun CMS, aucune base de
 données, ni React ni Tailwind ni bibliothèque d'animation.
 
+Le site existe en **français** (à la racine : `/`, `/realisations`, `/devis`…)
+et en **anglais** (sous `/en` : `/en/projects`, `/en/quote`…). Un sélecteur
+« FR | EN » dans l'en-tête passe d'une langue à l'autre (voir §2).
+
 ## Démarrage rapide
 
 **Prérequis :** [Node.js](https://nodejs.org) **20.3 ou plus récent** (22 LTS
@@ -44,8 +48,9 @@ confirmés ou remplacés.
 
 ## 2. Où se modifie quoi
 
-Tout le contenu éditable vit dans **`src/data/`**. Aucun texte n'est codé en
-dur dans les composants.
+Tout le contenu éditable vit dans **`src/data/`**, les textes de l'interface
+(boutons, titres de section, libellés) dans **`src/i18n/`**. Aucun texte n'est
+codé en dur dans les composants.
 
 ```
 src/data/
@@ -54,7 +59,63 @@ src/data/
   sectors.ts    Les secteurs (carrousel de l'accueil + filtres des Réalisations)
   content.ts    Chiffres clés, services, retours clients, page Studio, options du formulaire
   nav.ts        Liens du menu et du pied de page
+src/i18n/
+  fr.ts         Textes de l'interface en français
+  en.ts         Les mêmes, en anglais (mêmes clés)
+  routes.mjs    Correspondance des adresses françaises et anglaises
 ```
+
+### Version anglaise
+
+Chaque page existe dans les deux langues, avec des adresses traduites :
+
+| Français | Anglais |
+| --- | --- |
+| `/` | `/en` |
+| `/realisations` | `/en/projects` |
+| `/realisations/<slug>` | `/en/projects/<slug>` |
+| `/studio` | `/en/studio` |
+| `/devis` | `/en/quote` |
+| `/mentions-legales` | `/en/legal-notice` |
+
+**Le sélecteur « FR | EN »** est dans l'en-tête, sur ordinateur comme sur
+mobile (à côté du bouton menu). Il mène à **la même page** dans l'autre
+langue, en gardant le filtre (`?secteur=sante`) et l'ancre (`#contact`) en
+cours. C'est un simple lien : il fonctionne aussi sans JavaScript.
+
+**Où se traduit quoi :**
+
+- **Contenu** (`src/data/`) : chaque entrée garde son texte français et porte
+  un bloc `en` avec sa traduction. Exemple dans `src/data/projects.ts` :
+
+  ```ts
+  title: 'Robotique en mouvement',
+  excerpt: '…',
+  en: {
+    title: 'Robotics in Motion',
+    excerpt: '…',
+    gallery: [{ alt: '…', caption: 'Before' }, { alt: '…', caption: 'Panoramic mural' }],
+  },
+  ```
+
+  Un champ absent du bloc `en` **s'affiche en français** sur le site anglais :
+  une traduction oubliée n'efface rien. Les listes d'images (`gallery`) se
+  traduisent dans le même ordre que la liste française. **Quand vous modifiez
+  un texte français, pensez à mettre à jour son bloc `en`.**
+- **Interface** (`src/i18n/fr.ts` et `src/i18n/en.ts`) : même structure dans
+  les deux fichiers ; la construction échoue s'il manque une clé d'un côté.
+- **Messages du formulaire** (erreurs, confirmation, secours WhatsApp) : dans
+  `src/scripts/quote-form.ts` (objets `FR` et `EN`).
+- **Liens** : écrivez toujours l'adresse française dans `src/data/nav.ts` ;
+  elle est convertie seule pour la version anglaise.
+- **Retours clients** : les commentaires Instagram sont traduits (bloc `en`
+  de chaque commentaire) et la section indique qu'ils sont traduits du
+  français. Les passages soulignés (`highlight`) doivent figurer mot pour mot
+  dans le texte traduit.
+
+**Ajouter une page** : créez-la dans `src/views/` (le gabarit commun), puis
+une route dans `src/pages/` et une dans `src/pages/en/`, et ajoutez la paire
+d'adresses dans `src/i18n/routes.mjs`.
 
 ### Ajouter un projet
 
@@ -104,7 +165,8 @@ Les **fonds fixes** (photo immobile pendant que la section défile, effet
 `home/Stats.astro`, la prop `bg` de `ContactCta` et `pages/studio.astro`.
 
 **Textes alternatifs :** ils se modifient dans `src/data/`, à côté du chemin de
-chaque image. Ils sont obligatoires pour l'accessibilité et le référencement.
+chaque image (et en anglais dans le bloc `en` de l'entrée). Ils sont
+obligatoires pour l'accessibilité et le référencement.
 
 **Optimisation :** Astro s'en charge au build — tailles responsives, AVIF/WebP,
 dimensions explicites (pas de saut de mise en page) et chargement différé pour
@@ -145,6 +207,10 @@ node scripts/generate-placeholders.mjs
   second champ obligatoire).
 - **Aucun double envoi** : le bouton est verrouillé pendant la requête et après
   un succès.
+- **Version anglaise** (`/en/quote`) : même formulaire, mêmes champs, messages
+  en anglais. Elle envoie en plus un champ `language` = `English`, pour savoir
+  dans quelle langue répondre. Les choix « type d'espace » et « budget »
+  arrivent tels qu'affichés (en anglais).
 - Champ piège anti-spam `_gotcha`, invisible pour les visiteurs, et ignoré
   par les gestionnaires de mots de passe (attributs `data-lpignore`,
   `data-1p-ignore`, `data-bwignore`) : Basin **supprime sans prévenir** toute
@@ -228,7 +294,7 @@ et vérifiez :
 1. que la demande arrive bien dans le tableau de bord Basin **et** par e-mail ;
 2. qu'une demande avec **le téléphone seul** arrive aussi ;
 3. les libellés des champs (`name`, `phone`, `email`, `city`, `space_type`,
-   `budget`, `start_date`, `message`) ;
+   `budget`, `start_date`, `message`, et `language` depuis `/en/quote`) ;
 4. le comportement réel en cas de quota atteint, et ajustez au besoin les codes
    d'erreur dans `src/scripts/quote-form.ts` (fonction `describeFailure`).
 
@@ -266,9 +332,12 @@ src/
   components/        Composants réutilisables (.astro)
     home/            Sections de l'accueil
   layouts/           Gabarit de page (métadonnées, en-tête, pied de page)
-  pages/             Une page = un fichier
+  views/             Contenu de chaque page, commun aux deux langues
+  pages/             Les adresses : une route française, une route anglaise
     realisations/[slug].astro   Pages projet générées depuis les données
+    en/                         Version anglaise (mêmes gabarits, voir §2)
     robots.txt.ts               robots.txt généré (domaine configurable)
+  i18n/              Textes de l'interface et adresses des deux langues
   scripts/           JavaScript natif, chargé par page
   styles/global.css  Jetons de design : palette, échelle typographique, rythme
   data/              Contenu (voir §2)
@@ -318,6 +387,13 @@ l'en-tête (`scroll-margin-top`).
 
 Navigation mobile : panneau plein écran, `aria-expanded`, piège de focus,
 fermeture par Échap, focus rendu au bouton, défilement de page bloqué.
+
+Sélecteur de langue (`src/components/LangSwitch.astro`) : une pastille
+« FR | EN » à droite de la barre, toujours visible (y compris sur mobile, à
+côté du bouton menu). Le curseur plein, blanc sur l'en-tête noir et noir sur
+l'en-tête blanc, se place sous la langue active et glisse vers l'autre au
+clic. La langue de l'autre option est annoncée en toutes lettres aux lecteurs
+d'écran (« English », « Français »).
 
 ### Animations
 
@@ -402,7 +478,7 @@ pour changer des textes, remplacer des images ou ajuster le style.
 npm run build      # écrit le site dans dist/
 ```
 
-Astro génère 13 pages HTML statiques, convertit toutes les images en AVIF/WebP
+Astro génère 26 pages HTML statiques (13 en français, 13 en anglais), convertit toutes les images en AVIF/WebP
 aux différentes tailles, et produit `sitemap-index.xml`, `robots.txt` et la
 page `404`. Le dossier `dist/` fait environ 4 Mo avec les images d'exemple.
 
@@ -437,11 +513,12 @@ Puis, **avec `npm run preview` lancé dans un autre terminal** :
 ```bash
 npm run test:interactions   # filtres et grille, visionneuse, carrousel, accordéon,
                             # comparateur, navigation mobile, mouvement réduit,
-                            # sans JavaScript
+                            # sans JavaScript, version anglaise et sélecteur de langue
 npm run test:form           # formulaire : validation, états d'envoi, erreurs
                             # serveur, hors ligne, délai, secours WhatsApp,
                             # brouillon — réponses SIMULÉES
-npm run test:a11y           # 360/768/1024/1440 px, clavier, sémantique, métadonnées
+npm run test:a11y           # 360/768/1024/1440 px, clavier, sémantique, métadonnées,
+                            # pages françaises et anglaises
 ```
 
 Les trois suites passent. **Aucun envoi réel n'est effectué vers Basin.**
@@ -558,7 +635,10 @@ inclus dans l'offre gratuite.
 Le site fournit déjà ce que Google lit : titre et description par page,
 balise canonical, `sitemap-index.xml`, `robots.txt`, image de partage et
 données structurées (schema.org `Organization` + `WebSite` sur l'accueil :
-nom, logo, téléphone, e-mail, Instagram). Il reste à le **présenter** à Google :
+nom, logo, téléphone, e-mail, Instagram). Chaque page indique aussi sa
+version dans l'autre langue (balises `hreflang`, dans la page et dans le
+sitemap) : Google montre la version française ou anglaise selon la langue de
+la personne qui cherche. Il reste à le **présenter** à Google :
 
 1. **Une seule adresse officielle.** `site.url` (`src/data/site.mjs`) vaut
    `https://www.muralistique.com` : dans Cloudflare, `www.muralistique.com`
@@ -622,6 +702,8 @@ Le dossier `dist/` fonctionne tel quel sur Netlify (qui lit le même format
 
 ## 9. Ce qui est généré automatiquement
 
-`sitemap-index.xml`, `sitemap-0.xml`, `robots.txt`, la page `404`, les
-métadonnées Open Graph et Twitter Card de chaque page, et les variantes
+`sitemap-index.xml`, `sitemap-0.xml` (avec les versions française et anglaise
+de chaque page), `robots.txt`, les pages `404` (`404.html` et `en/404.html` :
+Cloudflare sert la plus proche de l'adresse demandée), les métadonnées Open
+Graph et Twitter Card de chaque page, les balises `hreflang`, et les variantes
 d'images (AVIF/WebP, plusieurs largeurs).
